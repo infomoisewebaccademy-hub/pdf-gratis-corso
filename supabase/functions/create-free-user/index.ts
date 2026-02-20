@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2.42.0'
+import { createClient } from 'npm:@supabase/supabase-js@2.87.1'
 
 declare const Deno: any;
 
@@ -43,16 +43,14 @@ Deno.serve(async (req: Request) => {
     }
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Controlla se l'utente esiste già (METODO CORRETTO)
-    let existingUser = null;
-    try {
-      const { data, error } = await supabaseAdmin.auth.admin.getUserByEmail(leadEmail);
-      if (error && !error.message.includes('User not found')) throw error;
-      if (data && data.user) existingUser = data.user;
-    } catch (error) {
-      // Se l'errore non è 'User not found', è un problema reale
-      if (!error.message.includes('User not found')) throw error;
-      // Altrimenti, l'utente non esiste, che è il caso che vogliamo gestire.
+    // 1. Controlla se l'utente esiste già (METODO RPC - IL PIÙ AFFIDABILE)
+    const { data: existingUser, error: rpcError } = await supabaseAdmin
+      .rpc('get_user_id_by_email', { email_text: leadEmail })
+      .single();
+
+    if (rpcError && rpcError.code !== 'PGRST116') {
+      // PGRST116 è l'errore per 'nessuna riga trovata', che per noi non è un errore.
+      throw rpcError;
     }
 
     let userId = existingUser?.id;
@@ -82,15 +80,31 @@ Deno.serve(async (req: Request) => {
         throw new Error("Impossibile ottenere l'ID utente.");
     }
 
-    // 2. Assegna il "corso" gratuito
-    const { error: purchaseError } = await supabaseAdmin
+    // 2. Controlla se il corso è già stato assegnato
+    const { data: existingPurchase, error: checkError } = await supabaseAdmin
         .from('purchases')
-        .upsert({ user_id: userId, course_id: FREE_GUIDE_COURSE_ID }, { onConflict: 'user_id,course_id' });
+        .select('user_id')
+        .eq('user_id', userId)
+        .eq('course_id', FREE_GUIDE_COURSE_ID)
+        .maybeSingle();
 
-    if (purchaseError) {
-        console.error("❌ Errore assegnazione corso gratuito:", purchaseError);
+    if (checkError) {
+        console.error("❌ Errore durante il controllo dell'acquisto esistente:", checkError);
+    }
+
+    // 3. Assegna il "corso" gratuito solo se non è già presente
+    if (!existingPurchase) {
+        const { error: purchaseError } = await supabaseAdmin
+            .from('purchases')
+            .insert({ user_id: userId, course_id: FREE_GUIDE_COURSE_ID });
+
+        if (purchaseError) {
+            console.error("❌ Errore assegnazione corso gratuito:", purchaseError);
+        } else {
+            console.log(`🎁 Corso gratuito assegnato a ${leadEmail}.`);
+        }
     } else {
-        console.log(`🎁 Corso gratuito assegnato a ${leadEmail}.`);
+        console.log(`ℹ️ Corso gratuito già posseduto da ${leadEmail}. Salto assegnazione.`);
     }
 
     // 3. Invia email con credenziali (solo se l'utente è nuovo)
