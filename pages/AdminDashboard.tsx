@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig } from '../types';
 // FIX: Added missing Loader2 import from lucide-react
-import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
@@ -207,6 +207,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [preLaunchConfig, setPreLaunchConfig] = useState<PreLaunchConfig>(currentSettings.pre_launch_config || DEFAULT_PRE_LAUNCH_CONFIG);
   const [pdfGuideConfig, setPdfGuideConfig] = useState<PdfGuideConfig>(currentSettings.pdf_guide_config || DEFAULT_PDF_GUIDE_CONFIG);
   
+  // Stati per l'upload del PDF
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const launchIframeRef = useRef<HTMLIFrameElement>(null);
@@ -242,6 +247,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
         alert("Impostazioni salvate con successo!"); 
     } catch (error: any) { alert("Errore: " + error.message); } 
     finally { setIsSavingSettings(false); }
+  };
+
+  const handlePdfUpload = async () => {
+    if (!pdfFile) { alert("Seleziona prima un file PDF."); return; }
+    setIsUploading(true);
+    try {
+      // 1. Rimuovi il vecchio file se esiste
+      if (pdfGuideConfig.guide_pdf_url) {
+        const oldFilePath = new URL(pdfGuideConfig.guide_pdf_url).pathname.split('/pdf-guides/')[1];
+        if (oldFilePath) {
+          await supabase.storage.from('pdf-guides').remove([decodeURIComponent(oldFilePath)]);
+        }
+      }
+
+      // 2. Carica il nuovo file con un nome unico
+      const fileName = `guida-mwa-${Date.now()}.pdf`;
+      const { data, error } = await supabase.storage
+        .from('pdf-guides')
+        .upload(fileName, pdfFile, {
+          cacheControl: '3600',
+          upsert: false // è più sicuro non fare upsert per evitare sovrascritture accidentali
+        });
+      
+      if (error) throw error;
+
+      // 3. Ottieni l'URL pubblico e salvalo nello stato
+      const { data: { publicUrl } } = supabase.storage.from('pdf-guides').getPublicUrl(data.path);
+      
+      setPdfGuideConfig(prev => ({ ...prev, guide_pdf_url: publicUrl }));
+      setPdfFile(null);
+      if(fileInputRef.current) fileInputRef.current.value = "";
+      alert("PDF caricato con successo! Ricorda di salvare le impostazioni.");
+
+    } catch (err: any) {
+      console.error("Errore upload PDF:", err);
+      alert("Errore upload PDF: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleReviewUpdate = (idx: number, field: string, value: string) => {
@@ -326,11 +370,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       icon: React.ElementType,
       config: PreLaunchConfig | PdfGuideConfig,
       handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
-      handleColorChange: (name: string, value: string) => void
+      handleColorChange: (name: string, value: string) => void,
+      isPdfPage: boolean = false
   ) => (
       <div className="space-y-6">
           <h3 className="text-xl font-bold mb-6 flex items-center">{React.createElement(icon, { className: "mr-2 text-red-600" })} {title}</h3>
           
+          {/* SEZIONE UPLOAD PDF (solo per pagina guida) */}
+          {isPdfPage && (
+              <div className="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-200">
+                  <h4 className="font-bold text-purple-800 mb-2 flex items-center"><File className="h-5 w-5 mr-2"/> Gestione Guida PDF</h4>
+                  <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro corso gratuito.</p>
+                  
+                  {pdfGuideConfig.guide_pdf_url ? (
+                      <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
+                          <p className="text-xs text-purple-500 font-bold">PDF Attualmente Caricato:</p>
+                          <div className="flex items-center gap-2">
+                              <a href={pdfGuideConfig.guide_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{pdfGuideConfig.guide_pdf_url}</a>
+                              <button onClick={() => navigator.clipboard.writeText(pdfGuideConfig.guide_pdf_url || '')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
+                          </div>
+                      </div>
+                  ) : (
+                       <div className="text-center text-xs py-2 bg-yellow-100 text-yellow-800 rounded border border-yellow-200 mb-4">Nessun PDF caricato.</div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                      <input 
+                          ref={fileInputRef}
+                          type="file" 
+                          accept="application/pdf"
+                          onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                      />
+                      <button onClick={handlePdfUpload} disabled={isUploading || !pdfFile} className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                          {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <UploadCloud className="h-4 w-4"/>}
+                          {pdfGuideConfig.guide_pdf_url ? 'Sostituisci' : 'Carica'}
+                      </button>
+                  </div>
+              </div>
+          )}
+
           <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
               <summary className="font-bold cursor-pointer flex items-center gap-2"><Palette/> Stile & Colori</summary>
               <div className="mt-4 space-y-3">
@@ -471,8 +550,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                     <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-h-[85vh] overflow-y-auto scrollbar-thin">
                         <div className="space-y-6">
-                            <h3 className="text-xl font-bold mb-6 flex items-center"><Rocket className="mr-2 text-red-600"/> Editor Pagina Pre-Lancio</h3>
-                             <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                            <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-2">Data del Lancio (Countdown)</label>
@@ -501,7 +579,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
              {activeTab === 'pdf_guide' && (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                     <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-h-[85vh] overflow-y-auto scrollbar-thin">
-                        {renderCapturePageEditor("Editor Guida PDF", Download, pdfGuideConfig, handlePdfGuideChange, handlePdfGuideColorChange)}
+                        {renderCapturePageEditor("Editor Guida PDF", Download, pdfGuideConfig, handlePdfGuideChange, handlePdfGuideColorChange, true)}
                     </div>
                     <div className="relative">
                         <div className="sticky top-20">

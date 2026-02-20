@@ -22,6 +22,8 @@ export interface Course {
   videoUrl?: string; 
   lessons_content?: Lesson[]; 
   status?: 'active' | 'full' | 'coming_soon'; 
+  resource_file_url?: string; // NUOVO: URL del file allegato
+  resource_file_name?: string; // NUOVO: Nome del file allegato
 }
 
 export interface UserProfile {
@@ -86,6 +88,7 @@ export interface PreLaunchConfig {
 // NUOVA: Interfaccia per la pagina Guida PDF
 export interface PdfGuideConfig extends PreLaunchConfig {
   // Eredita tutti i campi di PreLaunchConfig e può essere estesa se necessario
+  guide_pdf_url?: string; // URL del PDF caricato su Supabase Storage
 }
 
 // Added LandingPageConfig interface to fix import errors in Home.tsx, AdminDashboard.tsx, Login.tsx, and Footer.tsx

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Course, Lesson, UserProfile } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2 } from 'lucide-react';
+import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -13,13 +13,18 @@ interface CourseDetailProps {
   isPurchased: boolean;
   onBack: () => void;
   user: UserProfile | null;
+  settings: PlatformSettings; // Aggiunta per accedere all'URL del PDF
 }
 
-export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user }) => {
+export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
+
+  // Special check for the PDF guide course
+  const isPdfGuideCourse = course.id === 'course_pdf_guide_free';
+  const pdfUrl = settings.pdf_guide_config?.guide_pdf_url;
 
   // Carica progresso lezioni se acquistato
   useEffect(() => {
@@ -66,7 +71,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     if (course.lessons_content && course.lessons_content.length > 0) {
         setActiveLesson(course.lessons_content[0]);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
+    } else if (!isPdfGuideCourse) { // Mostra avviso solo se non è il corso guida (che può essere vuoto)
         alert("Questo corso non ha ancora lezioni caricate dall'insegnante.");
     }
   };
@@ -133,6 +138,39 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         <p className="text-xl text-gray-600 leading-relaxed whitespace-pre-wrap">{course.description}</p>
                     </div>
                 )}
+                
+                {/* BLOCCO DOWNLOAD GUIDA (Speciale) */}
+                {isPdfGuideCourse && isPurchased && pdfUrl && (
+                    <div className="bg-brand-50 p-6 rounded-2xl border-2 border-dashed border-brand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-brand-900 mb-1">La tua Guida è Pronta!</h2>
+                            <p className="text-brand-700 text-sm">Clicca qui per scaricare il PDF e iniziare a creare.</p>
+                        </div>
+                        <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
+                            <Download className="h-5 w-5"/> Scarica PDF
+                        </a>
+                    </div>
+                )}
+                
+                {/* BLOCCO DOWNLOAD MATERIALE CORSO (Generico) */}
+                {isPurchased && course.resource_file_url && (
+                    <div className="bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-blue-900 mb-1 flex items-center gap-2"><FileText/> Materiale Didattico</h2>
+                            <p className="text-blue-700 text-sm">Scarica il file allegato a questo corso.</p>
+                        </div>
+                        <a 
+                            href={course.resource_file_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            download={course.resource_file_name || 'materiale_corso'}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2"
+                        >
+                            <Download className="h-5 w-5"/> {course.resource_file_name ? `Scarica ${course.resource_file_name}` : 'Scarica File'}
+                        </a>
+                    </div>
+                )}
+
 
                 {isPurchased && activeLesson && (
                     <div className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -179,7 +217,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     <h2 className="text-2xl font-bold mb-6">Programma del Corso</h2>
                     <div className="space-y-4">
                         {(!course.lessons_content || course.lessons_content.length === 0) ? (
-                            <div className="text-center text-gray-400 py-4">Lezioni in arrivo...</div>
+                            <div className="text-center text-gray-400 py-4">{isPdfGuideCourse ? "Usa il pulsante in alto per scaricare la guida PDF." : "Lezioni in arrivo..."}</div>
                         ) : (
                             course.lessons_content.map((lesson, idx) => {
                                 const isCompleted = completedLessons.includes(lesson.id);

@@ -2,67 +2,28 @@
 import { createClient } from '@supabase/supabase-js';
 
 // ============================================================================================
-// 🛑 AREA MODIFICHE - INCOLLA QUI I TUOI DATI 🛑
-//
-// Se non riesci a usare il file .env, modifica direttamente queste due righe qui sotto.
-// Sostituisci il testo tra virgolette con i tuoi dati presi da Supabase Dashboard > Settings > API.
+// CONFIGURAZIONE AUTOMATICA DA VARIABILI D'AMBIENTE (.env)
+// Il sistema ora legge automaticamente le chiavi dal file .env
 // ============================================================================================
 
-const MY_SUPABASE_URL = "https://zplcjlyqmcayprettmqd.supabase.co"; // Es: "https://abcdefg.supabase.co"
-const MY_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbGNqbHlxbWNheXByZXR0bXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NzA0MzgsImV4cCI6MjA4MDI0NjQzOH0.OfK1kbwc-3OBrvIIVFnnTeNCgSinVGAJiIy8jfvxjSA"; // Es: "eyJhbGciOiJIUzI1NiIsIn..."
+const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://zplcjlyqmcayprettmqd.supabase.co';
+const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbGNqbHlxbWNheXByZXR0bXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NzA0MzgsImV4cCI6MjA4MDI0NjQzOH0.OfK1kbwc-3OBrvIIVFnnTeNCgSinVGAJiIy8jfvxjSA';
+
 
 // ============================================================================================
 // NON TOCCARE NULLA SOTTO QUESTA LINEA
 // ============================================================================================
 
-const getUrl = () => {
-    let url = '';
-    // 1. Usa il valore incollato manualmente se presente e valido
-    if (MY_SUPABASE_URL && !MY_SUPABASE_URL.includes("INCOLLA_QUI")) {
-        url = MY_SUPABASE_URL;
-    }
-    // 2. Altrimenti prova a leggere dal sistema (per quando pubblichi su Vercel/Netlify)
-    else if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
-        url = (import.meta as any).env.VITE_SUPABASE_URL || '';
-    }
-    
-    // Sanificazione URL: Rimuove spazi e slash finale se presente
-    if (url) {
-        url = url.trim().replace(/\/$/, "");
-    }
-    return url;
-};
-
-const getKey = () => {
-    let key = '';
-    // 1. Usa il valore incollato manualmente se presente e valido
-    if (MY_SUPABASE_KEY && !MY_SUPABASE_KEY.includes("INCOLLA_QUI")) {
-        key = MY_SUPABASE_KEY;
-    }
-    // 2. Altrimenti prova a leggere dal sistema
-    else if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
-        key = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || '';
-    }
-    
-    if (key) {
-        key = key.trim();
-    }
-    return key;
-};
-
-const finalUrl = getUrl();
-const finalKey = getKey();
-
 // Controllo errori
-if (!finalUrl || finalUrl.includes("placeholder") || !finalKey) {
-  console.error("🚨 ERRORE CRITICO: Supabase non è configurato.");
-  console.error("Vai nel file 'services/supabase.ts' e incolla URL e KEY nelle prime righe.");
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("🚨 ERRORE CRITICO: Variabili Supabase non trovate.");
+  console.error("Assicurati di aver creato un file '.env' con VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
 }
 
 // Inizializza il client
 export const supabase = createClient(
-    finalUrl || 'https://placeholder.supabase.co', 
-    finalKey || 'placeholder'
+    supabaseUrl || 'https://placeholder.supabase.co', 
+    supabaseAnonKey || 'placeholder'
 );
 
 /**
@@ -72,12 +33,12 @@ export const supabase = createClient(
  */
 export const createCheckoutSession = async (courseIds: string[], userId?: string, email?: string) => {
     try {
-        if (!finalUrl || finalUrl.includes('placeholder')) {
-            throw new Error("URL Supabase non configurato correttamente. Controlla services/supabase.ts");
+        if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+            throw new Error("URL Supabase non configurato correttamente. Controlla il tuo file .env");
         }
 
         // Costruiamo manualmente l'URL della funzione
-        const functionUrl = `${finalUrl}/functions/v1/create-checkout`;
+        const functionUrl = `${supabaseUrl}/functions/v1/create-checkout`;
         console.log(`🚀 Avvio pagamento per ${courseIds.length} corsi. Chiamata a: ${functionUrl}`);
         
         // FIX: Usiamo undefined invece di null. 
