@@ -14,6 +14,7 @@ import { UpdatePassword } from './pages/UpdatePassword';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { ComingSoon } from './pages/ComingSoon'; 
 import { PdfGuideLanding } from './pages/PdfGuideLanding'; // NUOVO
+import { ThankYouPdf } from './pages/ThankYouPdf';
 import { UserProfile, Course, PlatformSettings } from './types';
 import { supabase, createCheckoutSession } from './services/supabase';
 import { CartProvider } from './contexts/CartContext';
@@ -84,7 +85,7 @@ const AppContent: React.FC = () => {
 
   // NUOVA LOGICA: Determina se l'utente deve essere reindirizzato
   const activeMode = settings.active_mode || 'public';
-  const shouldRedirect = (activeMode === 'pre_launch' || activeMode === 'pdf_guide') && !user?.is_admin;
+  const shouldRedirect = activeMode === 'pre_launch' && !user?.is_admin;
   const redirectPath = activeMode === 'pre_launch' ? '/coming-soon' : '/get-guide';
   
   const hideNavbar = ['/update-password', '/payment-success', '/coming-soon', '/get-guide'].includes(location.pathname) || shouldRedirect;
@@ -284,6 +285,7 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/coming-soon" element={<ComingSoon launchDate={settings.pre_launch_date} config={settings.pre_launch_config} />} />
         <Route path="/get-guide" element={<PdfGuideLanding config={settings.pdf_guide_config} />} />
+        <Route path="/thank-you-pdf-gratuita" element={<ThankYouPdf />} />
         
         <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config} />} />
         <Route path="/courses" element={<CoursesPage courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} />} />

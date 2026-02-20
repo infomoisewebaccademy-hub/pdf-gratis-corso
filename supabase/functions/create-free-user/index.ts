@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    const lead = body.record;
+    const lead = body.record || body; // Accetta dati sia da trigger che da chiamata diretta
     
     if (!lead || !lead.email) {
       throw new Error("Dati del lead mancanti o non validi.");

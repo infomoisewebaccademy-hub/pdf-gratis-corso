@@ -73,16 +73,27 @@ export const PdfGuideLanding: React.FC<PdfGuideLandingProps> = ({ config: initia
         if (isPreview || !fullName.trim() || !email.trim()) return;
         setIsSubmitting(true);
         try {
-            const { error } = await supabase.from('waiting_list').insert([{ email, full_name: fullName, source: 'pdf_guide' }]);
-            if (error) {
-                if (error.code === '23505') { // Codice per violazione 'unique'
-                     alert("Questa email è già registrata! Controlla la tua casella di posta per le credenziali.");
-                     setIsSuccess(true);
-                } else throw error;
-            } else {
-                setIsSuccess(true);
+            const { data, error } = await supabase.functions.invoke('create-free-user', {
+                body: { 
+                    email: email,
+                    full_name: fullName,
+                    course_id: 'course_pdf_guide_free' // ID del corso gratuito
+                }
+            });
+
+            if (error) throw error;
+
+            if (data.userExists) {
+                alert("Questa email è già registrata! Controlla la tua casella di posta per le credenziali.");
             }
-        } catch (error: any) { alert("Si è verificato un errore: " + error.message); } 
+
+            setIsSuccess(true);
+            navigate('/thank-you-pdf-gratuita');
+
+        } catch (error: any) {
+            console.error("Errore durante la creazione dell'utente gratuito:", error);
+            alert("Si è verificato un errore: " + error.message);
+        } 
         finally { setIsSubmitting(false); }
     };
 
