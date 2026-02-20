@@ -201,6 +201,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isClearingChat, setIsClearingChat] = useState(false);
+  const [assigningCourse, setAssigningCourse] = useState<string | null>(null);
   
   const [localSettings, setLocalSettings] = useState<PlatformSettings>(currentSettings);
   const [landingConfig, setLandingConfig] = useState<LandingPageConfig>(() => ({ ...DEFAULT_LANDING_CONFIG, ...currentSettings.landing_page_config }));
@@ -214,6 +215,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const handleAssignPreview = async (courseId: string) => {
+    if (assigningCourse) return;
+    setAssigningCourse(courseId);
+    try {
+      const { error } = await supabase
+        .from('purchases')
+        .insert({ user_id: user.id, course_id: courseId });
+
+      if (error && error.code !== '23505') { // 23505 è il codice per violazione di unicità (già posseduto)
+        throw error;
+      }
+
+      await onRefresh(); // Aggiorna i dati dell'utente per riflettere il nuovo acquisto
+      alert(`Corso assegnato! Ora puoi vederlo nella tua dashboard.`);
+      navigate('/dashboard');
+
+    } catch (err: any) {
+      console.error("Errore assegnazione corso:", err);
+      alert("Errore durante l'assegnazione del corso: " + err.message);
+    } finally {
+      setAssigningCourse(null);
+    }
+  };
   const launchIframeRef = useRef<HTMLIFrameElement>(null);
   const pdfGuideIframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -530,7 +555,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                             <div className="p-6 flex-1 flex flex-col">
                                 <h3 className="font-bold text-lg mb-4 line-clamp-1">{course.title}</h3>
                                 <div className="mt-auto flex gap-2">
-                                    <button onClick={() => navigate(`/admin/course/${course.id}`)} className="flex-1 bg-brand-50 text-brand-700 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center justify-center"><Edit2 className="h-4 w-4 mr-2"/> Edit</button>
+                                    <button onClick={() => navigate(`/admin/course/${course.id}`)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg font-bold hover:bg-gray-200 flex items-center justify-center text-sm"><Edit2 className="h-4 w-4 mr-2"/> Modifica</button>
+                                    <button 
+                                        onClick={() => handleAssignPreview(course.id)} 
+                                        disabled={!!assigningCourse} 
+                                        className="flex-1 bg-brand-50 text-brand-700 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center justify-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {assigningCourse === course.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Eye className="h-4 w-4 mr-2"/>}
+                                        Anteprima
+                                    </button>
                                     <button onClick={() => onDelete(course.id)} className="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100"><Trash2 className="h-5 w-5"/></button>
                                 </div>
                             </div>
