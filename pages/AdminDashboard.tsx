@@ -381,6 +381,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
               <div className="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-200">
                   <h4 className="font-bold text-purple-800 mb-2 flex items-center"><File className="h-5 w-5 mr-2"/> Gestione Guida PDF</h4>
                   <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro corso gratuito.</p>
+
+                  <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
+                      <p className="text-xs text-purple-500 font-bold">URL Landing Page Condivisibile:</p>
+                      <div className="flex items-center gap-2">
+                          <a href={"/guida-pdf-gratuita"} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{window.location.origin + '/guida-pdf-gratuita'}</a>
+                          <button onClick={() => navigator.clipboard.writeText(window.location.origin + '/guida-pdf-gratuita')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
+                      </div>
+                  </div>
                   
                   {pdfGuideConfig.guide_pdf_url ? (
                       <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">

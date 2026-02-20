@@ -139,7 +139,7 @@ async function sendCredentialsEmail(apiKey: string, toEmail: string, password: s
                             <p style="margin: 5px 0; font-size: 18px;"><strong>Password:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd;">${password}</code></p>
                         </div>
                         <p>Accedi subito per scaricare la guida e iniziare a creare:</p>
-                        <a href="${SITE_URL}/#/login" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Accedi e Scarica la Guida</a>
+                        <a href="${SITE_URL}/login" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Accedi e Scarica la Guida</a>
                         <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;" />
                         <p style="font-size: 12px; color: #888;">Ti consigliamo di cambiare la password dopo il primo accesso.</p>
                     </div>

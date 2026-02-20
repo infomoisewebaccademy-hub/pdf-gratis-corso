@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
 import { CoursesPage } from './pages/CoursesPage';
@@ -284,7 +284,7 @@ const AppContent: React.FC = () => {
       )}
       <Routes>
         <Route path="/coming-soon" element={<ComingSoon launchDate={settings.pre_launch_date} config={settings.pre_launch_config} />} />
-        <Route path="/get-guide" element={<PdfGuideLanding config={settings.pdf_guide_config} />} />
+        <Route path="/guida-pdf-gratuita" element={<PdfGuideLanding config={settings.pdf_guide_config} />} />
         <Route path="/thank-you-pdf-gratuita" element={<ThankYouPdf />} />
         
         <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config} />} />
