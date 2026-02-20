@@ -1,56 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, CheckCircle, User, Zap, Lock } from 'lucide-react';
 import { supabase } from '../services/supabase';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PdfGuideConfig } from '../types';
+import { Loader, CheckCircle, AlertCircle, User, Mail, ArrowRight, Sparkles, ShieldCheck, DollarSign } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface PdfGuideLandingProps {
-    config?: PdfGuideConfig;
+    config: PdfGuideConfig;
 }
 
-// Helper per convertire HEX in RGBA per le trasparenze
-const hexToRgba = (hex: string, alpha: number): string => {
-    if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return `rgba(255,255,255,${alpha})`;
-    let c = hex.substring(1).split('');
-    if (c.length === 3) { c = [c[0], c[0], c[1], c[1], c[2], c[2]]; }
-    const num = parseInt(c.join(''), 16);
-    return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-};
-
-// Configurazione di Default robusta
-const DEFAULT_CONFIG: PdfGuideConfig = {
-    headline_solid: "CREA SITI CON L'AI",
-    headline_gradient: "La Guida Gratuita",
-    subheadline: "Sblocca il potenziale dell'Intelligenza Artificiale e impara a creare siti web professionali, senza scrivere codice.",
-    description: "Ricevi subito via email la nostra guida PDF passo-passo e accedi alla nostra piattaforma per un video-tutorial esclusivo. Inizia oggi a trasformare le tue idee in realtà.",
-    offer_badge: "100% Gratuito",
-    offer_title: "Ottieni la Guida e l'Accesso Immediato",
-    offer_text: "Inserisci i tuoi dati qui sotto. Riceverai la guida via email e le credenziali per accedere subito alla tua area riservata.",
-    cta_text: "SÌ, INVIATEMI LA GUIDA!",
-    success_title: "Accesso Inviato!",
-    success_text: "Perfetto! Controlla la tua casella di posta (anche SPAM) per trovare la guida e le tue credenziali di accesso. Ci vediamo dentro!",
-    title_color: "#ffffff", gradient_start: "#60a5fa", gradient_end: "#c084fc", button_color: "#2563eb",
-    admin_login_badge_text: "Area Riservata", spots_remaining_text: "", spots_soldout_text: "", spots_taken_text: "",
-    soldout_cta_text: "", available_cta_text: "", admin_login_text: "Area Riservata Staff",
-    form_disclaimer_text: "Inserisci i dati per ricevere la guida e creare il tuo accesso gratuito alla nostra piattaforma.",
-    form_name_placeholder: "Il tuo nome", form_email_placeholder: "La tua email migliore",
-    submitting_button_text: "Invio in corso...", success_priority_title: "Accesso Inviato!",
-    success_priority_subtitle: "Controlla la tua email per la guida e le credenziali.", success_standard_title: "", success_standard_subtitle: "",
-    bg_color_main: '#020617', text_color_body: '#94a3b8', accent_color: '#facc15', error_color: '#ef4444', success_color: '#22c55e',
-    container_bg_color: '#1e293b', container_border_color: '#334155', input_bg_color: '#020617'
-};
+const BenefitCard: React.FC<{ icon: React.ElementType, title: string, children: React.ReactNode }> = ({ icon: Icon, title, children }) => (
+    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center transform hover:-translate-y-2 transition-transform duration-300">
+        <Icon className="h-10 w-10 mx-auto mb-4 text-purple-400" />
+        <h3 className="font-bold text-lg text-white mb-2">{title}</h3>
+        <p className="text-slate-400 text-sm">{children}</p>
+    </div>
+);
 
 export const PdfGuideLanding: React.FC<PdfGuideLandingProps> = ({ config: initialConfig }) => {
+    const [config, setConfig] = useState(initialConfig);
+    const [email, setEmail] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const isPreview = searchParams.get('preview') === 'true';
-    const [liveConfig, setLiveConfig] = useState(initialConfig);
+    const isPreview = new URLSearchParams(location.search).get('preview') === 'true';
 
     useEffect(() => {
         if (isPreview) {
             const handleMessage = (event: MessageEvent) => {
-                if (event.data && typeof event.data === 'object' && 'headline_solid' in event.data) {
-                    setLiveConfig(event.data);
+                if (typeof event.data === 'object' && event.data !== null && Object.keys(event.data).length > 0) {
+                    setConfig(prevConfig => ({ ...prevConfig, ...event.data }));
                 }
             };
             window.addEventListener('message', handleMessage);
@@ -58,106 +38,126 @@ export const PdfGuideLanding: React.FC<PdfGuideLandingProps> = ({ config: initia
         }
     }, [isPreview]);
 
-    const config = isPreview ? liveConfig : initialConfig;
-    const text = { ...DEFAULT_CONFIG, ...config };
-    const displaySolid = text.headline_solid || DEFAULT_CONFIG.headline_solid;
-    const displayGradient = text.headline_gradient || DEFAULT_CONFIG.headline_gradient;
-
-    const [email, setEmail] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isPreview || !fullName.trim() || !email.trim()) return;
-        setIsSubmitting(true);
+        if (!email || !fullName) {
+            setError("Per favore, compila tutti i campi.");
+            return;
+        }
+        setIsLoading(true);
+        setError(null);
+
         try {
-            const { data, error } = await supabase.functions.invoke('create-free-user', {
-                body: { 
-                    email: email,
-                    full_name: fullName,
-                    course_id: 'course_pdf_guide_free' // ID del corso gratuito
-                }
+            const { data, error: functionError } = await supabase.functions.invoke('create-free-user', {
+                body: { email, full_name: fullName },
             });
 
-            if (error) throw error;
-
+            if (functionError) throw functionError;
             if (data.userExists) {
                 alert("Questa email è già registrata! Controlla la tua casella di posta per le credenziali.");
             }
-
-            setIsSuccess(true);
             navigate('/thank-you-pdf-gratuita');
-
         } catch (error: any) {
-            console.error("Errore durante la creazione dell'utente gratuito:", error);
-            alert("Si è verificato un errore: " + error.message);
-        } 
-        finally { setIsSubmitting(false); }
+            setError(error.message || "Si è verificato un errore. Riprova più tardi.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
+    const renderForm = (isSticky = false) => (
+        <div className={`bg-slate-900 p-8 rounded-xl border border-slate-700 shadow-2xl shadow-black/50 ${isSticky ? 'sticky top-8' : ''}`}>
+            <h3 className="text-2xl font-bold text-white text-center mb-2">{config.offer_title}</h3>
+            <p className="text-slate-400 text-center mb-6">{config.offer_text}</p>
+            <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                    <input type="text" placeholder={config.form_name_placeholder} value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-slate-800 border-2 border-slate-700 rounded-lg py-3 pr-4 pl-12 text-white focus:ring-purple-500 focus:border-purple-500 transition" />
+                </div>
+                <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                    <input type="email" placeholder={config.form_email_placeholder} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-slate-800 border-2 border-slate-700 rounded-lg py-3 pr-4 pl-12 text-white focus:ring-purple-500 focus:border-purple-500 transition" />
+                </div>
+                <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-900/50">
+                    {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>{config.cta_text} <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
+                </button>
+            </form>
+            {error && <p className="text-red-400 text-sm mt-4 text-center flex items-center justify-center"><AlertCircle className="h-4 w-4 mr-2"/> {error}</p>}
+            <p className="text-xs text-slate-600 mt-4 text-center">{config.form_disclaimer_text}</p>
+        </div>
+    );
+
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center text-white relative overflow-hidden font-sans p-4" style={{ backgroundColor: text.bg_color_main }}>
-            
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full blur-[120px] pointer-events-none opacity-20" style={{ backgroundColor: text.gradient_start }}></div>
-            <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none opacity-10" style={{ backgroundColor: text.gradient_end }}></div>
-
-            <main className="relative z-10 max-w-4xl w-full text-center">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight leading-tight uppercase">
-                    <span style={{ color: text.title_color }}>{displaySolid}</span><br/>
-                    <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, ${text.gradient_start}, ${text.gradient_end})` }}>{displayGradient}</span>
+        <div style={{ backgroundColor: config.bg_color_main, color: config.text_color_body }} className="min-h-screen font-sans text-slate-300">
+            <div className="text-center pt-20 pb-16 px-4 bg-slate-900/70">
+                <span className="inline-block bg-purple-500/20 text-purple-300 text-sm font-bold px-4 py-1 rounded-full mb-4 border border-purple-500/30">{config.offer_badge}</span>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-white">
+                    {config.headline_solid} <span style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }} className="text-transparent bg-clip-text">{config.headline_gradient}</span>
                 </h1>
+                <p className="max-w-3xl mx-auto mt-6 text-lg sm:text-xl text-slate-400">{config.subheadline}</p>
+                <a href="#form-section" className="mt-8 inline-block text-lg font-bold py-4 px-10 rounded-lg transition-all duration-300 ease-in-out group bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-900/50">
+                    Scarica la Guida Ora <ArrowRight className="inline-block h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+                </a>
+            </div>
 
-                <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: text.text_color_body }}>
-                    {text.description} <br/>
-                    <span className="text-white font-medium">{text.subheadline}</span>
-                </p>
+            <div id="form-section" className="max-w-7xl mx-auto p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                <div className="lg:col-span-2 space-y-12">
+                    <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-8">
+                        <h2 className="text-3xl font-bold text-white mb-4">La Creazione Web è <span className="text-red-400">Complicata e Costosa</span>. O forse no?</h2>
+                        <p className="mb-4">Fino a ieri, per avere un sito professionale dovevi scegliere: spendere 5.000€ per un'agenzia, passare mesi a imparare a programmare, o accontentarti di un template mediocre. Tempi lunghi, costi alti e zero controllo.</p>
+                        <p className="font-bold text-purple-300">Oggi, l'Intelligenza Artificiale ha cambiato le regole del gioco.</p>
+                    </div>
 
-                <div className="p-6 md:p-8 rounded-3xl border shadow-2xl max-w-xl mx-auto relative overflow-hidden text-left" style={{ background: text.container_bg_color, borderColor: text.container_border_color }}>
-                    <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl opacity-30" style={{backgroundColor: text.accent_color}}></div>
-                    
-                    {!isSuccess ? (
-                        <>
-                            <div className="flex items-center gap-2 font-bold text-sm uppercase tracking-widest mb-2" style={{color: text.accent_color}}>
-                                <Zap className="h-4 w-4 fill-current" /> {text.offer_badge}
+                    {(config.showcase_items || []).length > 0 && (
+                        <div>
+                            <h2 className="text-3xl font-bold text-white mb-6 text-center">Cosa Creerai con Queste Competenze</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {config.showcase_items?.map((item, idx) => (
+                                    <a href={item.url} target="_blank" rel="noopener noreferrer" key={idx} className="block bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden group">
+                                        <img src={item.image_url} alt={item.title} className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"/>
+                                        <div className="p-4">
+                                            <h4 className="font-bold text-white group-hover:text-purple-400 transition-colors">{item.title}</h4>
+                                        </div>
+                                    </a>
+                                ))}
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">{text.offer_title}</h3>
-                            <p className="mb-6 text-sm" style={{color: text.text_color_body}}>{text.offer_text}</p>
-
-                            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                                <div className="relative">
-                                    <User className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{color: text.text_color_body}} />
-                                    <input type="text" required placeholder={text.form_name_placeholder} value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full border rounded-xl py-4 pl-10 pr-4 placeholder-opacity-50 focus:ring-1 outline-none transition-all" style={{backgroundColor: text.input_bg_color, borderColor: text.container_border_color, color: text.title_color, '::placeholder': {color: text.text_color_body}}} />
-                                </div>
-                                <div className="relative">
-                                    <Mail className="h-5 w-5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{color: text.text_color_body}} />
-                                    <input type="email" required placeholder={text.form_email_placeholder} value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-xl py-4 pl-10 pr-4 placeholder-opacity-50 focus:ring-1 outline-none transition-all" style={{backgroundColor: text.input_bg_color, borderColor: text.container_border_color, color: text.title_color, '::placeholder': {color: text.text_color_body}}} />
-                                </div>
-                                <button type="submit" disabled={isSubmitting} style={{ backgroundColor: text.button_color }} className="w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:brightness-110 disabled:opacity-70 flex items-center justify-center uppercase tracking-wide mt-2">
-                                    {isSubmitting ? text.submitting_button_text : text.cta_text}
-                                </button>
-                            </form>
-                            <p className="text-xs mt-4 text-center" style={{color: text.text_color_body}}>{text.form_disclaimer_text}</p>
-                        </>
-                    ) : (
-                        <div className="py-8 text-center animate-in zoom-in duration-300">
-                            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: hexToRgba(text.success_color, 0.2)}}>
-                                <CheckCircle className="h-10 w-10" style={{color: text.success_color}} />
-                            </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">{text.success_title}</h3>
-                            <p className="max-w-sm mx-auto" style={{color: text.text_color_body}}>{text.success_text}</p>
                         </div>
                     )}
-                </div>
-            </main>
 
-            <footer className="absolute bottom-4 w-full flex justify-between items-center px-4">
-                 <div className="text-[10px] opacity-30" style={{color: text.text_color_body}}>&copy; {new Date().getFullYear()} Moise Web Academy</div>
-                 <button onClick={() => navigate('/login')} className="flex items-center gap-2 p-2 text-xs font-bold uppercase tracking-widest opacity-10 hover:opacity-100 transition-all" title="Area Staff" style={{color: text.text_color_body}}>
-                    <Lock className="h-3 w-3" /> {text.admin_login_text}
-                 </button>
-            </footer>
+                    <div>
+                        <h2 className="text-3xl font-bold text-white mb-6 text-center">Cosa Sbloccherai con la Guida</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            <BenefitCard icon={Sparkles} title="Struttura AI-Driven">Impara a generare layout professionali e testi persuasivi in pochi minuti.</BenefitCard>
+                            <BenefitCard icon={ShieldCheck} title="Sicurezza e Hosting">Metti online il tuo sito in modo sicuro su infrastrutture a costo zero.</BenefitCard>
+                            <BenefitCard icon={DollarSign} title="Monetizzazione">Scopri come trasformare questa competenza in un servizio da vendere a 1.000€+.</BenefitCard>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="lg:col-span-1">
+                    {renderForm(true)}
+                </div>
+            </div>
+
+            {config.stats_section?.is_visible && (config.stats_section?.stats || []).length > 0 && (
+                <section className="max-w-7xl mx-auto p-4 sm:p-8 mt-16">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white">{config.stats_section.title}</h2>
+                        <p className="max-w-2xl mx-auto mt-4 text-lg text-slate-400">{config.stats_section.subtitle}</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {config.stats_section.stats.map((stat, idx) => (
+                            <div key={idx} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 text-center">
+                                <div className="text-5xl font-black text-transparent bg-clip-text mb-2" style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }}>
+                                    {stat.value}
+                                </div>
+                                <h4 className="text-xl font-bold text-white mb-2">{stat.label}</h4>
+                                <p className="text-slate-400">{stat.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
         </div>
     );
 };

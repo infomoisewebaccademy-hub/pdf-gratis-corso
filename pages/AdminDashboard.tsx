@@ -174,6 +174,23 @@ const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
     success_title: "Accesso Inviato!",
     success_text: "Perfetto! Controlla la tua casella di posta (anche SPAM) per trovare la guida e le tue credenziali di accesso. Ci vediamo dentro!",
     form_disclaimer_text: "Inserisci i dati per ricevere la guida e creare il tuo accesso gratuito alla nostra piattaforma.",
+    showcase_section: {
+      is_visible: true,
+      title: 'Cosa Puoi Creare Davvero',
+      subtitle: 'Questi non sono template. Sono progetti reali, creati in poche ore con le tecniche che scoprirai nella guida.',
+      items: []
+    },
+    showcase_items: [],
+    stats_section: {
+      is_visible: true,
+      title: 'I Nostri Numeri',
+      subtitle: 'I risultati parlano da soli. Ecco cosa hanno ottenuto i nostri studenti grazie a questa guida.',
+      stats: [
+        { value: '93%', label: 'Tasso di Successo', description: 'Dei nostri studenti pubblica il proprio sito entro 48 ore.' },
+        { value: '+200%', label: 'Aumento Leads', description: 'L\'aumento medio di contatti generati dai siti creati con le nostre tecniche.' },
+        { value: '1 Ora', label: 'Tempo Medio', description: 'Il tempo medio necessario per creare e lanciare un sito completo partendo da zero.' },
+      ]
+    }
 };
 
 interface AdminDashboardProps {
@@ -401,46 +418,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       <div className="space-y-6">
           <h3 className="text-xl font-bold mb-6 flex items-center">{React.createElement(icon, { className: "mr-2 text-red-600" })} {title}</h3>
           
-          {/* SEZIONE UPLOAD PDF (solo per pagina guida) */}
           {isPdfPage && (
-              <div className="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-200">
-                  <h4 className="font-bold text-purple-800 mb-2 flex items-center"><File className="h-5 w-5 mr-2"/> Gestione Guida PDF</h4>
-                  <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro corso gratuito.</p>
-
-                  <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
-                      <p className="text-xs text-purple-500 font-bold">URL Landing Page Condivisibile:</p>
-                      <div className="flex items-center gap-2">
-                          <a href={"/guida-pdf-gratuita"} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{window.location.origin + '/guida-pdf-gratuita'}</a>
-                          <button onClick={() => navigator.clipboard.writeText(window.location.origin + '/guida-pdf-gratuita')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
-                      </div>
-                  </div>
-                  
-                  {pdfGuideConfig.guide_pdf_url ? (
+              <>
+                  <div className="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-200">
+                      <h4 className="font-bold text-purple-800 mb-2 flex items-center"><File className="h-5 w-5 mr-2"/> Gestione Guida PDF</h4>
+                      <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro corso gratuito.</p>
                       <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
-                          <p className="text-xs text-purple-500 font-bold">PDF Attualmente Caricato:</p>
+                          <p className="text-xs text-purple-500 font-bold">URL Landing Page Condivisibile:</p>
                           <div className="flex items-center gap-2">
-                              <a href={pdfGuideConfig.guide_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{pdfGuideConfig.guide_pdf_url}</a>
-                              <button onClick={() => navigator.clipboard.writeText(pdfGuideConfig.guide_pdf_url || '')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
+                              <a href={"/guida-pdf-gratuita"} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{window.location.origin + '/guida-pdf-gratuita'}</a>
+                              <button onClick={() => navigator.clipboard.writeText(window.location.origin + '/guida-pdf-gratuita')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
                           </div>
                       </div>
-                  ) : (
-                       <div className="text-center text-xs py-2 bg-yellow-100 text-yellow-800 rounded border border-yellow-200 mb-4">Nessun PDF caricato.</div>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                      <input 
-                          ref={fileInputRef}
-                          type="file" 
-                          accept="application/pdf"
-                          onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
-                          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                      />
-                      <button onClick={handlePdfUpload} disabled={isUploading || !pdfFile} className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2">
-                          {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <UploadCloud className="h-4 w-4"/>}
-                          {pdfGuideConfig.guide_pdf_url ? 'Sostituisci' : 'Carica'}
-                      </button>
+                      {pdfGuideConfig.guide_pdf_url && (
+                          <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
+                              <p className="text-xs text-purple-500 font-bold">PDF Attualmente Caricato:</p>
+                              <div className="flex items-center gap-2">
+                                  <a href={pdfGuideConfig.guide_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{pdfGuideConfig.guide_pdf_url}</a>
+                                  <button onClick={() => navigator.clipboard.writeText(pdfGuideConfig.guide_pdf_url || '')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
+                              </div>
+                          </div>
+                      )}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                          <input ref={fileInputRef} type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" />
+                          <button onClick={handlePdfUpload} disabled={isUploading || !pdfFile} className="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                              {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <UploadCloud className="h-4 w-4"/>}
+                              {pdfGuideConfig.guide_pdf_url ? 'Sostituisci' : 'Carica'}
+                          </button>
+                      </div>
                   </div>
-              </div>
+
+                  <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                      <summary className="font-bold cursor-pointer flex items-center gap-2"><Sparkles/> Showcase Progetti</summary>
+                      <div className="mt-4 space-y-4">
+                          {(pdfGuideConfig.showcase_items || []).map((item, idx) => (
+                              <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                  <button onClick={() => { const newItems = [...(pdfGuideConfig.showcase_items || [])]; newItems.splice(idx, 1); setPdfGuideConfig(prev => ({...prev, showcase_items: newItems})); }} className="absolute top-2 right-2 text-gray-400 hover:text-red-500">
+                                      <XCircle className="h-4 w-4"/>
+                                  </button>
+                                  <input value={item.title} onChange={e => { const newItems = [...(pdfGuideConfig.showcase_items || [])]; newItems[idx].title = e.target.value; setPdfGuideConfig(prev => ({...prev, showcase_items: newItems})); }} className="w-full border p-2 rounded text-sm font-bold" placeholder="Titolo Progetto" />
+                                  <input value={item.image_url} onChange={e => { const newItems = [...(pdfGuideConfig.showcase_items || [])]; newItems[idx].image_url = e.target.value; setPdfGuideConfig(prev => ({...prev, showcase_items: newItems})); }} className="w-full border p-2 rounded text-sm" placeholder="URL Immagine (es. https://.../screenshot.jpg)" />
+                                  <input value={item.url} onChange={e => { const newItems = [...(pdfGuideConfig.showcase_items || [])]; newItems[idx].url = e.target.value; setPdfGuideConfig(prev => ({...prev, showcase_items: newItems})); }} className="w-full border p-2 rounded text-sm" placeholder="URL Progetto (es. https://...)" />
+                              </div>
+                          ))}
+                          <button onClick={() => { const newItems = [...(pdfGuideConfig.showcase_items || []), {title: '', url: '', image_url: ''}]; setPdfGuideConfig(prev => ({...prev, showcase_items: newItems})); }} className="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-300 text-sm flex items-center justify-center gap-2">
+                              <Plus className="h-4 w-4"/> Aggiungi Esempio
+                          </button>
+                      </div>
+                   </details>
+
+                   <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                        <summary className="font-bold cursor-pointer flex items-center gap-2"><TrendingUp/> Sezione Statistiche</summary>
+                        <div className="mt-4 space-y-4">
+                            <div className="flex items-center gap-4">
+                                <input type="text" value={pdfGuideConfig.stats_section?.title || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, title: e.target.value}}))} className="w-full border p-2 rounded text-sm" placeholder="Titolo Sezione" />
+                                <div className="flex items-center gap-2">
+                                    <input type="checkbox" checked={pdfGuideConfig.stats_section?.is_visible || false} onChange={e => setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, is_visible: e.target.checked}}))} className="h-5 w-5 accent-purple-600" />
+                                    <span className="text-sm font-medium">Visibile</span>
+                                </div>
+                            </div>
+                            <textarea value={pdfGuideConfig.stats_section?.subtitle || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, subtitle: e.target.value}}))} rows={2} className="w-full border p-2 rounded text-sm" placeholder="Sottotitolo Sezione"></textarea>
+                            
+                            <h5 className="font-bold text-xs uppercase text-gray-500 pt-2">Elenco Statistiche</h5>
+                            {(pdfGuideConfig.stats_section?.stats || []).map((stat, idx) => (
+                                <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                    <button onClick={() => { const newStats = [...(pdfGuideConfig.stats_section?.stats || [])]; newStats.splice(idx, 1); setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, stats: newStats}})); }} className="absolute top-2 right-2 text-gray-400 hover:text-red-500">
+                                        <XCircle className="h-4 w-4"/>
+                                    </button>
+                                    <div className="flex gap-2">
+                                        <input value={stat.value} onChange={e => { const newStats = [...pdfGuideConfig.stats_section.stats]; newStats[idx].value = e.target.value; setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, stats: newStats}})); }} className="w-1/3 border p-2 rounded text-sm font-bold" placeholder="Valore (es. 93%)" />
+                                        <input value={stat.label} onChange={e => { const newStats = [...pdfGuideConfig.stats_section.stats]; newStats[idx].label = e.target.value; setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, stats: newStats}})); }} className="w-2/3 border p-2 rounded text-sm" placeholder="Etichetta (es. Tasso di Successo)" />
+                                    </div>
+                                    <textarea value={stat.description} onChange={e => { const newStats = [...pdfGuideConfig.stats_section.stats]; newStats[idx].description = e.target.value; setPdfGuideConfig(prev => ({...prev, stats_section: {...prev.stats_section, stats: newStats}})); }} rows={2} className="w-full border p-2 rounded text-sm" placeholder="Descrizione..."></textarea>
+                                </div>
+                            ))}
+                            <button onClick={() => { const newStats = [...(pdfGuideConfig.stats_section?.stats || []), {value: '', label: '', description: ''}]; setPdfGuideConfig(prev => ({...prev, stats_section: {...(prev.stats_section || DEFAULT_PDF_GUIDE_CONFIG.stats_section), stats: newStats}})); }} className="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-300 text-sm flex items-center justify-center gap-2">
+                                <Plus className="h-4 w-4"/> Aggiungi Statistica
+                            </button>
+                        </div>
+                   </details>
+              </>
           )}
 
           <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">

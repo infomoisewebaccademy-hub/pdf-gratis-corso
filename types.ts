@@ -66,6 +66,12 @@ export interface PreLaunchConfig {
   soldout_cta_text: string;
   available_cta_text: string;
   form_disclaimer_text: string;
+  showcase_section: {
+    is_visible: boolean;
+    title: string;
+    subtitle: string;
+    items: ShowcaseItem[];
+  };
   admin_login_text: string;
   form_name_placeholder: string;
   form_email_placeholder: string;
@@ -86,9 +92,29 @@ export interface PreLaunchConfig {
 }
 
 // NUOVA: Interfaccia per la pagina Guida PDF
+export interface ShowcaseItem {
+  title: string;
+  url: string;
+  image_url: string;
+}
+
+export interface StatItem {
+    value: string;
+    label: string;
+    description: string;
+}
+
+export interface StatsSection {
+    is_visible: boolean;
+    title: string;
+    subtitle: string;
+    stats: StatItem[];
+}
+
 export interface PdfGuideConfig extends PreLaunchConfig {
-  // Eredita tutti i campi di PreLaunchConfig e può essere estesa se necessario
-  guide_pdf_url?: string; // URL del PDF caricato su Supabase Storage
+  guide_pdf_url?: string; 
+  showcase_items?: ShowcaseItem[];
+  stats_section?: StatsSection;
 }
 
 // Added LandingPageConfig interface to fix import errors in Home.tsx, AdminDashboard.tsx, Login.tsx, and Footer.tsx
