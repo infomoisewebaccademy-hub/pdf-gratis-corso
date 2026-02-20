@@ -43,11 +43,17 @@ Deno.serve(async (req: Request) => {
     }
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Controlla se l'utente esiste già
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1, email: leadEmail });
-    if(listError) throw listError;
-    
-    const existingUser = users.length > 0 ? users[0] : null;
+    // 1. Controlla se l'utente esiste già (METODO CORRETTO)
+    let existingUser = null;
+    try {
+      const { data, error } = await supabaseAdmin.auth.admin.getUserByEmail(leadEmail);
+      if (error && !error.message.includes('User not found')) throw error;
+      if (data && data.user) existingUser = data.user;
+    } catch (error) {
+      // Se l'errore non è 'User not found', è un problema reale
+      if (!error.message.includes('User not found')) throw error;
+      // Altrimenti, l'utente non esiste, che è il caso che vogliamo gestire.
+    }
 
     let userId = existingUser?.id;
     let passwordGenerated = null;
