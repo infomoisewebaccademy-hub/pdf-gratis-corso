@@ -625,7 +625,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                     <div className="relative">
                         <div className="sticky top-20">
                            <h3 className="text-lg font-bold mb-2">Anteprima Live</h3>
-                           <iframe ref={pdfGuideIframeRef} src="/#/get-guide?preview=true" className="w-full h-[75vh] border-4 border-gray-300 rounded-lg shadow-lg" title="Anteprima Guida PDF"></iframe>
+                           <iframe ref={pdfGuideIframeRef} src="/guida-pdf-gratuita?preview=true" className="w-full h-[75vh] border-4 border-gray-300 rounded-lg shadow-lg" title="Anteprima Guida PDF"></iframe>
                         </div>
                     </div>
                 </div>
