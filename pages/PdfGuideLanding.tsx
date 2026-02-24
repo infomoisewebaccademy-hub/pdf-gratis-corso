@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
-import { Loader, AlertCircle, User, Mail, ArrowRight, Cpu, Layers, Code } from 'lucide-react';
+import { Loader, AlertCircle, User, Mail, ArrowRight, CheckCircle, Monitor, Code, Coffee } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const PdfGuideLanding: React.FC = () => {
@@ -13,131 +13,142 @@ export const PdfGuideLanding: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email || !fullName) {
-            setError("Compila tutti i campi richiesti.");
+            setError("Per favore, compila tutti i campi.");
             return;
         }
         setIsLoading(true);
         setError(null);
+
         try {
             const { data, error: functionError } = await supabase.functions.invoke('create-free-user', {
                 body: { email, full_name: fullName },
             });
+
             if (functionError) throw functionError;
             if (data.userExists) {
-                alert("Email già registrata. Controlla la tua casella di posta.");
+                alert("Questa email è già registrata! Controlla la tua casella di posta per le credenziali.");
             }
             navigate('/thank-you-pdf-gratuita');
         } catch (error: any) {
-            setError(error.message || "Errore imprevisto. Riprova.");
+            setError(error.message || "Si è verificato un errore. Riprova più tardi.");
         } finally {
             setIsLoading(false);
         }
     };
 
     const renderForm = () => (
-        <div className="bg-black/80 backdrop-blur-sm border border-white/10 p-8 rounded-2xl w-full max-w-md mx-auto">
-            <h3 className="text-xl font-bold text-white text-center mb-2">Accedi al Manuale Operativo</h3>
-            <p className="text-gray-400 text-center mb-6 text-sm">Ricevi il PDF via email.</p>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl shadow-gray-200/50">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">Scarica la Guida Pratica</h3>
+            <p className="text-gray-600 text-center mb-6">Ricevi subito via email il PDF gratuito.</p>
+            <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-                    <input type="text" placeholder="Nome completo" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-white/5 border-2 border-white/10 rounded-lg py-3 pr-4 pl-12 text-white focus:ring-white/50 focus:border-white/50 transition" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input type="text" placeholder="Il tuo nome completo" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition" />
                 </div>
                 <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-                    <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/5 border-2 border-white/10 rounded-lg py-3 pr-4 pl-12 text-white focus:ring-white/50 focus:border-white/50 transition" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input type="email" placeholder="La tua email principale" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition" />
                 </div>
-                <button type="submit" disabled={isLoading} className="w-full text-md font-bold py-3 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group bg-white hover:bg-gray-200 text-black">
-                    {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>Richiedi Accesso <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
+                <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30">
+                    {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>Voglio la Guida <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
                 </button>
             </form>
-            {error && <p className="text-red-400 text-xs mt-3 text-center flex items-center justify-center"><AlertCircle className="h-4 w-4 mr-2"/> {error}</p>}
+            {error && <p className="text-red-500 text-sm mt-4 text-center flex items-center justify-center"><AlertCircle className="h-4 w-4 mr-2"/> {error}</p>}
+            <p className="text-xs text-gray-500 mt-4 text-center">Rispettiamo la tua privacy. Niente spam.</p>
         </div>
     );
 
     return (
-        <div className="bg-black text-white font-sans">
-            <div className="min-h-screen flex flex-col justify-center items-center p-4 text-center">
-                <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight">Il web non si scrive. Si genera.</h1>
-            </div>
+        <div className="bg-gray-50 text-gray-800 font-sans">
+            {/* 1. HERO SECTION */}
+            <header className="bg-white text-center pt-24 pb-20 px-4">
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900">Il Tuo Sito Web Online in 1 Ora, Senza Scrivere Codice.</h1>
+                <p className="max-w-3xl mx-auto mt-6 text-lg md:text-xl text-gray-600">Usa l'intelligenza artificiale di Google per creare e pubblicare il tuo sito, anche se parti da zero. Ti guido io, passo dopo passo.</p>
+                <a href="#form-section" className="mt-8 inline-block text-lg font-bold py-4 px-10 rounded-lg transition-all duration-300 ease-in-out group bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30">
+                    Scarica la Guida Gratuita
+                </a>
+            </header>
 
-            <div className="max-w-4xl mx-auto p-8 space-y-28">
+            <main className="max-w-5xl mx-auto p-4 sm:p-8 space-y-24">
+                {/* 2. PROBLEMA */}
                 <section className="text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6">Il paradigma è cambiato.</h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">Il codice è stato il linguaggio di costruzione per trent'anni. Ora è diventato il risultato. L'intelligenza artificiale non è una scorciatoia. È un nuovo livello di astrazione. Chi prima impara a dialogare con essa, costruisce il futuro.</p>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">“Vorrei un sito, ma da dove inizio?”</h2>
+                    <p className="text-lg text-gray-700 max-w-3xl mx-auto">Se questo pensiero ti suona familiare, non sei solo. Molti credono di dover imparare a programmare, spendere migliaia di euro o capire termini tecnici come 'hosting' e 'dominio'. La verità? Il problema non sei tu, ma gli strumenti complicati che ti hanno proposto finora.</p>
                 </section>
 
-                <section>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Google AI Studio. Controllo, non comandi.</h2>
-                    <div className="grid md:grid-cols-3 gap-8 text-left">
-                        <div className="border border-white/10 p-6 rounded-xl">
-                            <Cpu className="h-8 w-8 mb-4 text-gray-400" />
-                            <h3 className="font-bold text-xl mb-2">Potenza Computazionale</h3>
-                            <p className="text-gray-400">Genera interfacce complesse in secondi, non settimane. Itera alla velocità del pensiero.</p>
-                        </div>
-                        <div className="border border-white/10 p-6 rounded-xl">
-                            <Layers className="h-8 w-8 mb-4 text-gray-400" />
-                            <h3 className="font-bold text-xl mb-2">Precisione Sistematica</h3>
-                            <p className="text-gray-400">Crea componenti web puliti, coerenti e funzionali. L'AI gestisce la sintassi, tu dirigi la strategia.</p>
-                        </div>
-                        <div className="border border-white/10 p-6 rounded-xl">
-                            <Code className="h-8 w-8 mb-4 text-gray-400" />
-                            <h3 className="font-bold text-xl mb-2">Controllo del Codice</h3>
-                            <p className="text-gray-400">L'output è codice standard, modificabile e comprensibile. Nessuna piattaforma chiusa, nessuna dipendenza.</p>
-                        </div>
-                    </div>
-                </section>
-
+                {/* 3. SOLUZIONE */}
                 <section id="form-section" className="grid md:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4">La Guida è il punto di ingresso.</h2>
-                        <p className="text-lg text-gray-400 mb-6">Questo manuale operativo è un PDF che condensa il processo per passare da un'idea a un'interfaccia web funzionante. Non è teoria. È un protocollo. Lo rendiamo gratuito perché chi capisce questo oggi, domani costruirà progetti più importanti.</p>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">La soluzione è un metodo, non più codice.</h2>
+                        <p className="text-lg text-gray-700 mb-6">In questa guida PDF ti mostro un sistema pratico per dire a una macchina cosa vuoi, e vederlo realizzato in pochi minuti. Niente teoria, solo pratica. <br/><br/> All'interno troverai:</p>
+                        <ul className="space-y-4">
+                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Il processo esatto, passo-passo:</strong> Dalla pagina bianca al sito online, senza saltare un solo passaggio.</span></li>
+                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Esempi reali e istruzioni chiare:</strong> Vedrai cosa scrivere e dove cliccare per ottenere un risultato professionale.</span></li>
+                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Il risultato finale:</strong> Un sito vetrina semplice, pulito e funzionante, pronto per essere mostrato al mondo.</span></li>
+                        </ul>
                     </div>
                     {renderForm()}
                 </section>
 
+                {/* 4. PROVA E RISULTATI */}
                 <section>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center">Risultati Visibili.</h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto text-center mb-12">Non si tratta di creare siti vetrina. Si tratta di costruire interfacce pulite, essenziali e intelligenti per progetti reali.</p>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Cosa puoi costruire DAVVERO con questo metodo?</h2>
+                    <div className="grid md:grid-cols-3 gap-8 text-center">
+                        <div className="bg-white p-6 rounded-xl border border-gray-200">
+                            <Monitor className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                            <h3 className="font-bold text-xl mb-2">Siti Vetrina</h3>
+                            <p className="text-gray-600">Per presentare la tua attività, il tuo portfolio o un progetto personale.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200">
+                            <Code className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                            <h3 className="font-bold text-xl mb-2">Pagine Semplici</h3>
+                            <p className="text-gray-600">Per lanciare un prodotto, un evento o raccogliere contatti in modo rapido.</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200">
+                            <Coffee className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                            <h3 className="font-bold text-xl mb-2">Progetti Reali</h3>
+                            <p className="text-gray-600">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
+                        </div>
+                    </div>
                 </section>
 
+                {/* 5. PER CHI È / PER CHI NON È */}
                 <section className="grid md:grid-cols-2 gap-8">
-                    <div className="border border-white/10 rounded-xl p-8">
-                        <h3 className="text-2xl font-bold text-white mb-4">Questo manuale è per te se:</h3>
-                        <ul className="space-y-2 text-gray-400">
-                            <li>- Pensi in termini di sistemi, non di pagine.</li>
-                            <li>- Vuoi controllare la tecnologia, non subirla.</li>
-                            <li>- Capisci che la velocità di esecuzione è un vantaggio strategico.</li>
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-8">
+                        <h3 className="text-2xl font-bold text-green-800 mb-4">Questa guida è per te se:</h3>
+                        <ul className="space-y-2 text-green-700">
+                            <li>- Vuoi un risultato concreto e visibile.</li>
+                            <li>- Parti da zero e non hai competenze tecniche.</li>
+                            <li>- Sei disposto a seguire un metodo passo-passo.</li>
+                            <li>- Vuoi capire come usare l'AI in modo pratico.</li>
                         </ul>
                     </div>
-                    <div className="border border-white/20 bg-white/5 rounded-xl p-8">
-                        <h3 className="text-2xl font-bold text-white mb-4">Non è per te se:</h3>
-                        <ul className="space-y-2 text-gray-400">
-                            <li>- Cerchi un trucco per evitare di pensare.</li>
-                            <li>- Credi che l'AI sostituisca la visione.</li>
-                            <li>- Preferisci la comodità alla competenza.</li>
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-8">
+                        <h3 className="text-2xl font-bold text-red-800 mb-4">Questa guida NON è per te se:</h3>
+                        <ul className="space-y-2 text-red-700">
+                            <li>- Cerchi un modo per fare soldi facili online.</li>
+                            <li>- Vuoi creare un e-commerce complesso in 5 minuti.</li>
+                            <li>- Non hai voglia di imparare un nuovo strumento.</li>
+                            <li>- Pensi che l'AI faccia tutto da sola senza input.</li>
                         </ul>
                     </div>
                 </section>
 
-                <section className="text-center border border-white/10 rounded-2xl p-12">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Dopo la guida.</h2>
-                    <p className="text-lg text-gray-400 max-w-3xl mx-auto">Il manuale fornisce le basi operative. Il passo successivo è ingegnerizzare una presenza online solida: dominio, sicurezza, performance. Una progressione naturale per chi costruisce in modo serio.</p>
+                {/* 6. COSA SUCCEDE DOPO */}
+                <section className="text-center bg-white border border-gray-200 rounded-2xl p-12">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Cosa succede dopo aver scaricato la guida?</h2>
+                    <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-6">Riceverai subito il PDF e potrai iniziare a creare. Questa guida è il primo passo per darti autonomia. Una volta che avrai il tuo sito base, potresti voler fare il passo successivo: registrarlo con un dominio personalizzato (.it o .com), renderlo più sicuro e pubblicarlo in modo professionale. Quello è un percorso più avanzato, ma le fondamenta le costruiamo oggi, insieme.</p>
                 </section>
 
-                <section className="text-center py-20">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Inizia ora.</h2>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">Accedi al manuale. È una scelta, non un'offerta.</p>
-                    <a href="#form-section" className="inline-block text-md font-bold py-3 px-8 rounded-lg transition-all duration-300 ease-in-out group bg-white hover:bg-gray-200 text-black">
-                        Richiedi Accesso
+                {/* 7. CTA FINALE */}
+                <section className="text-center">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Pronto a mettere online la tua idea?</h2>
+                    <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">Scarica la guida gratuita. È un PDF, senza fronzoli, che ti mostra esattamente cosa fare. Nessun costo, nessun rischio.</p>
+                    <a href="#form-section" className="inline-block text-lg font-bold py-4 px-10 rounded-lg transition-all duration-300 ease-in-out group bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30">
+                        Voglio la Guida, Ora
                     </a>
                 </section>
-            </div>
-            <footer className="max-w-4xl mx-auto p-8 text-center text-xs text-gray-500">
-                <p className="mb-2">Marketers di Strada S.R.L. | P.IVA 1234567890 | Via Prova 1, 10100 Torino (TO)</p>
-                <p><a href="/privacy-policy" className="hover:text-white">Privacy Policy</a> | <a href="/cookie-policy" className="hover:text-white">Cookie Policy</a></p>
-                <p className="mt-4">Questo sito non fa parte del sito Facebook o Facebook Inc. Inoltre, questo sito NON è approvato da Facebook in alcun modo. FACEBOOK è un marchio registrato di FACEBOOK, Inc.</p>
-            </footer>
+            </main>
         </div>
     );
 };
