@@ -99,7 +99,7 @@ export const PdfGuideLanding: React.FC = () => {
 
     const renderForm = (isBottom = false) => (
         <div id={isBottom ? "bottom-form" : "form-section"} className={`bg-white p-8 rounded-2xl border border-gray-200 shadow-xl shadow-gray-200/50 ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
-            <div className="inline-block px-4 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4">
+            <div className="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4" style={{ backgroundColor: `${config.gradient_start}1a`, color: config.gradient_start }}>
                 {config.offer_badge}
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">{config.offer_title}</h3>
@@ -107,13 +107,13 @@ export const PdfGuideLanding: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input type="text" placeholder={config.form_name_placeholder || "Il tuo nome completo"} value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    <input type="text" placeholder={config.form_name_placeholder || "Il tuo nome completo"} value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-2 transition" style={{ '--tw-ring-color': config.gradient_start } as any} />
                 </div>
                 <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input type="email" placeholder={config.form_email_placeholder || "La tua email principale"} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    <input type="email" placeholder={config.form_email_placeholder || "La tua email principale"} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-2 transition" style={{ '--tw-ring-color': config.gradient_start } as any} />
                 </div>
-                <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30" style={{ backgroundColor: config.gradient_start }}>
+                <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group text-white shadow-lg" style={{ backgroundColor: config.gradient_start, boxShadow: `0 10px 15px -3px ${config.gradient_start}4d` }}>
                     {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>{config.cta_text} <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
                 </button>
             </form>
@@ -161,17 +161,17 @@ export const PdfGuideLanding: React.FC = () => {
                     <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Cosa puoi costruire DAVVERO con questo metodo?</h2>
                     <div className="grid md:grid-cols-3 gap-8 text-center">
                         <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Monitor className="h-12 w-12 mx-auto mb-4 text-blue-600" style={{ color: config.gradient_start }} />
+                            <Monitor className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
                             <h3 className="font-bold text-xl mb-2">Siti Vetrina</h3>
                             <p className="text-gray-600">Per presentare la tua attività, il tuo portfolio o un progetto personale.</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Code className="h-12 w-12 mx-auto mb-4 text-blue-600" style={{ color: config.gradient_start }} />
+                            <Code className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
                             <h3 className="font-bold text-xl mb-2">Pagine Semplici</h3>
                             <p className="text-gray-600">Per lanciare un prodotto, un evento o raccogliere contatti in modo rapido.</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Coffee className="h-12 w-12 mx-auto mb-4 text-blue-600" style={{ color: config.gradient_start }} />
+                            <Coffee className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
                             <h3 className="font-bold text-xl mb-2">Progetti Reali</h3>
                             <p className="text-gray-600">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
                         </div>
@@ -182,7 +182,7 @@ export const PdfGuideLanding: React.FC = () => {
                 {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
                     <section className="py-12">
                         <div className="text-center mb-12">
-                            <h2 className="text-blue-600 font-bold tracking-widest uppercase text-sm mb-2" style={{ color: config.gradient_start }}>{config.testimonials_section.subtitle}</h2>
+                            <h2 className="font-bold tracking-widest uppercase text-sm mb-2" style={{ color: config.gradient_start }}>{config.testimonials_section.subtitle}</h2>
                             <h3 className="text-3xl md:text-4xl font-black text-gray-900">{config.testimonials_section.title}</h3>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

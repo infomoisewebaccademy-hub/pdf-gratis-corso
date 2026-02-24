@@ -968,6 +968,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
             {activeTab === 'landing_manual' && (
                 <div className="space-y-8 pb-20">
                     <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-bold mb-6 flex items-center"><Palette className="mr-2 text-brand-600"/> Stile & Colori</h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Colore Brand (Principale)</label>
+                                <div className="flex gap-3 items-center">
+                                    <input type="color" value={landingConfig.brand_color || '#2563eb'} onChange={(e) => setLandingConfig({...landingConfig, brand_color: e.target.value})} className="h-10 w-20 rounded cursor-pointer" />
+                                    <input type="text" value={landingConfig.brand_color || '#2563eb'} onChange={(e) => setLandingConfig({...landingConfig, brand_color: e.target.value})} className="flex-1 border p-2 rounded text-sm font-mono" />
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Sfondo Pagina</label>
+                                <div className="flex gap-3 items-center">
+                                    <input type="color" value={landingConfig.bg_color || '#020617'} onChange={(e) => setLandingConfig({...landingConfig, bg_color: e.target.value})} className="h-10 w-20 rounded cursor-pointer" />
+                                    <input type="text" value={landingConfig.bg_color || '#020617'} onChange={(e) => setLandingConfig({...landingConfig, bg_color: e.target.value})} className="flex-1 border p-2 rounded text-sm font-mono" />
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-4">Nota: Il colore brand influenzerà bottoni, icone e accenti in tutta la home page.</p>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
                         <h3 className="text-xl font-bold mb-6 flex items-center"><Megaphone className="mr-2 text-brand-600"/> Barra Annuncio</h3>
                         <div className="grid md:grid-cols-2 gap-6">
                             <input type="text" value={landingConfig.announcement_bar.text} onChange={(e) => setLandingConfig({...landingConfig, announcement_bar: {...landingConfig.announcement_bar, text: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Testo avviso..." />

@@ -151,6 +151,8 @@ export interface LandingPageConfig {
     bg_color: string;
     text_color: string;
   };
+  brand_color?: string;
+  bg_color?: string;
   hero: {
     title: string;
     subtitle: string;

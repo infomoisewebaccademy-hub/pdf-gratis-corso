@@ -22,6 +22,8 @@ const DEFAULT_CONFIG: LandingPageConfig = {
     bg_color: '#fbbf24', // Amber 400
     text_color: '#1e3a8a' // Blue 900
   },
+  brand_color: '#2563eb',
+  bg_color: '#020617',
   hero: {
     title: "Crea Siti Web Professionali o Piattaforme con l'AI in Poche Ore",
     subtitle: 'Senza Scrivere Una Riga di Codice.',

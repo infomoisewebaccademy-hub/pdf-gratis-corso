@@ -155,6 +155,45 @@ const AppContent: React.FC = () => {
   }, [navigate, user]);
 
   useEffect(() => {
+    const config = settings.landing_page_config;
+    if (config) {
+        const styleId = 'dynamic-colors-style';
+        let style = document.getElementById(styleId) as HTMLStyleElement;
+        if (!style) {
+            style = document.createElement('style');
+            style.id = styleId;
+            document.head.appendChild(style);
+        }
+        
+        let css = '';
+        if (config.brand_color) {
+            const brandColor = config.brand_color;
+            css += `
+                :root {
+                    --brand-color: ${brandColor};
+                }
+                .text-brand-400, .text-brand-500, .text-brand-600 { color: ${brandColor} !important; }
+                .bg-brand-500, .bg-brand-600, .bg-brand-700 { background-color: ${brandColor} !important; }
+                .border-brand-500, .border-brand-600 { border-color: ${brandColor} !important; }
+                .ring-brand-500, .ring-brand-600 { --tw-ring-color: ${brandColor} !important; }
+                .selection\\:bg-brand-500\\/30 ::selection { background-color: ${brandColor}4d !important; }
+                .shadow-brand-500\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
+                .shadow-brand-500\\/50 { --tw-shadow-color: ${brandColor}80 !important; }
+                .shadow-brand-600\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
+                .shadow-brand-900\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
+            `;
+        }
+        if (config.bg_color) {
+            css += `
+                .bg-slate-950 { background-color: ${config.bg_color} !important; }
+                body { background-color: ${config.bg_color}; }
+            `;
+        }
+        style.innerHTML = css;
+    }
+  }, [settings.landing_page_config]);
+
+  useEffect(() => {
     if (settings.font_family) {
         const linkId = 'dynamic-font-link';
         let link = document.getElementById(linkId) as HTMLLinkElement;
