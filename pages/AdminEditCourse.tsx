@@ -34,9 +34,54 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   });
 
   const [imgError, setImgError] = useState(false);
-  const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '' });
+  const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '' });
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [isUploadingVideo, setIsUploadingVideo] = useState<number | null>(null); // -1 per nuova lezione, altrimenti index
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
+    const file = event.target.files?.[0];
+    const courseId = isNew ? formData.id : id;
+
+    if (!file || !courseId) {
+        if (!courseId) alert("Per favore, imposta prima un 'ID Corso' per poter caricare file.");
+        return;
+    }
+
+    setIsUploadingVideo(lessonIndex);
+    try {
+        const filePath = `${courseId}/${Date.now()}_${file.name}`;
+        const { error } = await supabase.storage.from('course-videos').upload(filePath, file, { upsert: true });
+        if (error) throw error;
+
+        if (lessonIndex === -1) { // Nuova lezione
+            setNewLesson(prev => ({ ...prev, video_storage_path: filePath }));
+        } else { // Lezione esistente
+            const updatedLessons = [...(formData.lessons_content || [])];
+            updatedLessons[lessonIndex].video_storage_path = filePath;
+            setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
+        }
+    } catch (err: any) {
+        alert("Errore upload video: " + err.message);
+    } finally {
+        setIsUploadingVideo(null);
+    }
+  };
+
+  const handleVideoRemove = async (lessonIndex: number) => {
+    const lesson = formData.lessons_content?.[lessonIndex];
+    if (!lesson || !lesson.video_storage_path) return;
+    if (!confirm("Sei sicuro di voler rimuovere questo video? L'azione è permanente.")) return;
+
+    try {
+        await supabase.storage.from('course-videos').remove([lesson.video_storage_path]);
+        const updatedLessons = [...(formData.lessons_content || [])];
+        updatedLessons[lessonIndex].video_storage_path = undefined;
+        setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
+    } catch (err: any) {
+        alert("Errore rimozione video: " + err.message);
+    }
+  };
 
   useEffect(() => {
     if (!isNew && id) {
@@ -76,6 +121,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       id: isNew ? formData.id : id,
       features: formData.features?.filter(f => f.trim() !== '') || [],
       lessons: formData.lessons_content?.length || 0,
+      lessons_content: (formData.lessons_content || []).map(l => ({...l, videoUrl: l.video_storage_path ? '' : l.videoUrl})),
       discounted_price: formData.discounted_price || null,
       status: formData.status || 'active',
       resource_file_url: formData.resource_file_url || null,
@@ -132,9 +178,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   };
   const addLesson = () => {
     if (!newLesson.title) return;
-    const lesson: Lesson = { id: `lesson_${Date.now()}`, title: newLesson.title || 'Nuova Lezione', description: newLesson.description || '', videoUrl: newLesson.videoUrl || '', duration: '10:00' };
+    const lesson: Lesson = { id: `lesson_${Date.now()}`, title: newLesson.title || 'Nuova Lezione', description: newLesson.description || '', videoUrl: newLesson.videoUrl || '', video_storage_path: newLesson.video_storage_path, duration: '10:00' };
     setFormData({ ...formData, lessons_content: [...(formData.lessons_content || []), lesson] });
-    setNewLesson({ title: '', description: '', videoUrl: '' }); setIsAddingLesson(false);
+    setNewLesson({ title: '', description: '', videoUrl: '', video_storage_path: '' }); setIsAddingLesson(false);
   };
   const removeLesson = (index: number) => {
     const updated = [...(formData.lessons_content || [])]; updated.splice(index, 1);
@@ -232,7 +278,12 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                             <div className="flex justify-between items-center mb-3"><h4 className="font-bold text-sm text-brand-800">Nuova Lezione</h4><button type="button" onClick={() => setIsAddingLesson(false)}><X className="h-4 w-4 text-gray-400 hover:text-gray-600"/></button></div>
                             <div className="space-y-3">
                                 <input type="text" placeholder="Titolo Lezione" className="w-full border border-gray-300 rounded p-2 text-sm" value={newLesson.title} onChange={e => setNewLesson({...newLesson, title: e.target.value})} />
-                                <input type="text" placeholder="URL Video" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson({...newLesson, videoUrl: e.target.value})} />
+                                <div className="w-full bg-white border border-gray-300 rounded p-2 text-sm">
+                                    <label className="text-xs font-bold text-gray-500">Video Lezione (Carica File)</label>
+                                    <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, -1)} className="w-full text-xs" />
+                                </div>
+                                <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div><div className="relative flex justify-center text-xs"><span className="bg-brand-50/50 px-2 text-gray-500">o</span></div></div>
+                                <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson({...newLesson, videoUrl: e.target.value})} />
                                 <textarea placeholder="Breve descrizione" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})} />
                                 <button type="button" onClick={addLesson} disabled={!newLesson.title} className="w-full bg-brand-600 text-white py-2 rounded font-bold text-sm hover:bg-brand-700 disabled:opacity-50">Conferma</button>
                             </div>
@@ -246,7 +297,21 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                     <div className="mt-1 text-gray-300 cursor-move"><GripVertical className="h-5 w-5" /></div>
                                     <div className="flex-1 space-y-2">
                                         <div className="flex items-center gap-2"><span className="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-0.5 rounded">{idx + 1}</span><input type="text" value={lesson.title} onChange={e => updateLesson(idx, 'title', e.target.value)} className="font-bold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand-500 w-full" /></div>
-                                        <input type="text" value={lesson.videoUrl} onChange={e => updateLesson(idx, 'videoUrl', e.target.value)} placeholder="URL video..." className="text-xs text-gray-500 w-full bg-transparent border border-transparent hover:border-gray-200 rounded p-1 font-mono" />
+                                         <div className="text-xs text-gray-500 w-full bg-transparent border-b border-transparent hover:border-gray-200 focus-within:border-brand-300 rounded p-1">
+                                            <input type="text" value={lesson.videoUrl} onChange={e => updateLesson(idx, 'videoUrl', e.target.value)} placeholder="URL video..." className="w-full bg-transparent font-mono" />
+                                         </div>
+                                         <div className="text-xs text-gray-500 w-full bg-transparent border border-transparent hover:border-gray-200 rounded p-1">
+                                            {lesson.video_storage_path ? (
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-mono text-green-600 truncate">{lesson.video_storage_path.split('/').pop()}</span>
+                                                    <button type="button" onClick={() => handleVideoRemove(idx)} className="text-red-400 hover:text-red-600 p-1"><X className="h-3 w-3" /></button>
+                                                </div>
+                                            ) : isUploadingVideo === idx ? (
+                                                <div className='flex items-center gap-2 text-blue-500'><Loader2 className="h-3 w-3 animate-spin"/> Caricamento...</div>
+                                            ) : (
+                                                <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, idx)} className="w-full text-xs" />
+                                            )}
+                                         </div>
                                     </div>
                                     <button type="button" onClick={() => removeLesson(idx)} className="text-gray-400 hover:text-red-500 p-1"><Trash className="h-4 w-4" /></button>
                                 </div>

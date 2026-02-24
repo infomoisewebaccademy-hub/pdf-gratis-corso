@@ -4,6 +4,7 @@ export interface Lesson {
   title: string;
   description: string;
   videoUrl: string;
+  video_storage_path?: string;
   duration?: string;
   isFree?: boolean;
 }

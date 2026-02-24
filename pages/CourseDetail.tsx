@@ -16,6 +16,77 @@ interface CourseDetailProps {
   settings: PlatformSettings; // Aggiunta per accedere all'URL del PDF
 }
 
+const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ lesson, onEnded }) => {
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+        setIsLoading(true);
+
+        // Priorità al video caricato
+        if (lesson.video_storage_path) {
+            const getSignedUrl = async () => {
+                try {
+                    const { data, error } = await supabase.storage
+                        .from('course-videos')
+                        .createSignedUrl(lesson.video_storage_path, 3600); // URL valido per 1 ora
+                    
+                    if (error) throw error;
+
+                    if (isMounted) {
+                        setVideoUrl(data.signedUrl);
+                        setIsLoading(false);
+                    }
+                } catch (err) {
+                    console.error("Errore nel generare URL sicuro:", err);
+                    if (isMounted) setIsLoading(false);
+                }
+            };
+            getSignedUrl();
+        } else if (lesson.videoUrl) {
+            setVideoUrl(lesson.videoUrl);
+            setIsLoading(false);
+        } else {
+            setVideoUrl(null);
+            setIsLoading(false);
+        }
+
+        return () => { isMounted = false; };
+    }, [lesson.video_storage_path, lesson.videoUrl]);
+
+    return (
+        <div className="bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative group">
+            {isLoading ? (
+                <div className="flex items-center justify-center h-full text-white/50"><p>Caricamento video...</p></div>
+            ) : videoUrl ? (
+                videoUrl.includes('youtube') || videoUrl.includes('youtu.be') ? (
+                    <iframe 
+                        src={videoUrl.replace('watch?v=', 'embed/')}
+                        className="w-full h-full" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen
+                    ></iframe>
+                ) : (
+                    <video 
+                        src={videoUrl} 
+                        controls 
+                        controlsList="nodownload" 
+                        onContextMenu={e => e.preventDefault()} 
+                        className="w-full h-full" 
+                        onEnded={onEnded}
+                        autoPlay
+                    />
+                )
+            ) : (
+                <div className="flex items-center justify-center h-full text-white/50">
+                    <p>Video non disponibile per questa lezione.</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -94,7 +165,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
 
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         
         <button onClick={onBack} className="mb-8 text-gray-500 hover:text-gray-900 font-medium flex items-center">
             ← Torna ai Corsi
@@ -104,29 +175,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
             <div className="lg:col-span-2 space-y-8">
                 
                 {isPurchased && activeLesson ? (
-                    <div className="bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative group">
-                        {activeLesson.videoUrl ? (
-                             activeLesson.videoUrl.includes('youtube') || activeLesson.videoUrl.includes('youtu.be') ? (
-                                <iframe 
-                                    src={activeLesson.videoUrl.replace('watch?v=', 'embed/')} 
-                                    className="w-full h-full" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowFullScreen
-                                ></iframe>
-                             ) : (
-                                <video 
-                                    src={activeLesson.videoUrl} 
-                                    controls 
-                                    className="w-full h-full" 
-                                    onEnded={() => markLessonAsCompleted(activeLesson.id)}
-                                />
-                             )
-                        ) : (
-                            <div className="flex items-center justify-center h-full text-white/50">
-                                <p>Video non disponibile per questa lezione</p>
-                            </div>
-                        )}
-                    </div>
+                    <SecureVideoPlayer lesson={activeLesson} onEnded={() => markLessonAsCompleted(activeLesson.id)} />
                 ) : (
                     <div>
                         <div className="flex items-center gap-3 mb-2">

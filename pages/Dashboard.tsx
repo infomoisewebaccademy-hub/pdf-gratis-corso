@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Course, UserProfile } from '../types';
 import { PlayCircle, Book, RefreshCw, AlertTriangle, X, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { Sidebar } from '../components/Sidebar';
 
@@ -19,6 +19,7 @@ interface CourseProgress {
 
 export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, unreadChatCount = 0 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [progressMap, setProgressMap] = useState<CourseProgress>({});
@@ -69,7 +70,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
   return (
     <div className="pt-20 min-h-screen bg-white flex">
       {/* Sidebar Menu - Come richiesto nell'immagine */}
-      <Sidebar activeItem="my-courses" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
+      <Sidebar activeItem={location.pathname.substring(1) || 'my-courses'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 
       {/* Main Content Area */}
       <main className="flex-1 bg-gray-50/50 pb-20">

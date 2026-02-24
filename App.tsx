@@ -15,6 +15,9 @@ import { PaymentSuccess } from './pages/PaymentSuccess';
 import { ComingSoon } from './pages/ComingSoon'; 
 import { PdfGuideLanding } from './pages/PdfGuideLanding'; // NUOVO
 import { ThankYouPdf } from './pages/ThankYouPdf';
+import { ProfilePage } from './pages/ProfilePage';
+import { CertificatesPage } from './pages/CertificatesPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { UserProfile, Course, PlatformSettings } from './types';
 import { supabase, createCheckoutSession } from './services/supabase';
 import { CartProvider } from './contexts/CartContext';
@@ -294,6 +297,9 @@ const AppContent: React.FC = () => {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} courses={courses} onRefresh={refreshUserData} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+        <Route path="/profile" element={user ? <ProfilePage user={user} /> : <Navigate to="/login" />} />
+        <Route path="/certificates" element={user ? <CertificatesPage user={user} /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={user ? <SettingsPage user={user} /> : <Navigate to="/login" />} />
         
         <Route path="/admin" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} /> : <Navigate to="/" />} />
         <Route path="/admin/course/:id" element={user?.is_admin ? <AdminEditCourse courses={courses} onSave={handleSaveCourse} /> : <Navigate to="/" />} />
@@ -318,7 +324,7 @@ const CourseWrapper: React.FC<{courses: Course[], user: UserProfile | null, onPu
     const navigate = useNavigate(); const { id } = useParams<{ id: string }>(); const course = courses.find(c => c.id === id);
     if (!course) return null;
     const isPurchased = user?.purchased_courses.includes(course.id) || false;
-    return <CourseDetail course={course} onPurchase={() => onPurchase(course.id)} isPurchased={isPurchased} onBack={() => navigate('/')} user={user} settings={settings} />
+    return <CourseDetail course={course} onPurchase={() => onPurchase(course.id)} isPurchased={isPurchased} onBack={() => navigate(-1)} user={user} settings={settings} />
 };
 
 const App: React.FC = () => {
