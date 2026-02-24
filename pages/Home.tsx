@@ -158,25 +158,77 @@ const DEFAULT_CONFIG: LandingPageConfig = {
     subtitle: 'Testimonianze',
     is_visible: true,
     reviews: [
-        { 
-            name: 'Marco R.', 
-            role: 'Web Development', 
-            text: 'Corso eccezionale! Ho trovato lavoro come sviluppatore dopo soli 3 mesi. Il docente spiega in modo chiaro e i progetti pratici sono utilissimi.',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-        },
-        { 
-            name: 'Giulia S.', 
-            role: 'Digital Marketing', 
-            text: 'Contenuti aggiornati e pratici. Ora gestisco campagne per grandi brand grazie a quello che ho imparato.',
-            avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-        },
-        { 
-            name: 'Luca M.', 
-            role: 'UI/UX Design', 
-            text: 'Il miglior investimento per la mia carriera. Docenti preparatissimi e community attiva.',
-            avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-        }
-    ]
+    {
+        name: 'Elena G.',
+        role: 'Imprenditrice Digitale',
+        text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Davide F.',
+        role: 'Consulente Marketing',
+        text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Sofia L.',
+        role: 'Studentessa',
+        text: "Partivo da zero assoluto. Ora ho creato il sito per l'attività di famiglia e sto già ricevendo richieste da altri commercianti. Una competenza che mi ha aperto un mondo.",
+        avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Alessandro M.',
+        role: 'Fotografo Freelance',
+        text: "Volevo un portfolio online che si distinguesse, ma le agenzie mi chiedevano cifre folli. Grazie a Daniel ho costruito un sito magnifico in poche ore, completamente da solo. Consigliatissimo.",
+        avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Chiara B.',
+        role: 'Social Media Manager',
+        text: "La parte sulle automazioni è oro colato. Ho integrato form di contatto, email automatiche e notifiche per i miei clienti, facendogli risparmiare ore di lavoro manuale. Valore immenso.",
+        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Matteo V.',
+        role: 'Titolare di Ristorante',
+        text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
+        avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Valentina C.',
+        role: 'Coach Olistico',
+        text: "Il supporto su WhatsApp è la vera svolta. Avevo un dubbio sul dominio e Daniel mi ha risposto in 10 minuti, risolvendo tutto. Non sei mai lasciato solo. Questo non ha prezzo.",
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Riccardo T.',
+        role: 'Agente Immobiliare',
+        text: "Ho creato landing page specifiche per ogni immobile di lusso che vendo. Risultati? Tassi di conversione triplicati e clienti impressionati. Il miglior investimento del 2024.",
+        avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Laura P.',
+        role: 'Artista',
+        text: "Finalmente posso mostrare le mie opere online senza dipendere da nessuno. Il processo è stato così semplice e intuitivo che mi sono sentita una vera 'tech artist'. Grazie!",
+        avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    },
+    {
+        name: 'Simone R.',
+        role: 'Personal Trainer',
+        text: "Ho creato un'area riservata per i miei clienti con schede di allenamento e video esclusivi. Una funzionalità che pensavo costasse migliaia di euro, realizzata in un pomeriggio. Fenomenale.",
+        avatar: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+        verified: true
+    }
+]
   },
   usp_section: {
     title: 'Perché siamo diversi dagli altri corsi',
@@ -383,7 +435,14 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
             before_items: landingConfig.comparison_section?.before_items || DEFAULT_CONFIG.comparison_section?.before_items,
             after_items: landingConfig.comparison_section?.after_items || DEFAULT_CONFIG.comparison_section?.after_items,
         },
-        testimonials_section: { ...DEFAULT_CONFIG.testimonials_section, ...(landingConfig.testimonials_section || {}) },
+        testimonials_section: { 
+            ...DEFAULT_CONFIG.testimonials_section, 
+            ...(landingConfig.testimonials_section || {}),
+            is_visible: landingConfig.testimonials_section?.is_visible ?? DEFAULT_CONFIG.testimonials_section.is_visible,
+            reviews: (landingConfig.testimonials_section?.reviews && landingConfig.testimonials_section.reviews.length >= 10) 
+                ? landingConfig.testimonials_section.reviews 
+                : DEFAULT_CONFIG.testimonials_section.reviews
+        },
         usp_section: { ...DEFAULT_CONFIG.usp_section, ...(landingConfig.usp_section || {}) },
         cta_section: { ...DEFAULT_CONFIG.cta_section, ...(landingConfig.cta_section || {}) },
         footer: { 
@@ -1159,7 +1218,15 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-white text-lg">{review.name}</h4>
-                                    <p className="text-sm text-slate-400">{review.role}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <p className="text-sm text-slate-400">{review.role}</p>
+                                      {review.verified && (
+                                          <div className="flex items-center gap-1 text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full ring-1 ring-green-500/20">
+                                              <ShieldCheck className="h-3 w-3" />
+                                              <span>Verificata</span>
+                                          </div>
+                                      )}
+                                    </div>
                                 </div>
                              </div>
                              

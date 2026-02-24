@@ -92,7 +92,78 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
     title: 'Cosa Dicono i Nostri Studenti',
     subtitle: 'Testimonianze',
     is_visible: true,
-    reviews: []
+    reviews: [
+      {
+          name: 'Elena G.',
+          role: 'Imprenditrice Digitale',
+          text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Davide F.',
+          role: 'Consulente Marketing',
+          text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Sofia L.',
+          role: 'Studentessa',
+          text: "Partivo da zero assoluto. Ora ho creato il sito per l'attività di famiglia e sto già ricevendo richieste da altri commercianti. Una competenza che mi ha aperto un mondo.",
+          avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Alessandro M.',
+          role: 'Fotografo Freelance',
+          text: "Volevo un portfolio online che si distinguesse, ma le agenzie mi chiedevano cifre folli. Grazie a Daniel ho costruito un sito magnifico in poche ore, completamente da solo. Consigliatissimo.",
+          avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Chiara B.',
+          role: 'Social Media Manager',
+          text: "La parte sulle automazioni è oro colato. Ho integrato form di contatto, email automatiche e notifiche per i miei clienti, facendogli risparmiare ore di lavoro manuale. Valore immenso.",
+          avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Matteo V.',
+          role: 'Titolare di Ristorante',
+          text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
+          avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Valentina C.',
+          role: 'Coach Olistico',
+          text: "Il supporto su WhatsApp è la vera svolta. Avevo un dubbio sul dominio e Daniel mi ha risposto in 10 minuti, risolvendo tutto. Non sei mai lasciato solo. Questo non ha prezzo.",
+          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Riccardo T.',
+          role: 'Agente Immobiliare',
+          text: "Ho creato landing page specifiche per ogni immobile di lusso che vendo. Risultati? Tassi di conversione triplicati e clienti impressionati. Il miglior investimento del 2024.",
+          avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Laura P.',
+          role: 'Artista',
+          text: "Finalmente posso mostrare le mie opere online senza dipendere da nessuno. Il processo è stato così semplice e intuitivo che mi sono sentita una vera 'tech artist'. Grazie!",
+          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      },
+      {
+          name: 'Simone R.',
+          role: 'Personal Trainer',
+          text: "Ho creato un'area riservata per i miei clienti con schede di allenamento e video esclusivi. Una funzionalità che pensavo costasse migliaia di euro, realizzata in un pomeriggio. Fenomenale.",
+          avatar: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+          verified: true
+      }
+    ]
   },
   // Fix: Added missing usp_section to default config
   usp_section: {
@@ -190,6 +261,89 @@ const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
         { value: '+200%', label: 'Aumento Leads', description: 'L\'aumento medio di contatti generati dai siti creati con le nostre tecniche.' },
         { value: '1 Ora', label: 'Tempo Medio', description: 'Il tempo medio necessario per creare e lanciare un sito completo partendo da zero.' },
       ]
+    },
+    testimonials_section: {
+      title: 'Cosa Dicono i Nostri Studenti',
+      subtitle: 'Testimonianze',
+      is_visible: true,
+      reviews: [
+        {
+            name: 'Elena G.',
+            role: 'Imprenditrice Digitale',
+            text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Davide F.',
+            role: 'Consulente Marketing',
+            text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+            avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Sofia L.',
+            role: 'Studentessa',
+            text: "Partivo da zero assoluto. Ora ho creato il sito per l'attività di famiglia e sto già ricevendo richieste da altri commercianti. Una competenza che mi ha aperto un mondo.",
+            avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Alessandro M.',
+            role: 'Fotografo Freelance',
+            text: "Volevo un portfolio online che si distinguesse, ma le agenzie mi chiedevano cifre folli. Grazie a Daniel ho costruito un sito magnifico in poche ore, completamente da solo. Consigliatissimo.",
+            avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Chiara B.',
+            role: 'Social Media Manager',
+            text: "La parte sulle automazioni è oro colato. Ho integrato form di contatto, email automatiche e notifiche per i miei clienti, facendogli risparmiare ore di lavoro manuale. Valore immenso.",
+            avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Matteo V.',
+            role: 'Titolare di Ristorante',
+            text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
+            avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Valentina C.',
+            role: 'Coach Olistico',
+            text: "Il supporto su WhatsApp è la vera svolta. Avevo un dubbio sul dominio e Daniel mi ha risposto in 10 minuti, risolvendo tutto. Non sei mai lasciato solo. Questo non ha prezzo.",
+            avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Riccardo T.',
+            role: 'Agente Immobiliare',
+            text: "Ho creato landing page specifiche per ogni immobile di lusso che vendo. Risultati? Tassi di conversione triplicati e clienti impressionati. Il miglior investimento del 2024.",
+            avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Laura P.',
+            role: 'Artista',
+            text: "Finalmente posso mostrare le mie opere online senza dipendere da nessuno. Il processo è stato così semplice e intuitivo che mi sono sentita una vera 'tech artist'. Grazie!",
+            avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        },
+        {
+            name: 'Simone R.',
+            role: 'Personal Trainer',
+            text: "Ho creato un'area riservata per i miei clienti con schede di allenamento e video esclusivi. Una funzionalità che pensavo costasse migliaia di euro, realizzata in un pomeriggio. Fenomenale.",
+            avatar: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
+            verified: true
+        }
+      ]
+    },
+    footer: {
+      text: 'Moise Web Academy',
+      copyright: 'Tutti i diritti riservati.',
+      is_visible: true,
+      social_links: { facebook: '', instagram: '', linkedin: '', youtube: '' }
     }
 };
 
@@ -221,7 +375,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [assigningCourse, setAssigningCourse] = useState<string | null>(null);
   
   const [localSettings, setLocalSettings] = useState<PlatformSettings>(currentSettings);
-  const [landingConfig, setLandingConfig] = useState<LandingPageConfig>(() => ({ ...DEFAULT_LANDING_CONFIG, ...currentSettings.landing_page_config }));
+  const [landingConfig, setLandingConfig] = useState<LandingPageConfig>(() => {
+    const config = { ...DEFAULT_LANDING_CONFIG, ...currentSettings.landing_page_config };
+    if (!config.testimonials_section.reviews || config.testimonials_section.reviews.length < 10) {
+      config.testimonials_section.reviews = DEFAULT_LANDING_CONFIG.testimonials_section.reviews;
+    }
+    return config;
+  });
   const [preLaunchConfig, setPreLaunchConfig] = useState<PreLaunchConfig>(currentSettings.pre_launch_config || DEFAULT_PRE_LAUNCH_CONFIG);
   const [pdfGuideConfig, setPdfGuideConfig] = useState<PdfGuideConfig>(currentSettings.pdf_guide_config || DEFAULT_PDF_GUIDE_CONFIG);
   
@@ -261,9 +421,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
   useEffect(() => {
     setLocalSettings(currentSettings);
-    if (currentSettings.landing_page_config) setLandingConfig({ ...DEFAULT_LANDING_CONFIG, ...currentSettings.landing_page_config });
+    if (currentSettings.landing_page_config) {
+      const config = { ...DEFAULT_LANDING_CONFIG, ...currentSettings.landing_page_config };
+      if (!config.testimonials_section.reviews || config.testimonials_section.reviews.length < 10) {
+        config.testimonials_section.reviews = DEFAULT_LANDING_CONFIG.testimonials_section.reviews;
+      }
+      setLandingConfig(config);
+    }
     if (currentSettings.pre_launch_config) setPreLaunchConfig({ ...DEFAULT_PRE_LAUNCH_CONFIG, ...currentSettings.pre_launch_config });
-    if (currentSettings.pdf_guide_config) setPdfGuideConfig({ ...DEFAULT_PDF_GUIDE_CONFIG, ...currentSettings.pdf_guide_config });
+    if (currentSettings.pdf_guide_config) {
+      const config = { ...DEFAULT_PDF_GUIDE_CONFIG, ...currentSettings.pdf_guide_config };
+      if (!config.testimonials_section?.reviews || config.testimonials_section.reviews.length < 10) {
+        config.testimonials_section = {
+          ...(config.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!),
+          reviews: DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!.reviews
+        };
+      }
+      setPdfGuideConfig(config);
+    }
   }, [currentSettings]);
 
   // Invia le modifiche all'iframe di anteprima
@@ -334,6 +509,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
     const newReviews = [...(landingConfig.testimonials_section.reviews || [])];
     newReviews[idx] = { ...newReviews[idx], [field]: value };
     setLandingConfig({ ...landingConfig, testimonials_section: { ...landingConfig.testimonials_section, reviews: newReviews } });
+  };
+
+  const handlePdfReviewUpdate = (idx: number, field: string, value: string) => {
+    const newReviews = [...(pdfGuideConfig.testimonials_section?.reviews || [])];
+    newReviews[idx] = { ...newReviews[idx], [field]: value };
+    setPdfGuideConfig({ ...pdfGuideConfig, testimonials_section: { ...(pdfGuideConfig.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!), reviews: newReviews } });
   };
 
   const handleExportCSV = async () => {
@@ -467,7 +648,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                       </div>
                    </details>
 
-                   <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                    <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
                         <summary className="font-bold cursor-pointer flex items-center gap-2"><TrendingUp/> Sezione Statistiche</summary>
                         <div className="mt-4 space-y-4">
                             <div className="flex items-center gap-4">
@@ -495,6 +676,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                             <button onClick={() => { const newStats = [...(pdfGuideConfig.stats_section?.stats || []), {value: '', label: '', description: ''}]; setPdfGuideConfig(prev => ({...prev, stats_section: {...(prev.stats_section || DEFAULT_PDF_GUIDE_CONFIG.stats_section), stats: newStats}})); }} className="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-300 text-sm flex items-center justify-center gap-2">
                                 <Plus className="h-4 w-4"/> Aggiungi Statistica
                             </button>
+                        </div>
+                   </details>
+
+                   <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                        <summary className="font-bold cursor-pointer flex items-center gap-2"><MessageCircle/> Sezione Recensioni</summary>
+                        <div className="mt-4 space-y-4">
+                            <div className="flex items-center gap-4">
+                                <input type="text" value={pdfGuideConfig.testimonials_section?.title || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, testimonials_section: {...(prev.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!), title: e.target.value}}))} className="w-full border p-2 rounded text-sm" placeholder="Titolo Sezione" />
+                                <div className="flex items-center gap-2">
+                                    <input type="checkbox" checked={pdfGuideConfig.testimonials_section?.is_visible || false} onChange={e => setPdfGuideConfig(prev => ({...prev, testimonials_section: {...(prev.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!), is_visible: e.target.checked}}))} className="h-5 w-5 accent-purple-600" />
+                                    <span className="text-sm font-medium">Visibile</span>
+                                </div>
+                            </div>
+                            <input type="text" value={pdfGuideConfig.testimonials_section?.subtitle || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, testimonials_section: {...(prev.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!), subtitle: e.target.value}}))} className="w-full border p-2 rounded text-sm" placeholder="Sottotitolo" />
+                            
+                            <h5 className="font-bold text-xs uppercase text-gray-500 pt-2">Elenco Recensioni ({(pdfGuideConfig.testimonials_section?.reviews || []).length})</h5>
+                            {(pdfGuideConfig.testimonials_section?.reviews || []).map((review, idx) => (
+                                <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2 relative">
+                                    <button onClick={() => { const newReviews = [...(pdfGuideConfig.testimonials_section?.reviews || [])]; newReviews.splice(idx, 1); setPdfGuideConfig(prev => ({...prev, testimonials_section: {...prev.testimonials_section!, reviews: newReviews}})); }} className="absolute top-2 right-2 text-gray-400 hover:text-red-500">
+                                        <XCircle className="h-4 w-4"/>
+                                    </button>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input value={review.name} onChange={e => handlePdfReviewUpdate(idx, 'name', e.target.value)} className="border p-2 rounded text-sm font-bold" placeholder="Nome" />
+                                        <input value={review.role} onChange={e => handlePdfReviewUpdate(idx, 'role', e.target.value)} className="border p-2 rounded text-sm" placeholder="Ruolo" />
+                                    </div>
+                                    <textarea value={review.text} onChange={e => handlePdfReviewUpdate(idx, 'text', e.target.value)} rows={2} className="w-full border p-2 rounded text-sm" placeholder="Testo..."></textarea>
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" checked={review.verified} onChange={e => {
+                                            const newReviews = [...(pdfGuideConfig.testimonials_section?.reviews || [])];
+                                            newReviews[idx] = { ...newReviews[idx], verified: e.target.checked };
+                                            setPdfGuideConfig(prev => ({ ...prev, testimonials_section: { ...prev.testimonials_section!, reviews: newReviews } }));
+                                        }} className="h-4 w-4 accent-green-600" />
+                                        <span className="text-xs font-bold text-green-700">Verificata</span>
+                                    </div>
+                                </div>
+                            ))}
+                            <button onClick={() => { const newReviews = [...(pdfGuideConfig.testimonials_section?.reviews || []), {name: '', role: '', text: '', verified: true}]; setPdfGuideConfig(prev => ({...prev, testimonials_section: {...(prev.testimonials_section || DEFAULT_PDF_GUIDE_CONFIG.testimonials_section!), reviews: newReviews}})); }} className="w-full bg-gray-200 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-300 text-sm flex items-center justify-center gap-2">
+                                <Plus className="h-4 w-4"/> Aggiungi Recensione
+                            </button>
+                        </div>
+                   </details>
+
+                   <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+                        <summary className="font-bold cursor-pointer flex items-center gap-2"><LayoutTemplate/> Footer</summary>
+                        <div className="mt-4 space-y-4">
+                            <div className="flex items-center gap-4">
+                                <input type="text" value={pdfGuideConfig.footer?.text || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, footer: {...(prev.footer || DEFAULT_PDF_GUIDE_CONFIG.footer!), text: e.target.value}}))} className="w-full border p-2 rounded text-sm" placeholder="Testo Footer" />
+                                <div className="flex items-center gap-2">
+                                    <input type="checkbox" checked={pdfGuideConfig.footer?.is_visible || false} onChange={e => setPdfGuideConfig(prev => ({...prev, footer: {...(prev.footer || DEFAULT_PDF_GUIDE_CONFIG.footer!), is_visible: e.target.checked}}))} className="h-5 w-5 accent-purple-600" />
+                                    <span className="text-sm font-medium">Visibile</span>
+                                </div>
+                            </div>
+                            <input type="text" value={pdfGuideConfig.footer?.copyright || ''} onChange={e => setPdfGuideConfig(prev => ({...prev, footer: {...(prev.footer || DEFAULT_PDF_GUIDE_CONFIG.footer!), copyright: e.target.value}}))} className="w-full border p-2 rounded text-sm" placeholder="Copyright" />
                         </div>
                    </details>
               </>
@@ -752,6 +986,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                             <input type="text" value={landingConfig.hero.title} onChange={(e) => setLandingConfig({...landingConfig, hero: {...landingConfig.hero, title: e.target.value}})} className="w-full border p-3 rounded-xl font-bold text-lg" placeholder="Titolo Principale" />
                             <input type="text" value={landingConfig.hero.subtitle} onChange={(e) => setLandingConfig({...landingConfig, hero: {...landingConfig.hero, subtitle: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Sottotitolo" />
                             <textarea rows={4} value={landingConfig.hero.text} onChange={(e) => setLandingConfig({...landingConfig, hero: {...landingConfig.hero, text: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Testo descrittivo"></textarea>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold flex items-center"><MessageCircle className="mr-2 text-brand-600"/> Recensioni</h3>
+                            <div className="flex items-center gap-2">
+                                <input type="checkbox" checked={landingConfig.testimonials_section.is_visible} onChange={(e) => setLandingConfig({...landingConfig, testimonials_section: {...landingConfig.testimonials_section, is_visible: e.target.checked}})} className="h-5 w-5 accent-brand-600" />
+                                <label className="text-sm font-bold">Visibile</label>
+                            </div>
+                        </div>
+                        <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <input type="text" value={landingConfig.testimonials_section.title} onChange={(e) => setLandingConfig({...landingConfig, testimonials_section: {...landingConfig.testimonials_section, title: e.target.value}})} className="w-full border p-3 rounded-xl font-bold" placeholder="Titolo Sezione" />
+                                <input type="text" value={landingConfig.testimonials_section.subtitle} onChange={(e) => setLandingConfig({...landingConfig, testimonials_section: {...landingConfig.testimonials_section, subtitle: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Sottotitolo" />
+                            </div>
+                            
+                            <div className="space-y-4 pt-4">
+                                <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider">Elenco Recensioni ({landingConfig.testimonials_section.reviews.length})</h4>
+                                {landingConfig.testimonials_section.reviews.map((review, idx) => (
+                                    <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-200 relative space-y-3">
+                                        <button onClick={() => {
+                                            const newReviews = [...landingConfig.testimonials_section.reviews];
+                                            newReviews.splice(idx, 1);
+                                            setLandingConfig({...landingConfig, testimonials_section: {...landingConfig.testimonials_section, reviews: newReviews}});
+                                        }} className="absolute top-2 right-2 text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4"/></button>
+                                        
+                                        <div className="grid md:grid-cols-3 gap-3">
+                                            <input type="text" value={review.name} onChange={(e) => handleReviewUpdate(idx, 'name', e.target.value)} className="border p-2 rounded text-sm font-bold" placeholder="Nome Cognome" />
+                                            <input type="text" value={review.role} onChange={(e) => handleReviewUpdate(idx, 'role', e.target.value)} className="border p-2 rounded text-sm" placeholder="Ruolo/Professione" />
+                                            <div className="flex items-center gap-2 bg-white border p-2 rounded">
+                                                <input type="checkbox" checked={review.verified} onChange={(e) => {
+                                                    const newReviews = [...landingConfig.testimonials_section.reviews];
+                                                    newReviews[idx] = { ...newReviews[idx], verified: e.target.checked };
+                                                    setLandingConfig({ ...landingConfig, testimonials_section: { ...landingConfig.testimonials_section, reviews: newReviews } });
+                                                }} className="h-4 w-4 accent-green-600" />
+                                                <label className="text-xs font-bold text-green-700">Verificata</label>
+                                            </div>
+                                        </div>
+                                        <textarea rows={2} value={review.text} onChange={(e) => handleReviewUpdate(idx, 'text', e.target.value)} className="w-full border p-2 rounded text-sm" placeholder="Testo della recensione"></textarea>
+                                        <input type="text" value={review.avatar || ''} onChange={(e) => handleReviewUpdate(idx, 'avatar', e.target.value)} className="w-full border p-2 rounded text-xs font-mono" placeholder="URL Avatar (opzionale)" />
+                                    </div>
+                                ))}
+                                <button onClick={() => {
+                                    const newReviews = [...landingConfig.testimonials_section.reviews, { name: '', role: '', text: '', verified: true }];
+                                    setLandingConfig({...landingConfig, testimonials_section: {...landingConfig.testimonials_section, reviews: newReviews}});
+                                }} className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-bold hover:bg-gray-50 flex items-center justify-center gap-2">
+                                    <Plus className="h-4 w-4"/> Aggiungi Recensione
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

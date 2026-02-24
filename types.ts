@@ -116,6 +116,29 @@ export interface PdfGuideConfig extends PreLaunchConfig {
   guide_pdf_url?: string; 
   showcase_items?: ShowcaseItem[];
   stats_section?: StatsSection;
+  testimonials_section?: {
+    title: string;
+    subtitle: string;
+    is_visible: boolean;
+    reviews: Array<{
+      name: string;
+      role: string;
+      text: string;
+      avatar?: string;
+      verified?: boolean;
+    }>;
+  };
+  footer?: {
+    text: string;
+    copyright: string;
+    is_visible: boolean;
+    social_links?: {
+      facebook?: string;
+      instagram?: string;
+      linkedin?: string;
+      youtube?: string;
+    };
+  };
 }
 
 // Added LandingPageConfig interface to fix import errors in Home.tsx, AdminDashboard.tsx, Login.tsx, and Footer.tsx
@@ -206,6 +229,7 @@ export interface LandingPageConfig {
       text: string;
       avatar?: string;
       attachmentUrl?: string;
+      verified?: boolean;
     }>;
   };
   usp_section: {
