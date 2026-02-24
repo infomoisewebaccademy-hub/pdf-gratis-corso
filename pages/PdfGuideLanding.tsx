@@ -133,6 +133,11 @@ export const PdfGuideLanding: React.FC = () => {
                     </a>
                 </section>
             </div>
+            <footer className="max-w-4xl mx-auto p-8 text-center text-xs text-gray-500">
+                <p className="mb-2">Marketers di Strada S.R.L. | P.IVA 1234567890 | Via Prova 1, 10100 Torino (TO)</p>
+                <p><a href="/privacy-policy" className="hover:text-white">Privacy Policy</a> | <a href="/cookie-policy" className="hover:text-white">Cookie Policy</a></p>
+                <p className="mt-4">Questo sito non fa parte del sito Facebook o Facebook Inc. Inoltre, questo sito NON è approvato da Facebook in alcun modo. FACEBOOK è un marchio registrato di FACEBOOK, Inc.</p>
+            </footer>
         </div>
     );
 };
