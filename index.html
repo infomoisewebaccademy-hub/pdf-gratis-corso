@@ -6,7 +6,37 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MWA - Moise Web Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                50: 'var(--brand-50, #eff6ff)',
+                100: 'var(--brand-100, #dbeafe)',
+                200: 'var(--brand-200, #bfdbfe)',
+                300: 'var(--brand-300, #93c5fd)',
+                400: 'var(--brand-400, #60a5fa)',
+                500: 'var(--brand-500, #3b82f6)',
+                600: 'var(--brand-600, #2563eb)',
+                700: 'var(--brand-700, #1d4ed8)',
+                800: 'var(--brand-800, #1e40af)',
+                900: 'var(--brand-900, #1e3a8a)',
+                950: 'var(--brand-950, #172554)',
+              },
+              slate: {
+                950: 'var(--bg-main, #020617)',
+              }
+            }
+          }
+        }
+      }
+    </script>
 <script type="importmap">
 {
   "imports": {

@@ -165,30 +165,55 @@ const AppContent: React.FC = () => {
             document.head.appendChild(style);
         }
         
-        let css = '';
+        let css = ':root {\n';
+        
+        // Helper per generare variazioni di colore (molto semplificato)
+        const getShade = (hex: string, percent: number) => {
+            if (!hex || typeof hex !== 'string') return hex;
+            if (!hex.startsWith('#')) hex = '#' + hex;
+            if (hex.length !== 7) return hex;
+
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            
+            const adjust = (val: number) => {
+                const res = Math.round(val + (255 - val) * percent);
+                return Math.min(255, Math.max(0, res)).toString(16).padStart(2, '0');
+            };
+            
+            const darken = (val: number) => {
+                const res = Math.round(val * (1 + percent));
+                return Math.min(255, Math.max(0, res)).toString(16).padStart(2, '0');
+            };
+
+            if (percent > 0) return `#${adjust(r)}${adjust(g)}${adjust(b)}`;
+            return `#${darken(r)}${darken(g)}${darken(b)}`;
+        };
+
         if (config.brand_color) {
-            const brandColor = config.brand_color;
-            css += `
-                :root {
-                    --brand-color: ${brandColor};
-                }
-                .text-brand-400, .text-brand-500, .text-brand-600 { color: ${brandColor} !important; }
-                .bg-brand-500, .bg-brand-600, .bg-brand-700 { background-color: ${brandColor} !important; }
-                .border-brand-500, .border-brand-600 { border-color: ${brandColor} !important; }
-                .ring-brand-500, .ring-brand-600 { --tw-ring-color: ${brandColor} !important; }
-                .selection\\:bg-brand-500\\/30 ::selection { background-color: ${brandColor}4d !important; }
-                .shadow-brand-500\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
-                .shadow-brand-500\\/50 { --tw-shadow-color: ${brandColor}80 !important; }
-                .shadow-brand-600\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
-                .shadow-brand-900\\/20 { --tw-shadow-color: ${brandColor}33 !important; }
-            `;
+            const brand = config.brand_color;
+            css += `  --brand-50: ${getShade(brand, 0.9)};\n`;
+            css += `  --brand-100: ${getShade(brand, 0.8)};\n`;
+            css += `  --brand-200: ${getShade(brand, 0.6)};\n`;
+            css += `  --brand-300: ${getShade(brand, 0.4)};\n`;
+            css += `  --brand-400: ${getShade(brand, 0.2)};\n`;
+            css += `  --brand-500: ${brand};\n`;
+            css += `  --brand-600: ${getShade(brand, -0.1)};\n`;
+            css += `  --brand-700: ${getShade(brand, -0.2)};\n`;
+            css += `  --brand-800: ${getShade(brand, -0.3)};\n`;
+            css += `  --brand-900: ${getShade(brand, -0.4)};\n`;
+            css += `  --brand-950: ${getShade(brand, -0.6)};\n`;
         }
+        
         if (config.bg_color) {
-            css += `
-                .bg-slate-950 { background-color: ${config.bg_color} !important; }
-                body { background-color: ${config.bg_color}; }
-            `;
+            css += `  --bg-main: ${config.bg_color};\n`;
+            css += `}\n`;
+            css += `body { background-color: ${config.bg_color} !important; }\n`;
+        } else {
+            css += `}\n`;
         }
+        
         style.innerHTML = css;
     }
   }, [settings.landing_page_config]);
