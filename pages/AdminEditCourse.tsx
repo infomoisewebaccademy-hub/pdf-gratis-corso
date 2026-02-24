@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson } from '../types';
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2 } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
@@ -193,7 +193,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
 
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">
-      <form onSubmit={handleSubmit} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <form onSubmit={handleSubmit} className="w-full px-4 sm:px-6 lg:px-8">
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 sticky top-20 z-30 bg-gray-50/95 backdrop-blur py-4 border-b border-gray-200">
             <div className="flex items-center">
@@ -354,12 +354,15 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                     </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><Book className="h-5 w-5 mr-2 text-brand-600" /> Caratteristiche</h2>
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><CheckCircle2 className="h-5 w-5 mr-2 text-brand-600" /> Cosa Imparerai</h2>
                     <div className="space-y-3">
                         {formData.features?.map((feat, idx) => (
-                            <div key={idx} className="flex items-center gap-2"><input type="text" value={feat} onChange={e => updateFeature(idx, e.target.value)} className="flex-1 block w-full border border-gray-300 rounded-lg p-2 text-sm" placeholder="Punto chiave..." /><button type="button" onClick={() => removeFeature(idx)} className="text-red-400 hover:text-red-600"><Trash className="h-4 w-4" /></button></div>
+                            <div key={idx} className="flex items-center gap-2">
+                                <input type="text" value={feat} onChange={e => updateFeature(idx, e.target.value)} className="flex-1 block w-full border border-gray-300 rounded-lg p-3" placeholder="Es. Creare un sito web da zero..." />
+                                <button type="button" onClick={() => removeFeature(idx)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full"><Trash className="h-4 w-4" /></button>
+                            </div>
                         ))}
-                        <button type="button" onClick={addFeature} className="text-xs text-brand-600 font-bold flex items-center hover:text-brand-800"><Plus className="h-3 w-3 mr-1" /> Aggiungi</button>
+                        <button type="button" onClick={addFeature} className="text-sm bg-brand-50 text-brand-700 px-4 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center"><Plus className="h-4 w-4 mr-2" /> Aggiungi Punto</button>
                     </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
