@@ -994,9 +994,18 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                           <h2 className="text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight">
                               {config.ai_showcase_section?.title}
                           </h2>
-                          <p className="text-xl text-slate-400 leading-relaxed mb-12 whitespace-pre-wrap">
+                          <p className="text-xl text-slate-400 leading-relaxed mb-8 whitespace-pre-wrap">
                               {config.ai_showcase_section?.text}
                           </p>
+                          <div className="bg-brand-500/10 border border-brand-500/20 rounded-2xl p-6 mb-8">
+                              <p className="text-brand-300 font-medium flex items-center gap-2">
+                                  <Sparkles className="h-5 w-5" />
+                                  Bonus Esclusivo
+                              </p>
+                              <p className="text-slate-400 text-sm mt-2">
+                                  Nella guida PDF questi siti/piattaforme sono già compresi così e si potranno modificare a piacere per poi pubblicarli online.
+                              </p>
+                          </div>
                       </div>
                       
                       {/* Description Panel */}
@@ -1020,6 +1029,45 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                               </ul>
                           </div>
                       </div>
+                  </div>
+
+                  {/* Website Showcase Grid */}
+                  <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {[
+                          "https://please-make-the-55.aura.build/",
+                          "https://real-estate-developer-99.aura.build/",
+                          "https://ferdousmikdad-test.aura.build/",
+                          "https://luxury-coastal-60.aura.build/",
+                          "https://minimal-landing.aura.build/"
+                      ].map((url, idx) => (
+                          <div key={idx} className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-500/20">
+                              <div className="h-10 bg-slate-900 flex items-center px-4 gap-2 border-b border-white/5">
+                                  <div className="flex gap-1.5">
+                                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                                  </div>
+                                  <div className="flex-1 text-[10px] text-slate-500 font-mono truncate text-center opacity-50">
+                                      {url.replace('https://', '')}
+                                  </div>
+                              </div>
+                              <div className="h-[400px] overflow-hidden relative">
+                                  <iframe 
+                                      src={url} 
+                                      className="w-full h-full border-none pointer-events-auto"
+                                      title={`Showcase ${idx}`}
+                                      loading="lazy"
+                                  />
+                                  {/* Overlay to hint scrollability if needed, but user wants them to scroll */}
+                              </div>
+                              <div className="p-4 bg-slate-900/80 backdrop-blur-md border-t border-white/5 flex justify-between items-center">
+                                  <span className="text-xs font-medium text-slate-400">Template AI #{idx + 1}</span>
+                                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-brand-400 hover:text-brand-300 transition-colors">
+                                      <ExternalLink className="h-4 w-4" />
+                                  </a>
+                              </div>
+                          </div>
+                      ))}
                   </div>
               </div>
           </section>

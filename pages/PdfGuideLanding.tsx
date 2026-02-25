@@ -307,6 +307,61 @@ export const PdfGuideLanding: React.FC = () => {
                         ))}
                     </div>
                 </section>
+                
+                {/* WEBSITE SHOWCASE */}
+                <section className="space-y-16 py-20">
+                    <div className="text-center space-y-4 max-w-3xl mx-auto">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-4">
+                            <Monitor className="h-3 w-3" />
+                            Esempi Reali
+                        </div>
+                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi creare davvero</h2>
+                        <p className="text-lg text-slate-400 leading-relaxed">
+                            Questi sono esempi reali di siti e piattaforme creati interamente con l'AI. 
+                            <span className="text-brand-400 font-semibold block mt-2">
+                                Nella guida PDF questi siti sono già compresi e potrai modificarli a tuo piacimento per poi pubblicarli online.
+                            </span>
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[
+                            "https://please-make-the-55.aura.build/",
+                            "https://real-estate-developer-99.aura.build/",
+                            "https://ferdousmikdad-test.aura.build/",
+                            "https://luxury-coastal-60.aura.build/",
+                            "https://minimal-landing.aura.build/"
+                        ].map((url, idx) => (
+                            <div key={idx} className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all duration-500">
+                                <div className="h-10 bg-slate-900 flex items-center px-4 gap-2 border-b border-white/5">
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                                    </div>
+                                    <div className="flex-1 text-[10px] text-slate-500 font-mono truncate text-center opacity-50">
+                                        {url.replace('https://', '')}
+                                    </div>
+                                </div>
+                                <div className="h-[450px] overflow-hidden relative">
+                                    <iframe 
+                                        src={url} 
+                                        className="w-full h-full border-none"
+                                        title={`Showcase PDF ${idx}`}
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div className="p-4 bg-slate-900/80 backdrop-blur-md border-t border-white/5 flex justify-between items-center">
+                                    <span className="text-xs font-medium text-slate-400">Template Incluso #{idx + 1}</span>
+                                    <div className="flex items-center gap-2 text-brand-400 text-xs font-bold">
+                                        <CheckCircle className="h-3 w-3" />
+                                        EDITABILE
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
 
                 {/* 4. TESTIMONIALS */}
                 {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
