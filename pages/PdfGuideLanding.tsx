@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { PlatformSettings, PdfGuideConfig } from '../types';
 
 const DEFAULT_PDF_CONFIG: PdfGuideConfig = {
-    headline_solid: "CREA SITI CON L'AI",
-    headline_gradient: "La Guida Gratuita",
+    headline_solid: "CREA PIATTAFORME CON",
+    headline_gradient: "L'INTELLIGENZA ARTIFICIALE",
     description: "Ricevi subito via email la nostra guida PDF passo-passo e accedi alla nostra piattaforma per un video-tutorial esclusivo. Inizia oggi a trasformare le tue idee in realtà.",
     subheadline: "Sblocca il potenziale dell'Intelligenza Artificiale e impara a creare siti web professionali, senza scrivere codice.",
     offer_badge: "100% Gratuito",
@@ -16,11 +16,11 @@ const DEFAULT_PDF_CONFIG: PdfGuideConfig = {
     success_title: "Accesso Inviato!",
     success_text: "Perfetto! Controlla la tua casella di posta (anche SPAM) per trovare la guida e le tue credenziali di accesso. Ci vediamo dentro!",
     form_disclaimer_text: "Inserisci i dati per ricevere la guida e creare il tuo accesso gratuito alla nostra piattaforma.",
-    bg_color_main: "#f9fafb",
-    title_color: "#111827",
-    text_color_body: "#4b5563",
-    gradient_start: "#2563eb",
-    gradient_end: "#1d4ed8",
+    bg_color_main: "#020617",
+    title_color: "#ffffff",
+    text_color_body: "#94a3b8",
+    gradient_start: "#6366f1",
+    gradient_end: "#a855f7",
     testimonials_section: {
         title: 'Cosa Dicono i Nostri Studenti',
         subtitle: 'Testimonianze',
@@ -45,55 +45,6 @@ const DEFAULT_PDF_CONFIG: PdfGuideConfig = {
                 role: 'Studentessa',
                 text: "Partivo da zero assoluto. Ora ho creato il sito per l'attività di famiglia e sto già ricevendo richieste da altri commercianti. Una competenza che mi ha aperto un mondo.",
                 avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Alessandro M.',
-                role: 'Fotografo Freelance',
-                text: "Volevo un portfolio online che si distinguesse, ma le agenzie mi chiedevano cifre folli. Grazie a Daniel ho costruito un sito magnifico in poche ore, completamente da solo. Consigliatissimo.",
-                avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Chiara B.',
-                role: 'Social Media Manager',
-                text: "La parte sulle automazioni è oro colato. Ho integrato form di contatto, email automatiche e notifiche per i miei clienti, facendogli risparmiare ore di lavoro manuale. Valore immenso.",
-                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Matteo V.',
-                role: 'Titolare di Ristorante',
-                text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
-                avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Valentina C.',
-                role: 'Coach Olistico',
-                text: "Il supporto su WhatsApp è la vera svolta. Avevo un dubbio sul dominio e Daniel mi ha risposto in 10 minuti, risolvendo tutto. Non sei mai lasciato solo. Questo non ha prezzo.",
-                avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Riccardo T.',
-                role: 'Agente Immobiliare',
-                text: "Ho creato landing page specifiche per ogni immobile di lusso che vendo. Risultati? Tassi di conversione triplicati e clienti impressionati. Il miglior investimento del 2024.",
-                avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Laura P.',
-                role: 'Artista',
-                text: "Finalmente posso mostrare le mie opere online senza dipendere da nessuno. Il processo è stato così semplice e intuitivo che mi sono sentita una vera 'tech artist'. Grazie!",
-                avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
-                verified: true
-            },
-            {
-                name: 'Simone R.',
-                role: 'Personal Trainer',
-                text: "Ho creato un'area riservata per i miei clienti con schede di allenamento e video esclusivi. Una funzionalità che pensavo costasse migliaia di euro, realizzata in un pomeriggio. Fenomenale.",
-                avatar: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
                 verified: true
             }
         ]
@@ -123,7 +74,18 @@ export const PdfGuideLanding: React.FC = () => {
                 
                 if (error) throw error;
                 if (data?.pdf_guide_config) {
-                    const fetchedConfig = { ...DEFAULT_PDF_CONFIG, ...data.pdf_guide_config };
+                    // Mantieni i colori del tema scuro di default, aggiorna solo il contenuto
+                    const { 
+                        bg_color_main,
+                        title_color,
+                        text_color_body,
+                        gradient_start,
+                        gradient_end,
+                        ...contentConfig 
+                    } = data.pdf_guide_config;
+
+                    const fetchedConfig = { ...DEFAULT_PDF_CONFIG, ...contentConfig };
+                    
                     // Logic to ensure 10 reviews
                     if (!fetchedConfig.testimonials_section?.reviews || fetchedConfig.testimonials_section.reviews.length < 10) {
                         fetchedConfig.testimonials_section = {
@@ -225,111 +187,151 @@ export const PdfGuideLanding: React.FC = () => {
     };
 
     const renderForm = (isBottom = false) => (
-        <div id={isBottom ? "bottom-form" : "form-section"} className={`bg-white p-8 rounded-2xl border border-gray-200 shadow-xl shadow-gray-200/50 ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
-            <div className="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4" style={{ backgroundColor: `${config.gradient_start}1a`, color: config.gradient_start }}>
-                {config.offer_badge}
+        <div id={isBottom ? "bottom-form" : "form-section"} className={`bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-30 pointer-events-none"></div>
+            <div className="relative z-10">
+                <div className="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4" style={{ backgroundColor: `${config.gradient_start}1a`, color: config.gradient_start }}>
+                    {config.offer_badge}
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">{config.offer_title}</h3>
+                <p className="text-slate-400 mb-6">{config.offer_text}</p>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                        <input type="text" placeholder={config.form_name_placeholder || "Il tuo nome completo"} value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 pl-12 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-brand-500/50 transition outline-none" />
+                    </div>
+                    <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                        <input type="email" placeholder={config.form_email_placeholder || "La tua email principale"} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 pl-12 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-brand-500/50 transition outline-none" />
+                    </div>
+                    <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-xl transition-all duration-300 ease-in-out flex items-center justify-center group text-white shadow-[0_0_30px_-5px_rgba(99,102,241,0.5)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.7)] transform hover:-translate-y-1" style={{ backgroundColor: config.gradient_start }}>
+                        {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>{config.cta_text} <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
+                    </button>
+                </form>
+                {error && <p className="text-red-400 text-sm mt-4 text-center flex items-center justify-center"><AlertCircle className="h-4 w-4 mr-2"/> {error}</p>}
+                <p className="text-xs text-slate-500 mt-4 text-center">{config.form_disclaimer_text}</p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{config.offer_title}</h3>
-            <p className="text-gray-600 mb-6">{config.offer_text}</p>
-            <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input type="text" placeholder={config.form_name_placeholder || "Il tuo nome completo"} value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-2 transition" style={{ '--tw-ring-color': config.gradient_start } as any} />
-                </div>
-                <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input type="email" placeholder={config.form_email_placeholder || "La tua email principale"} value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-50 border-2 border-gray-200 rounded-lg py-3 pr-4 pl-12 text-gray-900 focus:ring-2 transition" style={{ '--tw-ring-color': config.gradient_start } as any} />
-                </div>
-                <button type="submit" disabled={isLoading} className="w-full text-lg font-bold py-4 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center group text-white shadow-lg" style={{ backgroundColor: config.gradient_start, boxShadow: `0 10px 15px -3px ${config.gradient_start}4d` }}>
-                    {isLoading ? <Loader className="animate-spin h-6 w-6" /> : <>{config.cta_text} <ArrowRight className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" /></>}
-                </button>
-            </form>
-            {error && <p className="text-red-500 text-sm mt-4 text-center flex items-center justify-center"><AlertCircle className="h-4 w-4 mr-2"/> {error}</p>}
-            <p className="text-xs text-gray-500 mt-4 text-center">{config.form_disclaimer_text}</p>
         </div>
     );
 
     return (
-        <div className="min-h-screen font-sans" style={{ backgroundColor: config.bg_color_main }}>
+        <div className="min-h-screen font-sans text-slate-200 selection:bg-brand-500/30" style={{ backgroundColor: config.bg_color_main }}>
+            {/* Background Glows */}
+            <div className="fixed top-0 w-full h-screen -z-10 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-brand-600/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-purple-900/10 rounded-full blur-[150px]"></div>
+            </div>
+
             {/* 1. HERO SECTION */}
-            <header className="bg-white text-center pt-24 pb-20 px-4">
-                <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900" style={{ color: config.title_color }}>
-                    {config.headline_solid} <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }}>{config.headline_gradient}</span>
-                </h1>
-                <p className="max-w-3xl mx-auto mt-6 text-lg md:text-xl text-gray-600" style={{ color: config.text_color_body }}>{config.subheadline}</p>
-                <a href="#form-section" className="mt-8 inline-block text-lg font-bold py-4 px-10 rounded-lg transition-all duration-300 ease-in-out group text-white shadow-lg" style={{ backgroundColor: config.gradient_start }}>
-                    Scarica la Guida Gratuita
-                </a>
+            <header className="relative text-center pt-32 pb-24 px-4 overflow-hidden">
+                <div className="max-w-5xl mx-auto relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-brand-400 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8 backdrop-blur-md">
+                        <Monitor className="h-3 w-3" />
+                        Guida PDF Gratuita 2025
+                    </div>
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.95] mb-8">
+                        {config.headline_solid} <br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }}>
+                            {config.headline_gradient}
+                        </span>
+                    </h1>
+                    <p className="max-w-2xl mx-auto mt-8 text-xl md:text-2xl text-slate-400 leading-relaxed" style={{ color: config.text_color_body }}>
+                        {config.subheadline}
+                    </p>
+                    <div className="mt-12">
+                        <a href="#form-section" className="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.6)] group transform hover:-translate-y-1" style={{ backgroundColor: config.gradient_start }}>
+                            Scarica la Guida Gratuita <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                    </div>
+                </div>
             </header>
 
-            <main className="max-w-6xl mx-auto p-4 sm:p-8 space-y-24">
-                {/* 2. PROBLEMA */}
-                <section className="text-center">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">“Vorrei un sito, ma da dove inizio?”</h2>
-                    <p className="text-lg text-gray-700 max-w-3xl mx-auto">Se questo pensiero ti suona familiare, non sei solo. Molti credono di dover imparare a programmare, spendere migliaia di euro o capire termini tecnici come 'hosting' e 'dominio'. La verità? Il problema non sei tu, ma gli strumenti complicati che ti hanno proposto finora.</p>
-                </section>
-
-                {/* 3. SOLUZIONE */}
-                <section className="grid md:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">La soluzione è un metodo, non più codice.</h2>
-                        <p className="text-lg text-gray-700 mb-6">In questa guida PDF ti mostro un sistema pratico per dire a una macchina cosa vuoi, e vederlo realizzato in pochi minuti. Niente teoria, solo pratica. <br/><br/> All'interno troverai:</p>
-                        <ul className="space-y-4">
-                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Il processo esatto, passo-passo:</strong> Dalla pagina bianca al sito online, senza saltare un solo passaggio.</span></li>
-                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Esempi reali e istruzioni chiare:</strong> Vedrai cosa scrivere e dove cliccare per ottenere un risultato professionale.</span></li>
-                            <li className="flex items-start"><CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-1 flex-shrink-0" /><span><strong>Il risultato finale:</strong> Un sito vetrina semplice, pulito e funzionante, pronto per essere mostrato al mondo.</span></li>
-                        </ul>
-                    </div>
-                    {renderForm()}
-                </section>
-
-                {/* 4. PROVA E RISULTATI */}
-                <section>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Cosa puoi costruire DAVVERO con questo metodo?</h2>
-                    <div className="grid md:grid-cols-3 gap-8 text-center">
-                        <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Monitor className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
-                            <h3 className="font-bold text-xl mb-2">Siti Vetrina</h3>
-                            <p className="text-gray-600">Per presentare la tua attività, il tuo portfolio o un progetto personale.</p>
+            <main className="max-w-7xl mx-auto px-6 space-y-32 pb-32">
+                {/* 2. PROBLEMA & SOLUZIONE */}
+                <section className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="space-y-8">
+                        <div className="space-y-4">
+                            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">“Vorrei un sito, ma da dove inizio?”</h2>
+                            <p className="text-lg text-slate-400 leading-relaxed">Se questo pensiero ti suona familiare, non sei solo. Molti credono di dover imparare a programmare o spendere migliaia di euro. La verità? Il problema non sei tu, ma gli strumenti complicati che ti hanno proposto finora.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Code className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
-                            <h3 className="font-bold text-xl mb-2">Pagine Semplici</h3>
-                            <p className="text-gray-600">Per lanciare un prodotto, un evento o raccogliere contatti in modo rapido.</p>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200">
-                            <Coffee className="h-12 w-12 mx-auto mb-4" style={{ color: config.gradient_start }} />
-                            <h3 className="font-bold text-xl mb-2">Progetti Reali</h3>
-                            <p className="text-gray-600">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 5. TESTIMONIALS */}
-                {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
-                    <section className="py-12">
-                        <div className="text-center mb-12">
-                            <h2 className="font-bold tracking-widest uppercase text-sm mb-2" style={{ color: config.gradient_start }}>{config.testimonials_section.subtitle}</h2>
-                            <h3 className="text-3xl md:text-4xl font-black text-gray-900">{config.testimonials_section.title}</h3>
-                        </div>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {config.testimonials_section.reviews.map((review, idx) => (
-                                <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <img src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} alt={review.name} className="h-12 w-12 rounded-full object-cover border-2 border-gray-50" referrerPolicy="no-referrer" />
+                        
+                        <div className="space-y-6">
+                            <h3 className="text-2xl font-bold text-white">La soluzione è un metodo, non più codice.</h3>
+                            <p className="text-lg text-slate-400">In questa guida PDF ti mostro un sistema pratico per dire a una macchina cosa vuoi, e vederlo realizzato in pochi minuti. All'interno troverai:</p>
+                            <ul className="space-y-4">
+                                {[
+                                    { title: "Il processo esatto, passo-passo", desc: "Dalla pagina bianca al sito online, senza saltare un solo passaggio." },
+                                    { title: "Esempi reali e istruzioni chiare", desc: "Vedrai cosa scrivere e dove cliccare per ottenere un risultato professionale." },
+                                    { title: "Il risultato finale", desc: "Un sito vetrina semplice, pulito e funzionante, pronto per essere mostrato al mondo." }
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+                                        <div className="mt-1 flex-shrink-0 h-6 w-6 rounded-full bg-brand-500/20 flex items-center justify-center">
+                                            <CheckCircle className="h-4 w-4 text-brand-400" />
+                                        </div>
                                         <div>
-                                            <h4 className="font-bold text-gray-900 leading-tight">{review.name}</h4>
-                                            <p className="text-xs text-gray-500">{review.role}</p>
+                                            <span className="block font-bold text-white">{item.title}</span>
+                                            <span className="text-slate-400 text-sm">{item.desc}</span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="relative">
+                        <div className="absolute -inset-4 bg-brand-500/20 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
+                        {renderForm()}
+                    </div>
+                </section>
+
+                {/* 3. PROVA E RISULTATI */}
+                <section className="space-y-16">
+                    <div className="text-center max-w-3xl mx-auto space-y-4">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi costruire DAVVERO?</h2>
+                        <p className="text-xl text-slate-400">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            { icon: Monitor, title: "Siti Vetrina", desc: "Per presentare la tua attività, il tuo portfolio o un progetto personale." },
+                            { icon: Code, title: "Pagine Semplici", desc: "Per lanciare un prodotto, un evento o raccogliere contatti in modo rapido." },
+                            { icon: Coffee, title: "Progetti Reali", desc: "Trasforma le tue idee in piattaforme funzionanti senza barriere tecniche." }
+                        ].map((item, i) => (
+                            <div key={i} className="bg-white/5 p-8 rounded-3xl border border-white/10 hover:border-brand-500/30 transition-all group">
+                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-brand-500/10 ring-1 ring-brand-500/20 group-hover:scale-110 transition-transform">
+                                    <item.icon className="h-7 w-7 text-brand-400" />
+                                </div>
+                                <h3 className="font-bold text-xl text-white mb-3">{item.title}</h3>
+                                <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* 4. TESTIMONIALS */}
+                {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
+                    <section className="space-y-16">
+                        <div className="text-center space-y-4">
+                            <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-400">{config.testimonials_section.subtitle}</h2>
+                            <h3 className="text-3xl md:text-5xl font-bold text-white tracking-tight">{config.testimonials_section.title}</h3>
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {config.testimonials_section.reviews.map((review, idx) => (
+                                <div key={idx} className="bg-white/5 p-8 rounded-3xl border border-white/10 flex flex-col h-full">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <img src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} alt={review.name} className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" referrerPolicy="no-referrer" />
+                                        <div>
+                                            <h4 className="font-bold text-white leading-tight">{review.name}</h4>
+                                            <p className="text-xs text-slate-500">{review.role}</p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1 mb-3">
-                                        {[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
+                                    <div className="flex gap-1 mb-4">
+                                        {[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />)}
                                     </div>
-                                    <p className="text-gray-600 text-sm italic leading-relaxed">"{review.text}"</p>
+                                    <p className="text-slate-300 italic leading-relaxed flex-grow">"{review.text}"</p>
                                     {review.verified && (
-                                        <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-1.5 text-green-600">
+                                        <div className="mt-6 pt-6 border-t border-white/5 flex items-center gap-2 text-brand-400">
                                             <ShieldCheck className="h-4 w-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Recensione Verificata</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Studente Verificato</span>
                                         </div>
                                     )}
                                 </div>
@@ -338,50 +340,73 @@ export const PdfGuideLanding: React.FC = () => {
                     </section>
                 )}
 
-                {/* 6. PER CHI È / PER CHI NON È */}
+                {/* 5. PER CHI È / PER CHI NON È */}
                 <section className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-green-50 border border-green-200 rounded-xl p-8">
-                        <h3 className="text-2xl font-bold text-green-800 mb-4">Questa guida è per te se:</h3>
-                        <ul className="space-y-2 text-green-700">
-                            <li>- Vuoi un risultato concreto e visibile.</li>
-                            <li>- Parti da zero e non hai competenze tecniche.</li>
-                            <li>- Sei disposto a seguire un metodo passo-passo.</li>
-                            <li>- Vuoi capire come usare l'AI in modo pratico.</li>
+                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-10 space-y-6">
+                        <h3 className="text-2xl font-bold text-emerald-400">Questa guida è per te se:</h3>
+                        <ul className="space-y-4">
+                            {[
+                                "Vuoi un risultato concreto e visibile.",
+                                "Parti da zero e non hai competenze tecniche.",
+                                "Sei disposto a seguire un metodo passo-passo.",
+                                "Vuoi capire come usare l'AI in modo pratico."
+                            ].map((text, i) => (
+                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                                    {text}
+                                </li>
+                            ))}
                         </ul>
                     </div>
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-8">
-                        <h3 className="text-2xl font-bold text-red-800 mb-4">Questa guida NON è per te se:</h3>
-                        <ul className="space-y-2 text-red-700">
-                            <li>- Cerchi un modo per fare soldi facili online.</li>
-                            <li>- Vuoi creare un e-commerce complesso in 5 minuti.</li>
-                            <li>- Non hai voglia di imparare un nuovo strumento.</li>
-                            <li>- Pensi che l'AI faccia tutto da sola senza input.</li>
+                    <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-10 space-y-6">
+                        <h3 className="text-2xl font-bold text-rose-400">Questa guida NON è per te se:</h3>
+                        <ul className="space-y-4">
+                            {[
+                                "Cerchi un modo per fare soldi facili online.",
+                                "Vuoi creare un e-commerce complesso in 5 minuti.",
+                                "Non hai voglia di imparare un nuovo strumento.",
+                                "Pensi che l'AI faccia tutto da sola senza input."
+                            ].map((text, i) => (
+                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-rose-500"></div>
+                                    {text}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </section>
 
-                {/* 7. CTA FINALE + FORM */}
-                <section className="text-center space-y-12 pb-20">
-                    <div className="max-w-3xl mx-auto">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Pronto a mettere online la tua idea?</h2>
-                        <p className="text-lg text-gray-700 mb-8">Scarica la guida gratuita. È un PDF, senza fronzoli, che ti mostra esattamente cosa fare. Nessun costo, nessun rischio.</p>
+                {/* 6. CTA FINALE */}
+                <section className="text-center space-y-12 py-20 relative">
+                    <div className="absolute inset-0 bg-brand-500/5 blur-3xl rounded-full opacity-30 pointer-events-none"></div>
+                    <div className="max-w-3xl mx-auto space-y-6 relative z-10">
+                        <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight">Pronto a mettere online la tua idea?</h2>
+                        <p className="text-xl text-slate-400 leading-relaxed">Scarica la guida gratuita. È un PDF pratico che ti mostra esattamente cosa fare. Nessun costo, nessun rischio.</p>
                     </div>
-                    {renderForm(true)}
+                    <div className="relative z-10">
+                        {renderForm(true)}
+                    </div>
                 </section>
             </main>
 
-            {/* 8. FOOTER */}
+            {/* 7. FOOTER */}
             {config.footer?.is_visible && (
-                <footer className="bg-white border-t border-gray-200 py-12">
-                    <div className="max-w-6xl mx-auto px-4 text-center">
-                        <h4 className="text-xl font-black tracking-tighter text-gray-900 mb-4">{config.footer.text}</h4>
-                        <div className="flex justify-center gap-6 mb-8">
-                            {config.footer.social_links?.facebook && <a href={config.footer.social_links.facebook} className="text-gray-400 hover:text-blue-600 transition-colors"><Facebook className="h-5 w-5"/></a>}
-                            {config.footer.social_links?.instagram && <a href={config.footer.social_links.instagram} className="text-gray-400 hover:text-pink-600 transition-colors"><Instagram className="h-5 w-5"/></a>}
-                            {config.footer.social_links?.linkedin && <a href={config.footer.social_links.linkedin} className="text-gray-400 hover:text-blue-700 transition-colors"><Linkedin className="h-5 w-5"/></a>}
-                            {config.footer.social_links?.youtube && <a href={config.footer.social_links.youtube} className="text-gray-400 hover:text-red-600 transition-colors"><Youtube className="h-5 w-5"/></a>}
+                <footer className="bg-slate-950 border-t border-white/5 py-16">
+                    <div className="max-w-7xl mx-auto px-6 text-center space-y-8">
+                        <h4 className="text-2xl font-black tracking-tighter text-white">{config.footer.text}</h4>
+                        <div className="flex justify-center gap-8">
+                            {[
+                                { icon: Facebook, link: config.footer.social_links?.facebook, color: "hover:text-blue-500" },
+                                { icon: Instagram, link: config.footer.social_links?.instagram, color: "hover:text-pink-500" },
+                                { icon: Linkedin, link: config.footer.social_links?.linkedin, color: "hover:text-blue-400" },
+                                { icon: Youtube, link: config.footer.social_links?.youtube, color: "hover:text-red-500" }
+                            ].map((social, i) => social.link && (
+                                <a key={i} href={social.link} className={`text-slate-500 transition-colors ${social.color}`}>
+                                    <social.icon className="h-6 w-6"/>
+                                </a>
+                            ))}
                         </div>
-                        <p className="text-gray-500 text-sm">© {new Date().getFullYear()} {config.footer.copyright}</p>
+                        <p className="text-slate-600 text-sm">© {new Date().getFullYear()} {config.footer.copyright}</p>
                     </div>
                 </footer>
             )}

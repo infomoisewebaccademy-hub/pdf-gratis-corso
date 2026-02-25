@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './index.css';
 
 // Gestione errori globale per catturare problemi di avvio (es. import falliti)
 window.addEventListener('error', (event) => {

@@ -545,60 +545,55 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
              <video 
                 poster={HERO_VIDEO.poster}
                 autoPlay loop muted playsInline 
-                className="w-full h-full object-cover opacity-30"
+                className="w-full h-full object-cover opacity-20"
              >
                 <source src={`${HERO_VIDEO.optimized}.webm`} type="video/webm" />
                 <source src={`${HERO_VIDEO.optimized}.mp4`} type="video/mp4" />
                 Il tuo browser non supporta il tag video.
              </video>
-             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950"></div>
+             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-950"></div>
           </div>
 
-          <section className={`relative z-10 pb-6 lg:pb-10 ${heroPaddingClass}`}>
+          <section className={`relative z-10 pb-16 lg:pb-24 ${heroPaddingClass}`}>
             <div className="max-w-7xl mx-auto px-6 relative z-10">
-              <div className="max-w-4xl mx-auto text-center">
+              <div className="max-w-5xl mx-auto text-center">
                 {config.hero.show_badges && (
-                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-brand-400 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-10 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <Sparkles className="h-3 w-3" />
                         <span className="flex h-1.5 w-1.5 bg-brand-400 rounded-full animate-pulse mx-1"></span>
-                        Zero Abbonamenti • Zero Crediti AI • Zero Tool a Pagamento
+                        L'Accademia #1 per Creatori No-Code & AI
                     </div>
                 )}
                 
-                <h1 className="text-5xl lg:text-7xl font-semibold text-white tracking-tight leading-[1.05] mb-6 animate-in fade-in zoom-in-95 duration-700 delay-100">
+                <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.95] mb-8 animate-in fade-in zoom-in-95 duration-700 delay-100">
                   {config.hero.title}
-                  <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">
+                  <span className="block mt-4 text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">
                     {config.hero.subtitle}
                   </span>
                 </h1>
 
                 {config.hero.text && (
-                    <p className="mt-6 max-w-2xl mx-auto text-xl text-slate-300 leading-relaxed mb-8 whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                    <p className="mt-8 max-w-2xl mx-auto text-xl md:text-2xl text-slate-400 leading-relaxed mb-12 whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                         {config.hero.text}
                     </p>
                 )}
 
-                {/* Benefits List */}
-                {config.hero.benefits && config.hero.benefits.length > 0 && (
-                    <ul className="mt-8 mb-12 text-left max-w-lg mx-auto space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                        {config.hero.benefits.map((benefit, i) => (
-                            <li key={i} className="flex items-start text-lg text-slate-300">
-                                <div className="mt-1 mr-3 flex-shrink-0 bg-brand-500/20 p-1 rounded-full ring-1 ring-brand-500/30">
-                                    <Check className="h-3 w-3 text-brand-400 stroke-[3]" />
-                                </div>
-                                {benefit}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-
-                <div className="flex flex-col sm:flex-row justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
                   <button 
                     onClick={handleNavigateToCourses}
-                    className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-brand-600 hover:bg-brand-500 rounded-xl transition-all shadow-[0_0_40px_-10px_rgba(37,99,235,0.5)] group"
+                    className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(37,99,235,0.6)] group transform hover:-translate-y-1"
                   >
-                    {config.hero.cta_primary} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {config.hero.cta_primary} <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </button>
+                  
+                  <div className="flex -space-x-3 items-center">
+                      {[1,2,3,4].map(i => (
+                          <img key={i} src={`https://i.pravatar.cc/100?u=${i}`} className="w-10 h-10 rounded-full border-2 border-slate-950 ring-1 ring-white/10" alt="Student" />
+                      ))}
+                      <div className="pl-6 text-sm text-slate-400 font-medium">
+                          <span className="text-white font-bold">+2,400</span> studenti iscritti
+                      </div>
+                  </div>
                 </div>
 
                 {config.hero.show_badges && (

@@ -245,6 +245,11 @@ const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
     success_title: "Accesso Inviato!",
     success_text: "Perfetto! Controlla la tua casella di posta (anche SPAM) per trovare la guida e le tue credenziali di accesso. Ci vediamo dentro!",
     form_disclaimer_text: "Inserisci i dati per ricevere la guida e creare il tuo accesso gratuito alla nostra piattaforma.",
+    bg_color_main: "#020617",
+    title_color: "#f8fafc",
+    text_color_body: "#94a3b8",
+    gradient_start: "#3b82f6",
+    gradient_end: "#8b5cf6",
     showcase_section: {
       is_visible: true,
       title: 'Cosa Puoi Creare Davvero',
