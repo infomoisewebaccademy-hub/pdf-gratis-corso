@@ -78,7 +78,7 @@ const AppContent: React.FC = () => {
   
   const [settings, setSettings] = useState<PlatformSettings>({
       id: 1, logo_url: '', logo_height: 64, logo_offset_x: 0, logo_offset_y: 0,
-      meta_pixel_id: '', font_family: 'Inter',
+      meta_pixel_id: '1825625164777432', font_family: 'Inter',
       active_mode: 'public', pre_launch_date: '', pre_launch_config: undefined
   });
   
@@ -253,6 +253,8 @@ const AppContent: React.FC = () => {
               logo_height: data.logo_height ?? 64,
               logo_offset_x: data.logo_offset_x ?? 0,
               logo_offset_y: data.logo_offset_y ?? 0,
+              // Override with the new requested Pixel ID if not set or to force update
+              meta_pixel_id: data.meta_pixel_id || '1825625164777432',
           };
           setSettings(newSettings);
       }

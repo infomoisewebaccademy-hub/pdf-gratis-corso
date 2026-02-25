@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { PlatformSettings, PdfGuideConfig } from '../types';
 
 const DEFAULT_PDF_CONFIG: PdfGuideConfig = {
+    meta_pixel_id: '1825625164777432',
     headline_solid: "CREA PIATTAFORME CON",
     headline_gradient: "L'INTELLIGENZA ARTIFICIALE",
     description: "Ricevi subito via email la nostra guida PDF passo-passo e accedi alla nostra piattaforma per un video-tutorial esclusivo. Inizia oggi a trasformare le tue idee in realtà.",

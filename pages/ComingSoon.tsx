@@ -26,6 +26,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
 
 // Configurazione di Default
 const DEFAULT_CONFIG: PreLaunchConfig = {
+    meta_pixel_id: '1825625164777432',
     headline_solid: "ACCESSO ESCLUSIVO",
     headline_gradient: "AL MONDO DELL'AI",
     subheadline: "Il futuro dello sviluppo web è qui, ed è gratuito.",

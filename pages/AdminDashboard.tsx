@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig } from '../types';
 // FIX: Added missing Loader2 import from lucide-react
-import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
@@ -193,6 +193,7 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
 };
 
 const DEFAULT_PRE_LAUNCH_CONFIG: PreLaunchConfig = {
+    meta_pixel_id: '1825625164777432',
     headline_solid: "ACCESSO ESCLUSIVO",
     headline_gradient: "AL MONDO DELL'AI",
     subheadline: "Il futuro dello sviluppo web è qui, ed è gratuito.",
@@ -234,6 +235,7 @@ const DEFAULT_PRE_LAUNCH_CONFIG: PreLaunchConfig = {
 
 const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
     ...DEFAULT_PRE_LAUNCH_CONFIG,
+    meta_pixel_id: '1825625164777432',
     headline_solid: "CREA SITI CON L'AI",
     headline_gradient: "La Guida Gratuita",
     description: "Ricevi subito via email la nostra guida PDF passo-passo e accedi alla nostra piattaforma per un video-tutorial esclusivo. Inizia oggi a trasformare le tue idee in realtà.",
@@ -397,6 +399,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isClearingCache, setIsClearingCache] = useState(false);
+
+  const handleClearCache = async () => {
+    if (!confirm("⚠️ Questa azione svuoterà la cache locale del browser (LocalStorage, SessionStorage) e forzerà il ricaricamento della pagina. Continuare?")) return;
+    
+    setIsClearingCache(true);
+    try {
+        // Clear LocalStorage
+        localStorage.clear();
+        // Clear SessionStorage
+        sessionStorage.clear();
+        
+        // Unregister Service Workers if any
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const registration of registrations) {
+                await registration.unregister();
+            }
+        }
+
+        alert("✨ Cache svuotata con successo! La pagina verrà ricaricata.");
+        window.location.reload();
+    } catch (err: any) {
+        alert("Errore durante lo svuotamento della cache: " + err.message);
+    } finally {
+        setIsClearingCache(false);
+    }
+  };
 
   const handleAssignPreview = async (courseId: string) => {
     if (assigningCourse) return;
@@ -958,7 +988,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                         </div>
 
                         <div className="space-y-6">
+                            <h4 className="font-bold text-gray-400 uppercase text-xs tracking-widest flex items-center"><Activity className="h-4 w-4 mr-2"/> Manutenzione</h4>
+                            <div className="bg-amber-50 p-6 rounded-2xl border border-amber-100">
+                                <h4 className="font-bold text-amber-800 mb-2 flex items-center"><RefreshCw className="h-4 w-4 mr-2"/> Svuota Cache Piattaforma</h4>
+                                <p className="text-sm text-amber-600 mb-4">Usa questa funzione se noti problemi di caricamento o se le modifiche non appaiono correttamente.</p>
+                                <button 
+                                    onClick={handleClearCache} 
+                                    disabled={isClearingCache}
+                                    className="w-full bg-amber-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-amber-700 flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50"
+                                >
+                                    {isClearingCache ? <Loader2 className="h-5 w-5 animate-spin" /> : <RefreshCw className="h-5 w-5" />} Svuota Cache Ora
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
                             <h4 className="font-bold text-gray-400 uppercase text-xs tracking-widest flex items-center"><Image className="h-4 w-4 mr-2"/> Branding</h4>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.meta_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, meta_pixel_id: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: 1825625164777432"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Il codice di tracciamento per le tue campagne Meta Ads.
+                                </p>
+                            </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                 <label className="block text-sm font-bold mb-2 text-gray-700">URL Logo</label>
                                 <input type="text" value={localSettings.logo_url || ''} onChange={(e) => setLocalSettings({...localSettings, logo_url: e.target.value})} className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"/>
