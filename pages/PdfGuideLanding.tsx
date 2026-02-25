@@ -224,107 +224,107 @@ export const PdfGuideLanding: React.FC = () => {
             </div>
 
             {/* 1. HERO SECTION */}
-            <header className="relative text-center pt-32 pb-24 px-4 overflow-hidden">
+            <header className="relative text-center pt-16 pb-8 md:pt-32 md:pb-24 px-4 overflow-hidden">
                 <div className="max-w-5xl mx-auto relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-brand-400 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8 backdrop-blur-md">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-brand-400 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-6 md:mb-8 backdrop-blur-md">
                         <Monitor className="h-3 w-3" />
                         Guida PDF Gratuita 2025
                     </div>
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.95] mb-8">
+                    <h1 className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.95] mb-6 md:mb-8">
                         {config.headline_solid} <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }}>
                             {config.headline_gradient}
                         </span>
                     </h1>
-                    <p className="max-w-2xl mx-auto mt-8 text-xl md:text-2xl text-slate-400 leading-relaxed" style={{ color: config.text_color_body }}>
+                    <p className="max-w-2xl mx-auto mt-6 md:mt-8 text-lg md:text-2xl text-slate-400 leading-relaxed px-4" style={{ color: config.text_color_body }}>
                         {config.subheadline}
                     </p>
-                    <div className="mt-12">
-                        <a href="#form-section" className="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.6)] group transform hover:-translate-y-1" style={{ backgroundColor: config.gradient_start }}>
-                            Scarica la Guida Gratuita <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                    <div className="mt-10 md:mt-12">
+                        <a href="#form-section" className="inline-flex items-center justify-center px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-bold text-white rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.6)] group transform hover:-translate-y-1" style={{ backgroundColor: config.gradient_start }}>
+                            Scarica la Guida Gratuita <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
                         </a>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-6 space-y-32 pb-32">
+            <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-10 md:space-y-32 pb-16 md:pb-32">
                 {/* 2. PROBLEMA & SOLUZIONE */}
-                <section className="grid lg:grid-cols-2 gap-16 items-center">
-                    <div className="space-y-8">
-                        <div className="space-y-4">
-                            <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">“Vorrei un sito, ma da dove inizio?”</h2>
-                            <p className="text-lg text-slate-400 leading-relaxed">Se questo pensiero ti suona familiare, non sei solo. Molti credono di dover imparare a programmare o spendere migliaia di euro. La verità? Il problema non sei tu, ma gli strumenti complicati che ti hanno proposto finora.</p>
+                <section className="grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
+                    <div className="space-y-6 md:space-y-8">
+                        <div className="space-y-3 md:space-y-4">
+                            <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tight">“Vorrei un sito, ma da dove inizio?”</h2>
+                            <p className="text-base md:text-lg text-slate-400 leading-relaxed">Se questo pensiero ti suona familiare, non sei solo. Molti credono di dover imparare a programmare o spendere migliaia di euro. La verità? Il problema non sei tu, ma gli strumenti complicati che ti hanno proposto finora.</p>
                         </div>
                         
-                        <div className="space-y-6">
-                            <h3 className="text-2xl font-bold text-white">La soluzione è un metodo, non più codice.</h3>
-                            <p className="text-lg text-slate-400">In questa guida PDF ti mostro un sistema pratico per dire a una macchina cosa vuoi, e vederlo realizzato in pochi minuti. All'interno troverai:</p>
-                            <ul className="space-y-4">
+                        <div className="space-y-4 md:space-y-6">
+                            <h3 className="text-xl md:text-2xl font-bold text-white">La soluzione è un metodo, non più codice.</h3>
+                            <p className="text-base md:text-lg text-slate-400">In questa guida PDF ti mostro un sistema pratico per dire a una macchina cosa vuoi, e vederlo realizzato in pochi minuti. All'interno troverai:</p>
+                            <ul className="space-y-3 md:space-y-4">
                                 {[
                                     { title: "Il processo esatto, passo-passo", desc: "Dalla pagina bianca al sito online, senza saltare un solo passaggio." },
                                     { title: "Esempi reali e istruzioni chiare", desc: "Vedrai cosa scrivere e dove cliccare per ottenere un risultato professionale." },
                                     { title: "Il risultato finale", desc: "Un sito vetrina semplice, pulito e funzionante, pronto per essere mostrato al mondo." }
                                 ].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
-                                        <div className="mt-1 flex-shrink-0 h-6 w-6 rounded-full bg-brand-500/20 flex items-center justify-center">
-                                            <CheckCircle className="h-4 w-4 text-brand-400" />
+                                    <li key={i} className="flex items-start gap-3 md:gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+                                        <div className="mt-1 flex-shrink-0 h-5 w-5 md:h-6 md:w-6 rounded-full bg-brand-500/20 flex items-center justify-center">
+                                            <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-brand-400" />
                                         </div>
                                         <div>
-                                            <span className="block font-bold text-white">{item.title}</span>
-                                            <span className="text-slate-400 text-sm">{item.desc}</span>
+                                            <span className="block font-bold text-white text-sm md:text-base">{item.title}</span>
+                                            <span className="text-slate-400 text-xs md:text-sm">{item.desc}</span>
                                         </div>
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     </div>
-                    <div className="relative">
+                    <div className="relative mt-8 lg:mt-0">
                         <div className="absolute -inset-4 bg-brand-500/20 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
                         {renderForm()}
                     </div>
                 </section>
 
                 {/* 3. PROVA E RISULTATI */}
-                <section className="space-y-16">
+                <section className="space-y-12 md:space-y-16">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi costruire DAVVERO?</h2>
-                        <p className="text-xl text-slate-400">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
+                        <h2 className="text-2xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi costruire DAVVERO?</h2>
+                        <p className="text-lg md:text-xl text-slate-400">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
                     </div>
                     
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                         {[
                             { icon: Monitor, title: "Siti Vetrina", desc: "Per presentare la tua attività, il tuo portfolio o un progetto personale." },
                             { icon: Code, title: "Pagine Semplici", desc: "Per lanciare un prodotto, un evento o raccogliere contatti in modo rapido." },
                             { icon: Coffee, title: "Progetti Reali", desc: "Trasforma le tue idee in piattaforme funzionanti senza barriere tecniche." }
                         ].map((item, i) => (
-                            <div key={i} className="bg-white/5 p-8 rounded-3xl border border-white/10 hover:border-brand-500/30 transition-all group">
-                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-brand-500/10 ring-1 ring-brand-500/20 group-hover:scale-110 transition-transform">
-                                    <item.icon className="h-7 w-7 text-brand-400" />
+                            <div key={i} className="bg-white/5 p-6 md:p-8 rounded-3xl border border-white/10 hover:border-brand-500/30 transition-all group">
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center mb-4 md:mb-6 bg-brand-500/10 ring-1 ring-brand-500/20 group-hover:scale-110 transition-transform">
+                                    <item.icon className="h-6 w-6 md:h-7 md:w-7 text-brand-400" />
                                 </div>
-                                <h3 className="font-bold text-xl text-white mb-3">{item.title}</h3>
-                                <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+                                <h3 className="font-bold text-lg md:text-xl text-white mb-2 md:mb-3">{item.title}</h3>
+                                <p className="text-slate-400 text-sm md:text-base leading-relaxed">{item.desc}</p>
                             </div>
                         ))}
                     </div>
                 </section>
                 
                 {/* WEBSITE SHOWCASE */}
-                <section className="space-y-16 py-20">
+                <section className="space-y-8 md:space-y-16 py-4 md:py-20">
                     <div className="text-center space-y-4 max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-2 md:mb-4">
                             <Monitor className="h-3 w-3" />
                             Esempi Reali
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi creare davvero</h2>
-                        <p className="text-lg text-slate-400 leading-relaxed">
+                        <h2 className="text-2xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi creare davvero</h2>
+                        <p className="text-base md:text-lg text-slate-400 leading-relaxed">
                             Questi sono esempi reali di siti e piattaforme creati interamente con l'AI. 
-                            <span className="text-brand-400 font-semibold block mt-2">
+                            <span className="text-brand-400 font-semibold block mt-1 md:mt-2">
                                 Nella guida PDF questi siti sono già compresi e potrai modificarli a tuo piacimento per poi pubblicarli online.
                             </span>
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                         {[
                             "https://please-make-the-55.aura.build/",
                             "https://real-estate-developer-99.aura.build/",
@@ -343,7 +343,7 @@ export const PdfGuideLanding: React.FC = () => {
                                         {url.replace('https://', '')}
                                     </div>
                                 </div>
-                                <div className="h-[450px] overflow-hidden relative">
+                                <div className="h-[300px] md:h-[450px] overflow-hidden relative">
                                     <iframe 
                                         src={url} 
                                         className="w-full h-full border-none"
@@ -353,7 +353,7 @@ export const PdfGuideLanding: React.FC = () => {
                                 </div>
                                 <div className="p-4 bg-slate-900/80 backdrop-blur-md border-t border-white/5 flex justify-between items-center">
                                     <span className="text-xs font-medium text-slate-400">Template Incluso #{idx + 1}</span>
-                                    <div className="flex items-center gap-2 text-brand-400 text-xs font-bold">
+                                    <div className="flex items-center gap-2 text-brand-400 text-[10px] md:text-xs font-bold">
                                         <CheckCircle className="h-3 w-3" />
                                         EDITABILE
                                     </div>
@@ -365,29 +365,29 @@ export const PdfGuideLanding: React.FC = () => {
 
                 {/* 4. TESTIMONIALS */}
                 {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
-                    <section className="space-y-16">
-                        <div className="text-center space-y-4">
-                            <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-brand-400">{config.testimonials_section.subtitle}</h2>
-                            <h3 className="text-3xl md:text-5xl font-bold text-white tracking-tight">{config.testimonials_section.title}</h3>
+                    <section className="space-y-12 md:space-y-16">
+                        <div className="text-center space-y-3 md:space-y-4">
+                            <h2 className="text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-brand-400">{config.testimonials_section.subtitle}</h2>
+                            <h3 className="text-2xl md:text-5xl font-bold text-white tracking-tight">{config.testimonials_section.title}</h3>
                         </div>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {config.testimonials_section.reviews.map((review, idx) => (
-                                <div key={idx} className="bg-white/5 p-8 rounded-3xl border border-white/10 flex flex-col h-full">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <img src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} alt={review.name} className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" referrerPolicy="no-referrer" />
+                                <div key={idx} className="bg-white/5 p-6 md:p-8 rounded-3xl border border-white/10 flex flex-col h-full">
+                                    <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                                        <img src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} alt={review.name} className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover ring-2 ring-white/10" referrerPolicy="no-referrer" />
                                         <div>
-                                            <h4 className="font-bold text-white leading-tight">{review.name}</h4>
-                                            <p className="text-xs text-slate-500">{review.role}</p>
+                                            <h4 className="font-bold text-white text-sm md:text-base leading-tight">{review.name}</h4>
+                                            <p className="text-[10px] md:text-xs text-slate-500">{review.role}</p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1 mb-4">
-                                        {[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />)}
+                                    <div className="flex gap-1 mb-3 md:mb-4">
+                                        {[...Array(5)].map((_, i) => <Star key={i} className="h-2.5 w-2.5 md:h-3 md:w-3 fill-yellow-500 text-yellow-500" />)}
                                     </div>
-                                    <p className="text-slate-300 italic leading-relaxed flex-grow">"{review.text}"</p>
+                                    <p className="text-slate-300 italic text-sm md:text-base leading-relaxed flex-grow">"{review.text}"</p>
                                     {review.verified && (
-                                        <div className="mt-6 pt-6 border-t border-white/5 flex items-center gap-2 text-brand-400">
-                                            <ShieldCheck className="h-4 w-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">Studente Verificato</span>
+                                        <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-white/5 flex items-center gap-2 text-brand-400">
+                                            <ShieldCheck className="h-3 w-3 md:h-4 md:w-4" />
+                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">Studente Verificato</span>
                                         </div>
                                     )}
                                 </div>
@@ -397,33 +397,33 @@ export const PdfGuideLanding: React.FC = () => {
                 )}
 
                 {/* 5. PER CHI È / PER CHI NON È */}
-                <section className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-10 space-y-6">
-                        <h3 className="text-2xl font-bold text-emerald-400">Questa guida è per te se:</h3>
-                        <ul className="space-y-4">
+                <section className="grid md:grid-cols-2 gap-6 md:gap-8">
+                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-6 md:p-10 space-y-4 md:space-y-6">
+                        <h3 className="text-xl md:text-2xl font-bold text-emerald-400">Questa guida è per te se:</h3>
+                        <ul className="space-y-3 md:space-y-4">
                             {[
                                 "Vuoi un risultato concreto e visibile.",
                                 "Parti da zero e non hai competenze tecniche.",
                                 "Sei disposto a seguire un metodo passo-passo.",
                                 "Vuoi capire come usare l'AI in modo pratico."
                             ].map((text, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                <li key={i} className="flex items-center gap-3 text-slate-300 text-sm md:text-base">
                                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
                                     {text}
                                 </li>
                             ))}
                         </ul>
                     </div>
-                    <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-10 space-y-6">
-                        <h3 className="text-2xl font-bold text-rose-400">Questa guida NON è per te se:</h3>
-                        <ul className="space-y-4">
+                    <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-6 md:p-10 space-y-4 md:space-y-6">
+                        <h3 className="text-xl md:text-2xl font-bold text-rose-400">Questa guida NON è per te se:</h3>
+                        <ul className="space-y-3 md:space-y-4">
                             {[
                                 "Cerchi un modo per fare soldi facili online.",
                                 "Vuoi creare un e-commerce complesso in 5 minuti.",
                                 "Non hai voglia di imparare un nuovo strumento.",
                                 "Pensi che l'AI faccia tutto da sola senza input."
                             ].map((text, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                <li key={i} className="flex items-center gap-3 text-slate-300 text-sm md:text-base">
                                     <div className="h-1.5 w-1.5 rounded-full bg-rose-500"></div>
                                     {text}
                                 </li>
@@ -433,11 +433,11 @@ export const PdfGuideLanding: React.FC = () => {
                 </section>
 
                 {/* 6. CTA FINALE */}
-                <section className="text-center space-y-12 py-20 relative">
+                <section className="text-center space-y-8 md:space-y-12 py-8 md:py-20 relative">
                     <div className="absolute inset-0 bg-brand-500/5 blur-3xl rounded-full opacity-30 pointer-events-none"></div>
-                    <div className="max-w-3xl mx-auto space-y-6 relative z-10">
-                        <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight">Pronto a mettere online la tua idea?</h2>
-                        <p className="text-xl text-slate-400 leading-relaxed">Scarica la guida gratuita. È un PDF pratico che ti mostra esattamente cosa fare. Nessun costo, nessun rischio.</p>
+                    <div className="max-w-3xl mx-auto space-y-4 md:space-y-6 relative z-10">
+                        <h2 className="text-3xl md:text-6xl font-bold text-white tracking-tight">Pronto a mettere online la tua idea?</h2>
+                        <p className="text-lg md:text-xl text-slate-400 leading-relaxed">Scarica la guida gratuita. È un PDF pratico che ti mostra esattamente cosa fare. Nessun costo, nessun rischio.</p>
                     </div>
                     <div className="relative z-10">
                         {renderForm(true)}
