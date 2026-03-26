@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
                     onClick={() => handleNavigate('/courses')} 
                     className="text-gray-600 hover:text-brand-600 font-medium transition-colors text-sm uppercase tracking-wide"
                   >
-                    Corsi
+                    Percorsi
                 </button>
             </div>
           </div>
@@ -134,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
                                         </>
                                     )}
                                     <button onClick={() => handleNavigate('/dashboard')} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-600 flex items-center transition-colors">
-                                        <LayoutDashboard className="h-4 w-4 mr-2" /> I Miei Corsi
+                                        <LayoutDashboard className="h-4 w-4 mr-2" /> I Miei Percorsi
                                     </button>
                                     <button onClick={() => handleNavigate('/cart')} className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-600 flex items-center transition-colors">
                                         <ShoppingCart className="h-4 w-4 mr-2" /> Carrello ({totalItems})
@@ -194,7 +194,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
         <div className="lg:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-xl max-h-[calc(100vh-80px)] overflow-y-auto z-40 animate-in slide-in-from-top-2">
             <div className="px-4 py-6 space-y-4">
                 <button onClick={() => handleNavigate('/')} className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium border border-transparent hover:border-gray-200 transition-all">Home</button>
-                <button onClick={() => handleNavigate('/courses')} className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium border border-transparent hover:border-gray-200 transition-all">Corsi</button>
+                <button onClick={() => handleNavigate('/courses')} className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium border border-transparent hover:border-gray-200 transition-all">Percorsi</button>
                 
                 <div className="border-t border-gray-100 my-2"></div>
                 
@@ -210,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
                             </button>
                         )}
                         <button onClick={() => handleNavigate('/dashboard')} className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center">
-                            <LayoutDashboard className="h-4 w-4 mr-2" /> I Miei Corsi
+                            <LayoutDashboard className="h-4 w-4 mr-2" /> I Miei Percorsi
                         </button>
                         <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium flex items-center">
                             <LogOut className="h-4 w-4 mr-2" /> Esci

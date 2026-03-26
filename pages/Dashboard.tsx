@@ -117,7 +117,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Corsi Attivi</div>
+                  <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Percorsi Attivi</div>
                   <div className="text-4xl font-black text-gray-900">{myCourses.length}</div>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -137,15 +137,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
               </div>
           </div>
 
-          <h2 className="text-2xl font-black text-gray-900 mb-8 tracking-tight">I Tuoi Corsi</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-8 tracking-tight">I Tuoi Percorsi</h2>
 
           {myCourses.length === 0 ? (
               <div className="bg-white rounded-3xl shadow-sm p-16 text-center border border-gray-100">
                   <div className="bg-gray-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Book className="h-10 w-10 text-gray-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Non hai ancora acquistato corsi</h3>
-                  <p className="text-gray-500 mb-8 max-w-sm mx-auto">Inizia oggi il tuo percorso di formazione con i nostri corsi pratici sull'AI.</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Non hai ancora acquistato percorsi</h3>
+                  <p className="text-gray-500 mb-8 max-w-sm mx-auto">Inizia oggi il tuo percorso di formazione con i nostri percorsi pratici sull'AI.</p>
                   <button 
                       onClick={() => navigate('/courses')} 
                       className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-white bg-brand-600 hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20"
@@ -195,7 +195,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
                                   </div>
                                   
                                   <button className="mt-auto w-full bg-brand-50 text-brand-700 py-3.5 rounded-2xl font-bold hover:bg-brand-600 hover:text-white transition-all duration-300">
-                                      Accedi al Corso
+                                      Accedi al Percorso
                                   </button>
                               </div>
                           </div>

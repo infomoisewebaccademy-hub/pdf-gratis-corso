@@ -107,7 +107,7 @@ const CourseCard: React.FC<{
                         onClick={() => onCourseSelect(course.id)}
                         className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex-1 shadow-lg shadow-green-900/20"
                     >
-                        Vai al Corso
+                        Vai al Percorso
                     </button>
                     ) : isFull ? (
                     <button 
@@ -154,7 +154,7 @@ export const CoursesPage: React.FC<CoursesPageProps> = ({ courses, onCourseSelec
     <div className="pt-32 min-h-screen bg-slate-900 pb-20 font-sans text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header della pagina corsi */}
+        {/* Header della pagina percorsi */}
         <div className="text-center mb-16 relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-brand-400 font-semibold text-xs sm:text-sm mb-6 uppercase tracking-wider shadow-lg">
               <span className="flex h-2 w-2 bg-brand-500 rounded-full animate-pulse"></span>
@@ -171,7 +171,7 @@ export const CoursesPage: React.FC<CoursesPageProps> = ({ courses, onCourseSelec
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-600 rounded-full blur-[150px] opacity-10 -z-10"></div>
         </div>
 
-        {/* Griglia Corsi */}
+        {/* Griglia Percorsi */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course) => (
                 <CourseCard 

@@ -142,8 +142,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     if (course.lessons_content && course.lessons_content.length > 0) {
         setActiveLesson(course.lessons_content[0]);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (!isPdfGuideCourse) { // Mostra avviso solo se non è il corso guida (che può essere vuoto)
-        alert("Questo corso non ha ancora lezioni caricate dall'insegnante.");
+    } else if (!isPdfGuideCourse) { // Mostra avviso solo se non è il percorso guida (che può essere vuoto)
+        alert("Questo percorso non ha ancora lezioni caricate dall'insegnante.");
     }
   };
 
@@ -168,7 +168,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
       <div className="w-full px-4 sm:px-6 lg:px-8">
         
         <button onClick={onBack} className="mb-8 text-gray-500 hover:text-gray-900 font-medium flex items-center">
-            ← Torna ai Corsi
+            ← Torna ai Percorsi
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -263,7 +263,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 )}
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                    <h2 className="text-2xl font-bold mb-6">Programma del Corso</h2>
+                    <h2 className="text-2xl font-bold mb-6">Programma del Percorso</h2>
                     <div className="space-y-4">
                         {(!course.lessons_content || course.lessons_content.length === 0) ? (
                             <div className="text-center text-gray-400 py-4">{isPdfGuideCourse ? "Usa il pulsante in alto per scaricare la guida PDF." : "Lezioni in arrivo..."}</div>
@@ -359,11 +359,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                     onClick={startLearning}
                                     className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-all mb-4 shadow-lg shadow-green-500/20"
                                 >
-                                    <Play className="inline-block h-5 w-5 mr-2 mb-1" /> Inizia Corso
+                                    <Play className="inline-block h-5 w-5 mr-2 mb-1" /> Inizia Percorso
                                 </button>
                             ) : (
                                 <div className="mb-4 p-4 bg-green-50 text-green-800 rounded-lg text-sm text-center font-bold border border-green-100">
-                                    Stai guardando il corso
+                                    Stai guardando il percorso
                                 </div>
                             )
                         ) : (

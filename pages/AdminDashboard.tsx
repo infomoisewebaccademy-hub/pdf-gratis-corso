@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig } from '../types';
 // FIX: Added missing Loader2 import from lucide-react
-import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
@@ -10,7 +10,7 @@ import { GoogleGenAI } from "@google/genai";
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
   announcement_bar: {
-    text: '🚀 Novità: Accedi subito ai corsi e inizia a creare progetti reali.',
+    text: '🚀 Novità: Accedi subito ai percorsi e inizia a creare progetti reali.',
     is_visible: true,
     is_sticky: false,
     type: 'static',
@@ -29,7 +29,7 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
         "Supporto PERSONALE diretto su whatsapp",
         "Soddisfatto o rimborsato in 30 giorni"
     ],
-    cta_primary: 'Scopri i corsi disponibili',
+    cta_primary: 'Scopri i percorsi disponibili',
     cta_secondary: '', 
     image_url: '', 
     show_badges: true
@@ -45,7 +45,7 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
     subtitle: 'Perché nasce Moise Web Academy',
     text: "Moise Web Academy nasce per rendere semplice ciò che sembra complesso.\nIn un mondo in cui creare siti e piattaforme digitali è sempre più fondamentale, vogliamo dimostrare che non serve essere programmatori per costruire progetti professionali.\nCon un metodo pratico e guidato, ti mostriamo come usare Google AppSheet e gli strumenti Google per dare vita alle tue idee, anche se parti da zero.\nSiamo Moise Web Academy. Negli ultimi anni abbiamo costruito piattaforme AI, siti web dinamici e automazioni per decine di progetti reali. Ma nel mercato della formazione c'è una cosa che ci ha sempre dato fastidio:",
     mission_points: [
-        "I corsi che promettono soldi veloci",
+        "I percorsi che promettono soldi veloci",
         "I “guru” che non hanno mai creato nulla",
         "Le lezioni che obbligano a comprare tool da 30–100€/mese"
     ],
@@ -167,20 +167,20 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
   },
   // Fix: Added missing usp_section to default config
   usp_section: {
-    title: 'Perché siamo diversi dagli altri corsi',
+    title: 'Perché siamo diversi dagli altri percorsi',
     is_visible: true,
     items: [
-      { title: 'TUTTO SENZA SPESE EXTRA', desc: 'Ogni corso è pensato per lavorare con AI a costo zero.' },
-      { title: 'Lezioni pratiche, non teoria', desc: 'Ogni modulo contiene schermate reali e processi passo-passo.' },
-      { title: 'Nessuna fuffa', desc: 'Non vi promettiamo guadagni, vi diamo competenze tecniche solide.' },
-      { title: 'Prezzi onesti', desc: 'Ogni corso lo pagate singolarmente. Niente abbonamenti.' }
+      { title: 'QUALITÀ SENZA COMPROMESSI', desc: 'Contenuti aggiornati e processi testati su progetti reali.' },
+      { title: 'ASSISTENZA 6 GIORNI SU 7', desc: 'Supporto diretto su WhatsApp o in piattaforma per non lasciarti mai solo.' },
+      { title: 'PARTNER GOOGLE & GEMINI', desc: 'Siamo specialisti certificati nell’uso delle tecnologie AI di Google.' },
+      { title: 'ZERO COSTI RICORRENTI', desc: 'Impari a usare strumenti gratuiti o low-code senza abbonamenti pesanti.' }
     ]
   },
   // Fix: Added missing cta_section to default config
   cta_section: {
     title: 'Iniziate a costruire qualcosa di reale.',
     subtitle: 'Usate l’AI a costo zero, create progetti veri e portate le vostre competenze al livello successivo.',
-    button_text: 'Guarda tutti i corsi',
+    button_text: 'Guarda tutti i percorsi',
     is_visible: true
   },
   footer: {
@@ -196,6 +196,13 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
     how_it_works_video_id: 'v1765456382/come-funziona-MWA_mpdave',
     target_section_video_id: 'v1765392297/uomo-affari-consegna-carta_f3tj6t',
     about_video_url: 'https://res.cloudinary.com/dhj0ztos6/video/upload/v1765452611/Home_page_rnk0zw.webm'
+  },
+  ai_showcase_section: {
+    title: 'Esempi Reali di Progetti AI',
+    subtitle: 'Guarda cosa puoi costruire con le competenze di MWA',
+    text: 'Questi sono solo alcuni esempi di piattaforme e siti web creati interamente con l\'intelligenza artificiale e gli strumenti che imparerai a usare nei nostri percorsi.',
+    is_visible: true,
+    urls: []
   }
 };
 
@@ -204,7 +211,7 @@ const DEFAULT_PRE_LAUNCH_CONFIG: PreLaunchConfig = {
     headline_solid: "ACCESSO ESCLUSIVO",
     headline_gradient: "AL MONDO DELL'AI",
     subheadline: "Il futuro dello sviluppo web è qui, ed è gratuito.",
-    description: "Accedi gratuitamente al nostro percorso base. Impara a creare siti web e software (SaaS) con l'Intelligenza Artificiale, senza costi nascosti. Iscriviti ora per ricevere il tuo accesso personale il 30 Gennaio.",
+    text: "Accedi gratuitamente al nostro percorso base. Impara a creare siti web e software (SaaS) con l'Intelligenza Artificiale, senza costi nascosti. Iscriviti ora per ricevere il tuo accesso personale il 30 Gennaio.",
     offer_badge: "Offerta Gratuita",
     offer_title: "Accesso Gratuito al Percorso Base",
     offer_text: "Lascia i tuoi dati per essere tra i primi a ricevere l'accesso esclusivo al video-percorso gratuito. Scopri le basi per trasformare le tue idee in realtà con l'AI.",
@@ -284,14 +291,14 @@ const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
         {
             name: 'Elena G.',
             role: 'Imprenditrice Digitale',
-            text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+          text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo percorso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
             avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
             verified: true
         },
         {
             name: 'Davide F.',
             role: 'Consulente Marketing',
-            text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+            text: "Finalmente un percorso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
             avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
             verified: true
         },
@@ -319,7 +326,7 @@ const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
         {
             name: 'Matteo V.',
             role: 'Titolare di Ristorante',
-            text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
+            text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del percorso in una settimana.",
             avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
             verified: true
         },
@@ -448,12 +455,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       }
 
       await onRefresh(); // Aggiorna i dati dell'utente per riflettere il nuovo acquisto
-      alert(`Corso assegnato! Ora puoi vederlo nella tua dashboard.`);
+      alert(`Percorso assegnato! Ora puoi vederlo nella tua dashboard.`);
       navigate('/dashboard');
 
     } catch (err: any) {
-      console.error("Errore assegnazione corso:", err);
-      alert("Errore durante l'assegnazione del corso: " + err.message);
+      console.error("Errore assegnazione percorso:", err);
+      alert("Errore durante l'assegnazione del percorso: " + err.message);
     } finally {
       setAssigningCourse(null);
     }
@@ -645,7 +652,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
               <>
                   <div className="bg-purple-50 p-6 rounded-2xl border-2 border-dashed border-purple-200">
                       <h4 className="font-bold text-purple-800 mb-2 flex items-center"><File className="h-5 w-5 mr-2"/> Gestione Guida PDF</h4>
-                      <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro corso gratuito.</p>
+                      <p className="text-sm text-purple-600 mb-4">Carica qui il file PDF che verrà automaticamente mostrato agli utenti nel loro percorso gratuito.</p>
                       <div className="bg-white p-3 rounded-lg border border-purple-200 mb-4">
                           <p className="text-xs text-purple-500 font-bold">URL Landing Page Condivisibile:</p>
                           <div className="flex items-center gap-2">
@@ -835,7 +842,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                     <Terminal className="h-5 w-5 mr-2" /> SQL Help
                 </button>
                 <button onClick={() => navigate('/admin/course/new')} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all flex items-center">
-                    <Plus className="h-5 w-5 mr-2" /> Nuovo Corso
+                    <Plus className="h-5 w-5 mr-2" /> Nuovo Percorso
                 </button>
             </div>
         </div>
@@ -1135,6 +1142,84 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                             </div>
                         </div>
                         <p className="text-xs text-gray-500 mt-4 italic">Inserisci l'ID del video caricato su Cloudinary per i primi 4 campi, o l'URL completo per l'ultimo.</p>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-50 text-brand-600 rounded-lg">
+                                    <Monitor className="h-5 w-5" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">Sezione Showcase AI</h3>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">Visibile</span>
+                                <input type="checkbox" checked={landingConfig.ai_showcase_section?.is_visible !== false} onChange={(e) => setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), is_visible: e.target.checked}})} className="h-5 w-5 accent-brand-600" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Titolo Sezione</label>
+                                <input type="text" value={landingConfig.ai_showcase_section?.title || ''} onChange={(e) => setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), title: e.target.value}})} className="w-full border p-3 rounded-xl font-bold" placeholder="Titolo Sezione" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Sottotitolo</label>
+                                <input type="text" value={landingConfig.ai_showcase_section?.subtitle || ''} onChange={(e) => setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), subtitle: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Sottotitolo" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Testo Descrittivo</label>
+                            <textarea rows={3} value={landingConfig.ai_showcase_section?.text || ''} onChange={(e) => setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), text: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Testo descrittivo..."></textarea>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="font-bold text-sm text-gray-500 uppercase tracking-wider">Siti in Vetrina (Showcase)</h4>
+                                <button 
+                                    onClick={() => {
+                                        const currentUrls = landingConfig.ai_showcase_section?.urls || [];
+                                        setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), urls: [...currentUrls, '']}});
+                                    }}
+                                    className="flex items-center gap-2 text-brand-600 hover:text-brand-700 font-medium text-sm"
+                                >
+                                    <Plus className="h-4 w-4" /> Aggiungi Sito
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                {(landingConfig.ai_showcase_section?.urls || []).map((url, idx) => (
+                                    <div key={idx} className="flex gap-2 items-center">
+                                        <div className="flex-1 relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <ExternalLink className="h-4 w-4" />
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                value={url} 
+                                                onChange={(e) => {
+                                                    const newUrls = [...(landingConfig.ai_showcase_section?.urls || [])];
+                                                    newUrls[idx] = e.target.value;
+                                                    setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), urls: newUrls}});
+                                                }} 
+                                                className="w-full border pl-10 pr-3 py-2 rounded-xl text-sm" 
+                                                placeholder="https://esempio.aura.build/" 
+                                            />
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                const newUrls = (landingConfig.ai_showcase_section?.urls || []).filter((_, i) => i !== idx);
+                                                setLandingConfig({...landingConfig, ai_showcase_section: {...(landingConfig.ai_showcase_section || DEFAULT_LANDING_CONFIG.ai_showcase_section), urls: newUrls}});
+                                            }}
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">

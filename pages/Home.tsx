@@ -15,7 +15,7 @@ interface HomeProps {
 // ... (DEFAULT_CONFIG, IconMap, FAQ_ITEMS restano invariati) ...
 const DEFAULT_CONFIG: LandingPageConfig = {
   announcement_bar: {
-    text: '🎉 Offerta lancio: Tutti i corsi al 50% di sconto per i primi 100 iscritti!',
+    text: '🎉 Offerta lancio: Tutti i percorsi al 50% di sconto per i primi 100 iscritti!',
     is_visible: false,
     is_sticky: false,
     type: 'static',
@@ -27,7 +27,7 @@ const DEFAULT_CONFIG: LandingPageConfig = {
   hero: {
     title: "Crea Siti Web Professionali o Piattaforme con l'AI in Poche Ore",
     subtitle: 'Senza Scrivere Una Riga di Codice.',
-    cta_primary: 'Scopri i corsi disponibili',
+    cta_primary: 'Scopri i percorsi disponibili',
     cta_secondary: '', // Rimosso default
     image_url: '', 
     benefits: [
@@ -51,7 +51,7 @@ const DEFAULT_CONFIG: LandingPageConfig = {
     subtitle: 'Perché nasce Moise Web Academy',
     text: "Moise Web Academy nasce per rendere semplice ciò che sembra complesso.\nIn un mondo in cui creare siti e piattaforme digitali è sempre più fondamentale, vogliamo dimostrare che non serve essere programmatori per costruire progetti professionali.\nCon un metodo pratico e guidato, ti mostriamo come usare Google AppSheet e gli strumenti Google per dare vita alle tue idee, anche se parti da zero.\nSiamo Moise Web Academy. Negli ultimi anni abbiamo costruito piattaforme AI, siti web dinamici e automazioni per decine di progetti reali. Ma nel mercato della formazione c'è una cosa che ci ha sempre dato fastidio:",
     mission_points: [
-        "I corsi che promettono soldi veloci",
+        "I percorsi che promettono soldi veloci",
         "I “guru” che non hanno mai creato nulla",
         "Le lezioni che obbligano a comprare tool da 30–100€/mese"
     ],
@@ -120,22 +120,14 @@ const DEFAULT_CONFIG: LandingPageConfig = {
       subtitle: 'Potenza Creativa Senza Limiti',
       text: "L'AI non è solo uno strumento di scrittura. Oggi, con le competenze che ti insegniamo, puoi generare interfacce complete, backend scalabili e design mozzafiato in tempo reale.\n\nDal semplice sito vetrina a piattaforme complesse con login e database, passando per e-commerce e landing page ad alta conversione. Tutto questo ottimizzato tecnicamente e pronto per il mercato, senza scrivere codice manualmente e senza spendere mesi di sviluppo.",
       is_visible: true,
-      urls: [
-          "https://studioskinlounge.aura.build/",
-          "https://flowfund-fintech-10.aura.build/",
-          "https://glowmist-skincare-9.aura.build/",
-          "https://conscious-dance-68.aura.build/",
-          "https://gym-fitness-club-47.aura.build/",
-          "https://newbox-designer.aura.build/",
-          "https://architectu-interior-38.aura.build/"
-      ]
+      urls: []
   },
   comparison_section: {
     title: 'La Tua Vita Prima e Dopo Moise Web Academy',
-    subtitle: 'Non è solo un corso. È un cambio di prospettiva sulla tua autonomia e sulle tue possibilità.',
+    subtitle: 'Non è solo un percorso. È un cambio di prospettiva sulla tua autonomia e sulle tue possibilità.',
     is_visible: true,
-    before_title: 'PRIMA (Senza il corso)',
-    after_title: 'DOPO (Con il corso)',
+    before_title: 'PRIMA (Senza il percorso)',
+    after_title: 'DOPO (Con il percorso)',
     before_items: [
         'Dipendi da sviluppatori costosi per ogni singola modifica',
         'Spendi 2.000-10.000€ per un sito base (e altre centinaia per ogni aggiornamento)',
@@ -163,14 +155,14 @@ const DEFAULT_CONFIG: LandingPageConfig = {
     {
         name: 'Elena G.',
         role: 'Imprenditrice Digitale',
-        text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+        text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo percorso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
         avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
         verified: true
     },
     {
         name: 'Davide F.',
         role: 'Consulente Marketing',
-        text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+        text: "Finalmente un percorso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
         avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
         verified: true
     },
@@ -198,7 +190,7 @@ const DEFAULT_CONFIG: LandingPageConfig = {
     {
         name: 'Matteo V.',
         role: 'Titolare di Ristorante',
-        text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del corso in una settimana.",
+        text: "Pagavo 100€ al mese per un sito obsoleto. Ora ho un sito moderno con prenotazione online che gestisco io, a costo quasi zero. Ho ammortizzato il costo del percorso in una settimana.",
         avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
         verified: true
     },
@@ -233,19 +225,19 @@ const DEFAULT_CONFIG: LandingPageConfig = {
 ]
   },
   usp_section: {
-    title: 'Perché siamo diversi dagli altri corsi',
+    title: 'Perché siamo diversi dagli altri percorsi',
     is_visible: true,
     items: [
-      { title: 'TUTTO SENZA SPESE EXTRA', desc: 'Ogni corso è pensato per lavorare con AI a costo zero.' },
-      { title: 'Lezioni pratiche, non teoria', desc: 'Ogni modulo contiene schermate reali e processi passo-passo.' },
-      { title: 'Nessuna fuffa', desc: 'Non vi promettiamo guadagni, vi diamo competenze tecniche solide.' },
-      { title: 'Prezzi onesti', desc: 'Ogni corso lo pagate singolarmente. Niente abbonamenti.' }
+      { title: 'QUALITÀ SENZA COMPROMESSI', desc: 'Contenuti aggiornati e processi testati su progetti reali.' },
+      { title: 'ASSISTENZA 6 GIORNI SU 7', desc: 'Supporto diretto su WhatsApp o in piattaforma per non lasciarti mai solo.' },
+      { title: 'PARTNER GOOGLE & GEMINI', desc: 'Siamo specialisti certificati nell’uso delle tecnologie AI di Google.' },
+      { title: 'ZERO COSTI RICORRENTI', desc: 'Impari a usare strumenti gratuiti o low-code senza abbonamenti pesanti.' }
     ]
   },
   cta_section: {
     title: 'Iniziate a costruire qualcosa di reale.',
     subtitle: 'Usate l’AI a costo zero, create progetti veri e portate le vostre competenze al livello successivo.',
-    button_text: 'Guarda tutti i corsi',
+    button_text: 'Guarda tutti i percorsi',
     is_visible: true
   },
   footer: {
@@ -275,15 +267,15 @@ const IconMap: Record<string, React.ElementType> = {
 const FAQ_ITEMS = [
     {
         q: "Devo avere competenze tecniche o di programmazione?",
-        a: "Assolutamente NO. Il corso è pensato per chi parte da zero assoluto. Se sai usare WhatsApp, Google e guardare un video su YouTube, sei già pronto. Non serve sapere nulla di codice, HTML, CSS o programmazione."
+        a: "Assolutamente NO. Il percorso è pensato per chi parte da zero assoluto. Se sai usare WhatsApp, Google e guardare un video su YouTube, sei già pronto. Non serve sapere nulla di codice, HTML, CSS o programmazione."
     },
     {
-        q: "Quanto tempo serve per completare il corso?",
-        a: "Il corso base si completa in 3-5 ore. Il premium in 8-10 ore totali. Ma puoi andare completamente al tuo ritmo: hai accesso illimitato a vita, quindi puoi seguirlo in una settimana o in due mesi. Tu decidi."
+        q: "Quanto tempo serve per completare il percorso?",
+        a: "Il percorso base si completa in 3-5 ore. Il premium in 8-10 ore totali. Ma puoi andare completamente al tuo ritmo: hai accesso illimitato a vita, quindi puoi seguirlo in una settimana o in due mesi. Tu decidi."
     },
     {
-        q: "Quanto tempo ci vuole per creare un sito dopo il corso?",
-        a: "Dopo aver seguito il corso base, puoi creare un sito professionale in 3-5 ore. Con la pratica e l'esperienza, scendi a 1-2 ore per sito. I nostri studenti più veloci creano landing page in 30-45 minuti."
+        q: "Quanto tempo ci vuole per creare un sito dopo il percorso?",
+        a: "Dopo aver seguito il percorso base, puoi creare un sito professionale in 3-5 ore. Con la pratica e l'esperienza, scendi a 1-2 ore per sito. I nostri studenti più veloci creano landing page in 30-45 minuti."
     },
     {
         q: "Quali strumenti servono? Ci sono costi aggiuntivi?",
@@ -299,35 +291,35 @@ const FAQ_ITEMS = [
     },
     {
         q: "Come trovo i clienti?",
-        a: "Nel corso Premium ti diamo script pronti per contattare attività locali (ristoranti, hotel, professionisti, negozi, palestre). Puoi iniziare anche da conoscenti e passaparola. Molti nostri studenti trovano i primi clienti semplicemente guardandosi intorno nella propria città: quante attività hanno siti vecchi o inesistenti?"
+        a: "Nel percorso Premium ti diamo script pronti per contattare attività locali (ristoranti, hotel, professionisti, negozi, palestre). Puoi iniziare anche da conoscenti e passaparola. Molti nostri studenti trovano i primi clienti semplicemente guardandosi intorno nella propria città: quante attività hanno siti vecchi o inesistenti?"
     },
     {
-        q: "Per quanto tempo ho accesso al corso?",
+        q: "Per quanto tempo ho accesso al percorso?",
         a: "Per sempre. Accesso illimitato a vita. Anche se tra 5 anni vuoi rivedere una lezione, sarà ancora lì. E riceverai GRATIS tutti gli aggiornamenti futuri quando aggiungiamo nuovi contenuti o funzionalità."
     },
     {
         q: "C'è supporto se ho problemi o domande?",
-        a: "Sì! Offriamo assistenza dedicata via chat con risposta garantita entro 8 ore lavorative. Nel corso Premium hai anche assistenza PRIORITARIA (rispondiamo entro 2 ore) e sessioni 1-a-1 con Daniel per analizzare i tuoi progetti."
+        a: "Sì! Offriamo assistenza dedicata via chat con risposta garantita entro 8 ore lavorative. Nel percorso Premium hai anche assistenza PRIORITARIA (rispondiamo entro 2 ore) e sessioni 1-a-1 con Daniel per analizzare i tuoi progetti."
     },
     {
         q: "Cosa succede se l'AI cambia o viene aggiornata?",
-        a: "Aggiorniamo costantemente il corso con le ultime novità e strumenti AI. Quando escono nuove funzionalità o miglioramenti, aggiungiamo lezioni gratuite. Il tuo accesso include TUTTI gli aggiornamenti futuri senza costi extra."
+        a: "Aggiorniamo costantemente il percorso con le ultime novità e strumenti AI. Quando escono nuove funzionalità o miglioramenti, aggiungiamo lezioni gratuite. Il tuo accesso include TUTTI gli aggiornamenti futuri senza costi extra."
     },
     {
-        q: "Il corso va bene anche per creare il sito della MIA attività?",
+        q: "Il percorso va bene anche per creare il sito della MIA attività?",
         a: "Assolutamente sì! Anzi, è uno dei casi d'uso principali. Risparmi migliaia di euro (che avresti dato a un'agenzia) e resti autonomo per sempre. Ogni volta che vuoi modificare qualcosa, lo fai tu in pochi minuti. Zero dipendenze."
     },
     {
         q: "E se non ho tempo ora? Posso iniziare dopo?",
-        a: "Certamente! Una volta iscritto hai accesso a vita. Puoi iniziare domani, tra una settimana o tra un mese. Il corso sarà sempre lì ad aspettarti. Ma ricorda: i bonus per i primi 50 iscritti scadono, quindi iscriviti ora per non perderli."
+        a: "Certamente! Una volta iscritto hai accesso a vita. Puoi iniziare domani, tra una settimana o tra un mese. Il percorso sarà sempre lì ad aspettarti. Ma ricorda: i bonus per i primi 50 iscritti scadono, quindi iscriviti ora per non perderli."
     },
     {
-        q: "Il corso è registrato o sono lezioni live?",
+        q: "Il percorso è registrato o sono lezioni live?",
         a: "Tutto registrato e sempre disponibile. Massima flessibilità: segui quando vuoi, metti in pausa, rivedi le parti che ti servono 10 volte se necessario. Nessun vincolo di orario o giorno."
     },
     {
         q: "Funziona anche per creare app mobile?",
-        a: "Il corso si concentra su siti web professionali (che comunque sono responsive e funzionano perfettamente su mobile). Per app native iOS/Android servirebbero competenze diverse. Ma i siti web moderni sono così potenti che spesso sostituiscono benissimo le app."
+        a: "Il percorso si concentra su siti web professionali (che comunque sono responsive e funzionano perfettamente su mobile). Per app native iOS/Android servirebbero competenze diverse. Ma i siti web moderni sono così potenti che spesso sostituiscono benissimo le app."
     },
     {
         q: "Che differenza c'è tra Base e Premium?",
@@ -338,11 +330,7 @@ const FAQ_ITEMS = [
         a: "Sì, puoi fare upgrade in qualsiasi momento pagando la differenza. Ma i bonus esclusivi (sessioni 1-a-1, template, script) sono solo per chi si iscrive ora nei primi 50 posti."
     },
     {
-        q: "C'è una garanzia?",
-        a: "Sì! Garanzia Soddisfatti o Rimborsati di 30 giorni. Se non sei soddisfatto per qualsiasi motivo, ti rimborsiamo il 100%. Nessuna domanda, nessuna giustificazione. Zero rischi per te."
-    },
-    {
-        q: "Il corso è adatto anche a persone over 50?",
+        q: "Il percorso è adatto anche a persone over 50?",
         a: "Assolutamente sì! Abbiamo studenti di tutte le età. L'unico requisito è saper usare un computer base. Se riesci a guardare video su YouTube e scrivere su WhatsApp, sei già pronto. Daniel spiega tutto passo-passo, senza dare nulla per scontato."
     }
 ];
@@ -399,7 +387,30 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
   // Merge config with defaults
   const config = useMemo(() => {
-    if (!landingConfig) return DEFAULT_CONFIG;
+    // Funzione helper per sostituire corso con percorso ricorsivamente
+    const replaceCorso = (obj: any): any => {
+        if (typeof obj === 'string') {
+            // Sostituzione case-insensitive ma preservando il caso se possibile (semplice)
+            return obj
+                .replace(/corso/g, 'percorso')
+                .replace(/Corso/g, 'Percorso')
+                .replace(/corsi/g, 'percorsi')
+                .replace(/Corsi/g, 'Percorsi');
+        }
+        if (Array.isArray(obj)) {
+            return obj.map(replaceCorso);
+        }
+        if (obj !== null && typeof obj === 'object') {
+            const newObj: any = {};
+            for (const key in obj) {
+                newObj[key] = replaceCorso(obj[key]);
+            }
+            return newObj;
+        }
+        return obj;
+    };
+
+    if (!landingConfig) return replaceCorso(DEFAULT_CONFIG);
     
     let featuresToUse = landingConfig.features_section;
     if (!featuresToUse || !featuresToUse.cards || featuresToUse.cards.length < 4) {
@@ -472,13 +483,72 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
         }
     };
 
+    // Forziamo i nuovi punti USP se quelli nel DB sembrano vecchi o non contengono le parole chiave richieste
+    const hasNewUSP = merged.usp_section.items && 
+                     merged.usp_section.items.some(item => item.title.includes("QUALITÀ") || item.title.includes("ASSISTENZA"));
+    
+    if (!merged.usp_section.items || merged.usp_section.items.length < 4 || !hasNewUSP) {
+        merged.usp_section = DEFAULT_CONFIG.usp_section;
+    }
+
+    // Rimuoviamo i 5 lavori di esempio se presenti (basandoci sul pattern aura.build)
+    if (merged.ai_showcase_section?.urls && merged.ai_showcase_section.urls.length > 0) {
+        const hasExamples = merged.ai_showcase_section.urls.some(url => url.includes('aura.build'));
+        if (hasExamples) {
+            merged.ai_showcase_section.urls = [];
+        }
+    }
+
     if (merged.hero.title && merged.hero.title.includes("Costruiamo piattaforme")) {
         merged.hero.title = "Crea Siti Web Professionali o Piattaforme con l'AI in Poche Ore";
         merged.hero.subtitle = "Senza Scrivere Una Riga di Codice.";
     }
 
-    return merged;
+    // Applichiamo la sostituzione globale corso -> percorso su tutto l'oggetto finale
+    return replaceCorso(merged);
   }, [landingConfig]);
+
+  // Applichiamo la sostituzione globale anche ai corsi e alle FAQ
+  const processedCourses = useMemo(() => {
+      // Funzione helper per sostituire corso con percorso ricorsivamente (definita qui per semplicità o riutilizzabile)
+      const replaceCorso = (obj: any): any => {
+          if (typeof obj === 'string') {
+              return obj
+                  .replace(/corso/g, 'percorso')
+                  .replace(/Corso/g, 'Percorso')
+                  .replace(/corsi/g, 'percorsi')
+                  .replace(/Corsi/g, 'Percorsi');
+          }
+          if (Array.isArray(obj)) return obj.map(replaceCorso);
+          if (obj !== null && typeof obj === 'object') {
+              const newObj: any = {};
+              for (const key in obj) newObj[key] = replaceCorso(obj[key]);
+              return newObj;
+          }
+          return obj;
+      };
+      return replaceCorso(courses);
+  }, [courses]);
+
+  const processedFaqs = useMemo(() => {
+      const replaceCorso = (obj: any): any => {
+          if (typeof obj === 'string') {
+              return obj
+                  .replace(/corso/g, 'percorso')
+                  .replace(/Corso/g, 'Percorso')
+                  .replace(/corsi/g, 'percorsi')
+                  .replace(/Corsi/g, 'Percorsi');
+          }
+          if (Array.isArray(obj)) return obj.map(replaceCorso);
+          if (obj !== null && typeof obj === 'object') {
+              const newObj: any = {};
+              for (const key in obj) newObj[key] = replaceCorso(obj[key]);
+              return newObj;
+          }
+          return obj;
+      };
+      return replaceCorso(FAQ_ITEMS);
+  }, []);
 
   const heroVideo = useMemo(() => createOptimizedVideo(config.videos?.hero_video_id || 'v1765326450/home_2_bbhedx'), [config.videos?.hero_video_id]);
   const aiEraVideo = useMemo(() => createOptimizedVideo(config.videos?.ai_era_video_id || 'v1765328025/home_page_3_tnvnqm'), [config.videos?.ai_era_video_id]);
@@ -575,7 +645,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-950"></div>
           </div>
 
-          <section className={`relative z-10 pb-16 lg:pb-24 ${heroPaddingClass}`}>
+          <section className={`relative z-10 pb-12 lg:pb-24 ${heroPaddingClass}`}>
             <div className="max-w-7xl mx-auto px-6 relative z-10">
               <div className="max-w-5xl mx-auto text-center">
                 {config.hero.show_badges && (
@@ -631,7 +701,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* --- AI ERA SECTION (Video Integration) --- */}
       {config.ai_era_section?.is_visible !== false && (
-          <section className="relative z-10 py-24">
+          <section className="relative z-10 py-16 md:py-24">
              <div className="max-w-7xl mx-auto px-6">
                   {/* Container Glassmorphic */}
                   <div className="bg-white/5 backdrop-blur-xl ring-1 ring-white/10 rounded-3xl p-8 md:p-12 overflow-hidden relative shadow-2xl">
@@ -699,9 +769,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* SECTION 2 - Features Grid MOVED HERE */}
       {config.features_section.is_visible && (
-          <section className="py-24 relative">
+          <section className="py-16 md:py-24 relative">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center max-w-3xl mx-auto mb-16">
+                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
                     <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-6">
                         <Cpu className="h-3 w-3" />
                         Skills
@@ -740,12 +810,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                 </div>
 
                 {/* Courses Preview CTA */}
-                <div className="mt-20 pt-12 border-t border-white/5 text-center">
+                <div className="mt-16 md:mt-20 pt-10 md:pt-12 border-t border-white/5 text-center">
                     <h2 className="text-3xl font-semibold text-white mb-4">I Nostri Corsi Più Popolari</h2>
                     <p className="text-slate-400 mb-10 max-w-2xl mx-auto">Scelti da migliaia di studenti per qualità e completezza.</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {courses.slice(0,3).map(course => {
+                        {processedCourses.slice(0,3).map(course => {
                              const displayPrice = course.price;
                              const fakeOriginalPrice = Math.round(course.price * 1.4);
                              const discountPercent = Math.round(((fakeOriginalPrice - displayPrice) / fakeOriginalPrice) * 100);
@@ -780,7 +850,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* SECTION 1 - About / Mission MOVED AFTER */}
       {config.about_section.is_visible && (
-        <section className="py-24 bg-slate-900/50 border-t border-white/5 relative overflow-hidden">
+        <section className="py-16 md:py-24 bg-slate-900/50 border-t border-white/5 relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
             
@@ -862,7 +932,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                           Ma c'era un problema: tutte le risorse erano in inglese, frammentate o troppo tecniche per chi partiva da zero.
                                       </p>
                                       <p>
-                                          Così ho deciso di creare <strong className="text-brand-400">Moise Web Academy</strong>: il primo corso in italiano completo, passo-passo, che insegna a chiunque a creare siti web professionali usando l'intelligenza artificiale.
+                                          Così ho deciso di creare <strong className="text-brand-400">Moise Web Academy</strong>: il primo percorso in italiano completo, passo-passo, che insegna a chiunque a creare siti web professionali usando l'intelligenza artificiale.
                                       </p>
                                       <div className="pt-4 border-t border-white/10 mt-2">
                                           <p className="italic text-xs text-slate-500">La mia missione? Renderti autonomo e darti una competenza che vale oro.</p>
@@ -929,7 +999,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* --- HOW IT WORKS --- */}
       {config.how_it_works_section?.is_visible !== false && (
-          <section className="py-24 bg-slate-900/50 border-t border-white/5 relative">
+          <section className="py-16 md:py-24 bg-slate-900/50 border-t border-white/5 relative">
               <div className="max-w-7xl mx-auto px-6">
                   <div className="grid lg:grid-cols-12 gap-16 items-center">
                       <div className="lg:col-span-5">
@@ -1004,8 +1074,8 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* --- AI SHOWCASE (Simplified - No Slider) --- */}
       {config.ai_showcase_section?.is_visible !== false && (
-          <section className="py-24 bg-slate-950 border-t border-white/5 relative overflow-hidden">
-              <div className="max-w-7xl mx-auto px-6 mb-16">
+          <section className="py-16 md:py-24 bg-slate-950 border-t border-white/5 relative overflow-hidden">
+              <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-16">
                   <div className="grid lg:grid-cols-12 gap-16 items-center">
                       <div className="lg:col-span-5">
                           <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8">
@@ -1054,13 +1124,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
                   {/* Website Showcase Grid */}
                   <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {[
-                          "https://please-make-the-55.aura.build/",
-                          "https://real-estate-developer-99.aura.build/",
-                          "https://ferdousmikdad-test.aura.build/",
-                          "https://luxury-coastal-60.aura.build/",
-                          "https://minimal-landing.aura.build/"
-                      ].map((url, idx) => (
+                      {(config.ai_showcase_section?.urls || []).map((url, idx) => (
                           <div key={idx} className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-500/20">
                               <div className="h-10 bg-slate-900 flex items-center px-4 gap-2 border-b border-white/5">
                                   <div className="flex gap-1.5">
@@ -1095,10 +1159,10 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       )}
 
       {/* --- TARGET SECTION (Video Integration: Uomo Affari) --- */}
-      <section className="py-24 relative overflow-hidden">
+      <section className="py-16 md:py-24 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6">
               
-              <div className="text-center mb-16 relative z-10">
+              <div className="text-center mb-12 md:mb-16 relative z-10">
                   <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">Moise Web Academy È Perfetto Per Te Se...</h2>
               </div>
 
@@ -1161,20 +1225,20 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       </section>
 
       {/* --- FILTER SECTION (Per chi NON è) --- */}
-      <section className="py-24 bg-slate-900 border-t border-white/5 relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-slate-900 border-t border-white/5 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[150px] pointer-events-none"></div>
           
           <div className="max-w-5xl mx-auto px-6 relative z-10">
-              <div className="text-center mb-16">
+              <div className="text-center mb-12 md:mb-16">
                   <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
-                      Questo Corso NON È Per Te Se...
+                      Questo Percorso NON È Per Te Se...
                   </h2>
                   <div className="w-24 h-1 bg-red-500/50 mx-auto rounded-full"></div>
               </div>
 
               <div className="space-y-4">
                   {[
-                      { title: 'Cerchi la bacchetta magica', desc: 'L\'AI è potentissima, ma devi imparare a usarla. Se cerchi “soldi facili” senza impegno, questo corso non fa per te.' },
+                      { title: 'Cerchi la bacchetta magica', desc: 'L\'AI è potentissima, ma devi imparare a usarla. Se cerchi “soldi facili” senza impegno, questo percorso non fa per te.' },
                       { title: 'Vuoi che qualcuno faccia tutto al posto tuo', desc: 'Ti insegniamo a creare, non creiamo noi per te. Ti diamo la canna da pesca, non il pesce.' },
                       { title: 'Pensi che l\'AI faccia tutto da sola', desc: 'L’intelligenza artificiale va guidata con i prompt giusti. È come una Ferrari: se non sai guidare, non serve a nulla.' },
                       { title: 'Vuoi diventare un programmatore "classico"', desc: 'Se il tuo sogno è scrivere migliaia di righe di codice, questo non è il percorso giusto. Noi usiamo il Low-Code/No-Code.' },
@@ -1204,9 +1268,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* --- COMPARISON SECTION --- */}
       {config.comparison_section?.is_visible !== false && (
-         <section className="py-24 bg-slate-950 border-t border-white/5">
+         <section className="py-16 md:py-24 bg-slate-950 border-t border-white/5">
              <div className="max-w-7xl mx-auto px-6">
-                 <div className="text-center max-w-4xl mx-auto mb-16">
+                 <div className="text-center max-w-4xl mx-auto mb-12 md:mb-16">
                      <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">{config.comparison_section?.title || "La Tua Vita Prima e Dopo"}</h2>
                      <p className="text-xl text-slate-400">{config.comparison_section?.subtitle}</p>
                  </div>
@@ -1254,7 +1318,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       {config.testimonials_section.is_visible && (
         <section className="py-24 bg-slate-900/50 border-t border-white/5">
              <div className="max-w-7xl mx-auto px-6">
-                <div className="text-center mb-16">
+                <div className="text-center mb-12 md:mb-16">
                     <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-slate-300 bg-white/5 ring-1 ring-white/10 rounded-full mb-6">
                         <MessageCircle className="h-3 w-3" />
                         {config.testimonials_section.subtitle}
@@ -1376,7 +1440,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                               required
                               rows={4}
                               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white focus:ring-1 focus:ring-brand-500 outline-none resize-none"
-                              placeholder="Raccontaci cosa ti è piaciuto del corso..."
+                              placeholder="Raccontaci cosa ti è piaciuto del percorso..."
                               value={reviewForm.text}
                               onChange={(e) => setReviewForm({...reviewForm, text: e.target.value})}
                           ></textarea>
@@ -1397,9 +1461,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* SECTION 4 - USP */}
       {config.usp_section.is_visible && (
-          <section className="py-24 bg-slate-950 border-t border-white/5">
+          <section className="py-16 md:py-24 bg-slate-950 border-t border-white/5">
             <div className="max-w-7xl mx-auto px-6">
-                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-12 text-center tracking-tight">{config.usp_section.title}</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-10 md:mb-12 text-center tracking-tight">{config.usp_section.title}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {config.usp_section.items.map((item, idx) => (
                         <div key={idx} className="flex gap-6 p-6 rounded-2xl bg-white/5 ring-1 ring-white/5 hover:bg-white/10 transition-colors">
@@ -1419,73 +1483,10 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           </section>
       )}
 
-      {/* SECTION - GUARANTEE */}
-      <section className="py-24 bg-slate-950 border-t border-white/5">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-              <div className="inline-block p-4 rounded-full bg-yellow-500/10 ring-1 ring-yellow-500/20 mb-6">
-                  <ShieldCheck className="h-12 w-12 text-yellow-500" />
-              </div>
-              
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-4 tracking-tight">
-                  Garanzia Soddisfatti o Rimborsati 30 Giorni
-              </h2>
-              
-              <p className="text-xl text-brand-400 font-bold mb-8">
-                  Zero rischi per te. Tutto il vantaggio dalla tua parte.
-              </p>
-
-              <div className="text-lg text-slate-300 leading-relaxed mb-10">
-                  <p className="mb-6 font-medium">
-                      Siamo così sicuri che Moise Web Academy cambierà il tuo modo di vedere la creazione di siti web che ti offriamo una garanzia totale di 30 giorni.
-                      <br/>Hai un mese intero per:
-                  </p>
-                  
-                  <ul className="text-left max-w-lg mx-auto space-y-3 mb-8">
-                      {['Seguire tutto il corso al tuo ritmo', 'Creare i tuoi primi progetti e testare ogni lezione', 'Mettere in pratica tutto ciò che impari', 'Vedere con i tuoi occhi i risultati'].map((item, idx) => (
-                          <li key={idx} className="flex items-start">
-                              <CheckCircle className="h-6 w-6 text-green-400 mr-3 flex-shrink-0" />
-                              <span className="font-medium">{item}</span>
-                          </li>
-                      ))}
-                  </ul>
-
-                  <p className="mb-4">
-                      Se per QUALSIASI motivo non sei soddisfatto, ti rimborsiamo ogni centesimo. Nessuna domanda, nessuna giustificazione, nessuna discussione.
-                  </p>
-                  <p className="mb-8 font-bold text-white">
-                      Basta una semplice email e riavrai indietro il 100% di quello che hai pagato.
-                  </p>
-              </div>
-
-              <div className="bg-slate-900 ring-1 ring-white/10 rounded-2xl p-8 mb-10 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-2 h-full bg-brand-500"></div>
-                  <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">La nostra promessa</h3>
-                  <p className="text-xl md:text-2xl text-brand-400 font-black italic">
-                      "O impari a creare siti web professionali con l'AI, o non paghi nulla."
-                  </p>
-              </div>
-
-              <div className="text-lg text-slate-400 mb-12 font-medium space-y-2">
-                  <p>Semplice. Chiaro. Onesto.</p>
-                  <p className="font-bold text-white">Zero rischi. Solo opportunità.</p>
-                  <p className="text-slate-500 text-base pt-4">
-                      L'unica cosa che puoi perdere è il tempo che passi a rimandarla a domani.
-                  </p>
-              </div>
-
-              <button 
-                  onClick={handleNavigateToCourses}
-                  className="bg-brand-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-50 transition-all shadow-xl shadow-brand-500/20 inline-flex items-center group transform hover:scale-105"
-              >
-                  ACCEDI ORA <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
-              </button>
-          </div>
-      </section>
-
       {/* --- SECTION FAQ --- */}
-      <section className="py-24 bg-slate-900/50 border-t border-white/5">
+      <section className="py-16 md:py-24 bg-slate-900/50 border-t border-white/5">
           <div className="max-w-4xl mx-auto px-6">
-              <div className="text-center mb-16">
+              <div className="text-center mb-12 md:mb-16">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-4 tracking-tight">
                       Domande Frequenti
                   </h2>
@@ -1495,7 +1496,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
               </div>
 
               <div className="space-y-4">
-                  {FAQ_ITEMS.map((item, idx) => (
+                  {processedFaqs.map((item, idx) => (
                       <div 
                           key={idx} 
                           className="bg-white/5 ring-1 ring-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:bg-white/10"
@@ -1541,7 +1542,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
       {/* SECTION 7 - CTA FINALE */}
       {config.cta_section.is_visible && (
-        <section className="py-24 relative overflow-hidden">
+        <section className="py-16 md:py-24 relative overflow-hidden">
             <div className="absolute inset-0 bg-brand-600/20 backdrop-blur-3xl"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/30 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/30 rounded-full blur-[100px]"></div>

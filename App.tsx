@@ -375,8 +375,8 @@ const AppContent: React.FC = () => {
              <div className="min-h-screen pt-32 flex justify-center bg-gray-50 px-4">
                  <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md h-fit text-center">
                      <h2 className="text-2xl font-bold mb-4">Crea Account</h2>
-                     <p className="text-gray-500 mb-6">Per registrarti, acquista un corso.</p>
-                     <button onClick={() => navigate('/')} className="bg-brand-600 text-white px-6 py-2 rounded-lg font-bold">Vedi Corsi</button>
+                     <p className="text-gray-500 mb-6">Per registrarti, acquista un percorso.</p>
+                     <button onClick={() => navigate('/')} className="bg-brand-600 text-white px-6 py-2 rounded-lg font-bold">Vedi Percorsi</button>
                  </div>
              </div>
         )} />

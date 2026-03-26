@@ -30,14 +30,14 @@ const DEFAULT_PDF_CONFIG: PdfGuideConfig = {
             {
                 name: 'Elena G.',
                 role: 'Imprenditrice Digitale',
-                text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo corso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
+                text: 'Ho sempre pensato che creare un e-commerce fosse un incubo tecnico. Con questo percorso ho messo online il mio shop in un weekend, senza scrivere una riga di codice. Incredibile!',
                 avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
                 verified: true
             },
             {
                 name: 'Davide F.',
                 role: 'Consulente Marketing',
-                text: "Finalmente un corso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
+                text: "Finalmente un percorso che va dritto al punto. L'approccio pratico con l'AI mi ha permesso di offrire landing page ai miei clienti a un prezzo competitivo, aumentando il mio fatturato del 40%.",
                 avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80',
                 verified: true
             },
@@ -247,7 +247,7 @@ export const PdfGuideLanding: React.FC = () => {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-10 md:space-y-32 pb-16 md:pb-32">
+            <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-8 md:space-y-20 pb-16 md:pb-32">
                 {/* 2. PROBLEMA & SOLUZIONE */}
                 <section className="grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
                     <div className="space-y-6 md:space-y-8">
@@ -285,7 +285,7 @@ export const PdfGuideLanding: React.FC = () => {
                 </section>
 
                 {/* 3. PROVA E RISULTATI */}
-                <section className="space-y-12 md:space-y-16">
+                <section className="space-y-8 md:space-y-12">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi costruire DAVVERO?</h2>
                         <p className="text-lg md:text-xl text-slate-400">L'AI non sostituisce un programmatore, ma ti dà un'autonomia che prima era impensabile.</p>
@@ -309,7 +309,7 @@ export const PdfGuideLanding: React.FC = () => {
                 </section>
                 
                 {/* WEBSITE SHOWCASE */}
-                <section className="space-y-8 md:space-y-16 py-4 md:py-20">
+                <section className="space-y-8 md:space-y-12 py-4 md:py-12">
                     <div className="text-center space-y-4 max-w-3xl mx-auto">
                         <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-2 md:mb-4">
                             <Monitor className="h-3 w-3" />
@@ -325,13 +325,10 @@ export const PdfGuideLanding: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                        {[
-                            "https://please-make-the-55.aura.build/",
-                            "https://real-estate-developer-99.aura.build/",
-                            "https://ferdousmikdad-test.aura.build/",
-                            "https://luxury-coastal-60.aura.build/",
-                            "https://minimal-landing.aura.build/"
-                        ].map((url, idx) => (
+                        {(config.showcase_items && config.showcase_items.length > 0 
+                          ? config.showcase_items.map(item => item.url)
+                          : []
+                        ).map((url, idx) => (
                             <div key={idx} className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all duration-500">
                                 <div className="h-10 bg-slate-900 flex items-center px-4 gap-2 border-b border-white/5">
                                     <div className="flex gap-1.5">
@@ -365,7 +362,7 @@ export const PdfGuideLanding: React.FC = () => {
 
                 {/* 4. TESTIMONIALS */}
                 {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
-                    <section className="space-y-12 md:space-y-16">
+                    <section className="space-y-8 md:space-y-12">
                         <div className="text-center space-y-3 md:space-y-4">
                             <h2 className="text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-brand-400">{config.testimonials_section.subtitle}</h2>
                             <h3 className="text-2xl md:text-5xl font-bold text-white tracking-tight">{config.testimonials_section.title}</h3>
