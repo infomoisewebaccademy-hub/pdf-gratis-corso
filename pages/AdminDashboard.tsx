@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, EyeOff, 
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
+import { Sidebar, SidebarItem } from '../components/Sidebar';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
@@ -828,65 +829,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       </div>
   );
 
+  const adminMenuItems: SidebarItem[] = [
+    { id: 'courses', label: 'Corsi', icon: Book },
+    { id: 'launch', label: 'Pre-Lancio', icon: Rocket },
+    { id: 'pdf_guide', label: 'Guida PDF', icon: Download },
+    { id: 'landing_manual', label: 'Editor Home', icon: LayoutTemplate },
+    { id: 'community', label: 'Community', icon: Users },
+    { id: 'general', label: 'Impostazioni', icon: Settings },
+  ];
+
   return (
-    <div className="pt-24 min-h-screen bg-gray-50 pb-20 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Gestione Piattaforma</h1>
-                <p className="text-gray-500 mt-1">Controlla ogni aspetto della tua Academy.</p>
-            </div>
-            <div className="flex gap-3">
-                <button onClick={() => setShowHelp(!showHelp)} className="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all flex items-center">
-                    <Terminal className="h-5 w-5 mr-2" /> SQL Help
-                </button>
-                <button onClick={() => navigate('/admin/course/new')} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all flex items-center">
-                    <Plus className="h-5 w-5 mr-2" /> Nuovo Percorso
-                </button>
-            </div>
-        </div>
+    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row">
+      <Sidebar 
+        activeItem={activeTab} 
+        items={adminMenuItems} 
+        onItemClick={(id) => setActiveTab(id as any)} 
+      />
 
-        {showHelp && (
-            <div className="bg-slate-900 text-slate-200 p-6 rounded-xl mb-8 shadow-xl border border-slate-700 font-mono text-sm relative">
-                <button onClick={() => setShowHelp(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X className="h-5 w-5"/></button>
-                <h3 className="text-white font-bold text-lg mb-4 flex items-center"><Terminal className="mr-2 h-5 w-5"/> Comandi Database Utili</h3>
-                <p className="text-slate-400 mb-4">Esegui questi comandi nell'SQL Editor di Supabase per aggiornare la struttura.</p>
-                    <div className="bg-black p-4 rounded border border-slate-700 mb-2">
-                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
-                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
-                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS favicon_url text;</code>
-                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS rating numeric DEFAULT 5.0;</code>
-                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_discount_badge boolean DEFAULT true;</code>
-                        <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
-                    </div>
-            </div>
-        )}
+      <main className="flex-1 bg-gray-50/50 pb-20 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-6 py-10 lg:px-12">
+          
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+              <div>
+                  <h1 className="text-3xl font-bold text-gray-900">Gestione Piattaforma</h1>
+                  <p className="text-gray-500 mt-1">Controlla ogni aspetto della tua Academy.</p>
+              </div>
+              <div className="flex gap-3">
+                  <button onClick={() => setShowHelp(!showHelp)} className="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all flex items-center">
+                      <Terminal className="h-5 w-5 mr-2" /> SQL Help
+                  </button>
+                  <button onClick={() => navigate('/admin/course/new')} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all flex items-center">
+                      <Plus className="h-5 w-5 mr-2" /> Nuovo Percorso
+                  </button>
+              </div>
+          </div>
 
-        {/* TABS */}
-        <div className="flex border-b border-gray-200 mb-8 space-x-8 overflow-x-auto scrollbar-hide">
-            <button onClick={() => setActiveTab('courses')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'courses' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <Book className="h-4 w-4 mr-2" /> Corsi
-            </button>
-            <button onClick={() => setActiveTab('launch')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'launch' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <Rocket className="h-4 w-4 mr-2" /> Pre-Lancio
-            </button>
-            <button onClick={() => setActiveTab('pdf_guide')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'pdf_guide' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <Download className="h-4 w-4 mr-2" /> Guida PDF
-            </button>
-            <button onClick={() => setActiveTab('landing_manual')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'landing_manual' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <LayoutTemplate className="h-4 w-4 mr-2" /> Editor Home
-            </button>
-            <button onClick={() => setActiveTab('community')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'community' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <Users className="h-4 w-4 mr-2" /> Community
-            </button>
-            <button onClick={() => setActiveTab('general')} className={`pb-4 font-bold text-sm border-b-2 transition-all flex items-center whitespace-nowrap ${activeTab === 'general' ? 'border-brand-600 text-brand-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}>
-                <Settings className="h-4 w-4 mr-2" /> Impostazioni
-            </button>
-        </div>
+          {showHelp && (
+              <div className="bg-slate-900 text-slate-200 p-6 rounded-xl mb-8 shadow-xl border border-slate-700 font-mono text-sm relative">
+                  <button onClick={() => setShowHelp(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X className="h-5 w-5"/></button>
+                  <h3 className="text-white font-bold text-lg mb-4 flex items-center"><Terminal className="mr-2 h-5 w-5"/> Comandi Database Utili</h3>
+                  <p className="text-slate-400 mb-4">Esegui questi comandi nell'SQL Editor di Supabase per aggiornare la struttura.</p>
+                      <div className="bg-black p-4 rounded border border-slate-700 mb-2">
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS favicon_url text;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS rating numeric DEFAULT 5.0;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_discount_badge boolean DEFAULT true;</code>
+                          <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
+                      </div>
+              </div>
+          )}
 
-        {/* CONTENT */}
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+          {/* CONTENT */}
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             
             {activeTab === 'courses' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1305,7 +1300,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
             </button>
         </div>
 
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

@@ -68,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-white flex">
+    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row">
       {/* Sidebar Menu - Come richiesto nell'immagine */}
       <Sidebar activeItem={location.pathname.substring(1) || 'my-courses'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 

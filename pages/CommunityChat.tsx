@@ -116,7 +116,7 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-white flex">
+    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row">
       <Sidebar activeItem="community" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 
       <main className="flex-1 flex flex-col bg-gray-50/50 h-[calc(100vh-80px)]">
