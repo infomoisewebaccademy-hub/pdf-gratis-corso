@@ -257,6 +257,13 @@ const DEFAULT_CONFIG: LandingPageConfig = {
       logo_margin_bottom: 0,
       logo_margin_left: 0,
       logo_margin_right: 0
+  },
+  videos: {
+    hero_video_id: 'v1765326450/home_2_bbhedx',
+    ai_era_video_id: 'v1765328025/home_page_3_tnvnqm',
+    how_it_works_video_id: 'v1765456382/come-funziona-MWA_mpdave',
+    target_section_video_id: 'v1765392297/uomo-affari-consegna-carta_f3tj6t',
+    about_video_url: 'https://res.cloudinary.com/dhj0ztos6/video/upload/v1765452611/Home_page_rnk0zw.webm'
   }
 };
 
@@ -344,9 +351,17 @@ const FAQ_ITEMS = [
 const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dhj0ztos6/video/upload";
 
 const createOptimizedVideo = (videoId: string) => {
-    // Ottimizzazione aggressiva e responsiva per TUTTI i video.
-    // Rimuoviamo f_auto per evitare conflitti con i tag <source> espliciti,
-    // garantendo che il browser possa scegliere tra webm e mp4 senza problemi.
+    if (!videoId) return { optimized: '', poster: '' };
+    
+    // Se è già un URL completo, lo restituiamo così com'è
+    if (videoId.startsWith('http')) {
+        return {
+            optimized: videoId.replace(/\.(webm|mp4)$/i, ''),
+            poster: ''
+        };
+    }
+
+    // Ottimizzazione aggressiva e responsiva per TUTTI i video Cloudinary.
     const optimizationParams = 'w_auto,dpr_auto,c_limit,q_auto:good';
     
     return {
@@ -355,10 +370,6 @@ const createOptimizedVideo = (videoId: string) => {
     };
 };
 
-const HERO_VIDEO = createOptimizedVideo("v1765326450/home_2_bbhedx");
-const AI_ERA_VIDEO = createOptimizedVideo("v1765328025/home_page_3_tnvnqm");
-const HOW_IT_WORKS_VIDEO = createOptimizedVideo("v1765456382/come-funziona-MWA_mpdave");
-const TARGET_SECTION_VIDEO = createOptimizedVideo("v1765392297/uomo-affari-consegna-carta_f3tj6t");
 // ------------------------------------
 
 export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landingConfig }) => {
@@ -454,6 +465,10 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                 ...DEFAULT_CONFIG.footer.social_links,
                 ...(landingConfig.footer?.social_links || {})
             }
+        },
+        videos: {
+            ...DEFAULT_CONFIG.videos,
+            ...(landingConfig.videos || {})
         }
     };
 
@@ -465,13 +480,19 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
     return merged;
   }, [landingConfig]);
 
+  const heroVideo = useMemo(() => createOptimizedVideo(config.videos?.hero_video_id || 'v1765326450/home_2_bbhedx'), [config.videos?.hero_video_id]);
+  const aiEraVideo = useMemo(() => createOptimizedVideo(config.videos?.ai_era_video_id || 'v1765328025/home_page_3_tnvnqm'), [config.videos?.ai_era_video_id]);
+  const howItWorksVideo = useMemo(() => createOptimizedVideo(config.videos?.how_it_works_video_id || 'v1765456382/come-funziona-MWA_mpdave'), [config.videos?.how_it_works_video_id]);
+  const targetSectionVideo = useMemo(() => createOptimizedVideo(config.videos?.target_section_video_id || 'v1765392297/uomo-affari-consegna-carta_f3tj6t'), [config.videos?.target_section_video_id]);
+
   const aboutVideo = useMemo(() => {
-    if(!config.about_section.image_url.includes('cloudinary')) return { optimized: config.about_section.image_url, poster: '' };
-    const parts = config.about_section.image_url.split('/upload/');
-    if(parts.length < 2) return { optimized: config.about_section.image_url, poster: '' };
+    const videoUrl = config.videos?.about_video_url || config.about_section.image_url;
+    if(!videoUrl.includes('cloudinary')) return { optimized: videoUrl, poster: '' };
+    const parts = videoUrl.split('/upload/');
+    if(parts.length < 2) return { optimized: videoUrl, poster: '' };
     const videoId = parts[1].replace(/\.\w+$/, '');
     return createOptimizedVideo(videoId);
-  }, [config.about_section.image_url]);
+  }, [config.videos?.about_video_url, config.about_section.image_url]);
 
 
   const handleNavigateToCourses = () => {
@@ -543,12 +564,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           {/* Hero Video Background - OTTIMIZZATO per tutti i dispositivi */}
           <div className="absolute inset-0 z-0">
              <video 
-                poster={HERO_VIDEO.poster}
+                poster={heroVideo.poster}
                 autoPlay loop muted playsInline 
                 className="w-full h-full object-cover opacity-20"
              >
-                <source src={`${HERO_VIDEO.optimized}.webm`} type="video/webm" />
-                <source src={`${HERO_VIDEO.optimized}.mp4`} type="video/mp4" />
+                <source src={`${heroVideo.optimized}.webm`} type="video/webm" />
+                <source src={`${heroVideo.optimized}.mp4`} type="video/mp4" />
                 Il tuo browser non supporta il tag video.
              </video>
              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-950"></div>
@@ -648,13 +669,13 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                           {/* Right Video Visual - OTTIMIZZATO */}
                           <div className="relative rounded-3xl overflow-hidden lg:h-[750px] md:h-[600px] h-[450px] w-full shadow-2xl ring-1 ring-white/10 group">
                                <video 
-                                  poster={AI_ERA_VIDEO.poster}
+                                  poster={aiEraVideo.poster}
                                   loading="lazy"
                                   autoPlay loop muted playsInline 
                                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                                >
-                                  <source src={`${AI_ERA_VIDEO.optimized}.webm`} type="video/webm" />
-                                  <source src={`${AI_ERA_VIDEO.optimized}.mp4`} type="video/mp4" />
+                                  <source src={`${aiEraVideo.optimized}.webm`} type="video/webm" />
+                                  <source src={`${aiEraVideo.optimized}.mp4`} type="video/mp4" />
                                </video>
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
@@ -953,13 +974,13 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                       <div className="lg:col-span-7">
                           <div className="relative h-full min-h-[400px] rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
                                <video 
-                                  poster={HOW_IT_WORKS_VIDEO.poster}
+                                  poster={howItWorksVideo.poster}
                                   loading="lazy"
                                   autoPlay loop muted playsInline 
                                   className="absolute inset-0 w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-700"
                                >
-                                   <source src={`${HOW_IT_WORKS_VIDEO.optimized}.webm`} type="video/webm" />
-                                   <source src={`${HOW_IT_WORKS_VIDEO.optimized}.mp4`} type="video/mp4" />
+                                   <source src={`${howItWorksVideo.optimized}.webm`} type="video/webm" />
+                                   <source src={`${howItWorksVideo.optimized}.mp4`} type="video/mp4" />
                                </video>
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
@@ -1104,13 +1125,13 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                   {/* Right Video Visual - OTTIMIZZATO */}
                   <div className="lg:col-span-5 h-full min-h-[500px] relative rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
                         <video 
-                            poster={TARGET_SECTION_VIDEO.poster}
+                            poster={targetSectionVideo.poster}
                             loading="lazy"
                             autoPlay loop muted playsInline 
                             className="absolute inset-0 w-full h-full object-cover"
                         >
-                           <source src={`${TARGET_SECTION_VIDEO.optimized}.webm`} type="video/webm" />
-                           <source src={`${TARGET_SECTION_VIDEO.optimized}.mp4`} type="video/mp4" />
+                           <source src={`${targetSectionVideo.optimized}.webm`} type="video/webm" />
+                           <source src={`${targetSectionVideo.optimized}.mp4`} type="video/mp4" />
                         </video>
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90"></div>
                         

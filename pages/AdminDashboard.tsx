@@ -189,6 +189,13 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
       is_visible: true,
       logo_height: 40,
       social_links: { facebook: '', instagram: '', linkedin: '', youtube: '' }
+  },
+  videos: {
+    hero_video_id: 'v1765326450/home_2_bbhedx',
+    ai_era_video_id: 'v1765328025/home_page_3_tnvnqm',
+    how_it_works_video_id: 'v1765456382/come-funziona-MWA_mpdave',
+    target_section_video_id: 'v1765392297/uomo-affari-consegna-carta_f3tj6t',
+    about_video_url: 'https://res.cloudinary.com/dhj0ztos6/video/upload/v1765452611/Home_page_rnk0zw.webm'
   }
 };
 
@@ -1071,6 +1078,63 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                             <input type="text" value={landingConfig.hero.subtitle} onChange={(e) => setLandingConfig({...landingConfig, hero: {...landingConfig.hero, subtitle: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Sottotitolo" />
                             <textarea rows={4} value={landingConfig.hero.text} onChange={(e) => setLandingConfig({...landingConfig, hero: {...landingConfig.hero, text: e.target.value}})} className="w-full border p-3 rounded-xl" placeholder="Testo descrittivo"></textarea>
                         </div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+                        <h3 className="text-xl font-bold mb-6 flex items-center"><Video className="mr-2 text-brand-600"/> Gestione Video Home Page</h3>
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Video Hero (ID Cloudinary)</label>
+                                <input 
+                                    type="text" 
+                                    value={landingConfig.videos?.hero_video_id || ''} 
+                                    onChange={(e) => setLandingConfig({...landingConfig, videos: {...(landingConfig.videos || {}), hero_video_id: e.target.value}})} 
+                                    className="w-full border p-3 rounded-xl font-mono text-sm" 
+                                    placeholder="Esempio: v1765326450/home_2_bbhedx" 
+                                />
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Video Era AI (ID Cloudinary)</label>
+                                <input 
+                                    type="text" 
+                                    value={landingConfig.videos?.ai_era_video_id || ''} 
+                                    onChange={(e) => setLandingConfig({...landingConfig, videos: {...(landingConfig.videos || {}), ai_era_video_id: e.target.value}})} 
+                                    className="w-full border p-3 rounded-xl font-mono text-sm" 
+                                    placeholder="Esempio: v1765328025/home_page_3_tnvnqm" 
+                                />
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Video Come Funziona (ID Cloudinary)</label>
+                                <input 
+                                    type="text" 
+                                    value={landingConfig.videos?.how_it_works_video_id || ''} 
+                                    onChange={(e) => setLandingConfig({...landingConfig, videos: {...(landingConfig.videos || {}), how_it_works_video_id: e.target.value}})} 
+                                    className="w-full border p-3 rounded-xl font-mono text-sm" 
+                                    placeholder="Esempio: v1765456382/come-funziona-MWA_mpdave" 
+                                />
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Video Target Section (ID Cloudinary)</label>
+                                <input 
+                                    type="text" 
+                                    value={landingConfig.videos?.target_section_video_id || ''} 
+                                    onChange={(e) => setLandingConfig({...landingConfig, videos: {...(landingConfig.videos || {}), target_section_video_id: e.target.value}})} 
+                                    className="w-full border p-3 rounded-xl font-mono text-sm" 
+                                    placeholder="Esempio: v1765392297/uomo-affari-consegna-carta_f3tj6t" 
+                                />
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl">
+                                <label className="block text-sm font-bold mb-2">Video Chi Siamo (URL Completo)</label>
+                                <input 
+                                    type="text" 
+                                    value={landingConfig.videos?.about_video_url || landingConfig.about_section.image_url || ''} 
+                                    onChange={(e) => setLandingConfig({...landingConfig, videos: {...(landingConfig.videos || {}), about_video_url: e.target.value}})} 
+                                    className="w-full border p-3 rounded-xl font-mono text-sm" 
+                                    placeholder="URL completo del video..." 
+                                />
+                            </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-4 italic">Inserisci l'ID del video caricato su Cloudinary per i primi 4 campi, o l'URL completo per l'ultimo.</p>
                     </div>
 
                     <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">

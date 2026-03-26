@@ -264,6 +264,13 @@ export interface LandingPageConfig {
       youtube?: string;
     };
   };
+  videos?: {
+    hero_video_id?: string;
+    ai_era_video_id?: string;
+    how_it_works_video_id?: string;
+    target_section_video_id?: string;
+    about_video_url?: string;
+  };
 }
 
 export interface PlatformSettings {
