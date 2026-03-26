@@ -242,15 +242,23 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     if (settings.favicon_url) {
-      const linkId = 'dynamic-favicon';
-      let link = document.getElementById(linkId) as HTMLLinkElement;
-      if (!link) {
-        link = document.createElement('link');
-        link.id = linkId;
-        link.rel = 'icon';
-        document.head.appendChild(link);
-      }
-      link.href = settings.favicon_url;
+      // Rimuovi tutti i link rel="icon" esistenti
+      const existingLinks = document.querySelectorAll("link[rel~='icon']");
+      existingLinks.forEach(link => link.remove());
+
+      // Crea e aggiungi il nuovo link
+      const newLink = document.createElement('link');
+      newLink.rel = 'icon';
+      
+      // Determina il tipo in base all'estensione
+      const url = settings.favicon_url.toLowerCase();
+      if (url.endsWith('.png')) newLink.type = 'image/png';
+      else if (url.endsWith('.svg')) newLink.type = 'image/svg+xml';
+      else if (url.endsWith('.ico')) newLink.type = 'image/x-icon';
+      else if (url.endsWith('.jpg') || url.endsWith('.jpeg')) newLink.type = 'image/jpeg';
+      
+      newLink.href = settings.favicon_url;
+      document.head.appendChild(newLink);
     }
   }, [settings.favicon_url]);
 
