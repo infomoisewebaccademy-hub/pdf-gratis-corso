@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig } from '../types';
 // FIX: Added missing Loader2 import from lucide-react
-import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw, Monitor } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, EyeOff, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
@@ -854,7 +854,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                 <p className="text-slate-400 mb-4">Esegui questi comandi nell'SQL Editor di Supabase per aggiornare la struttura.</p>
                 <div className="bg-black p-4 rounded border border-slate-700 mb-2">
                     <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
-                    <code className="text-green-400 select-all block">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
+                    <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
+                    <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
                 </div>
             </div>
         )}
@@ -890,7 +891,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                         <div key={course.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group hover:shadow-lg transition-all">
                             <div className="relative h-48">
                                 <img src={course.image} className="w-full h-full object-cover" alt="" />
-                                <div className="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-xs font-bold">{course.level}</div>
+                                <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
+                                    <div className="bg-white/90 px-3 py-1 rounded-full text-xs font-bold shadow-sm">{course.level}</div>
+                                    {course.is_hidden && (
+                                        <div className="bg-gray-800 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg flex items-center">
+                                            <EyeOff className="h-3 w-3 mr-1" /> Nascosto
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div className="p-6 flex-1 flex flex-col">
                                 <h3 className="font-bold text-lg mb-4 line-clamp-1">{course.title}</h3>

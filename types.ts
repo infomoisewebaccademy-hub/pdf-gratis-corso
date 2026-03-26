@@ -23,6 +23,7 @@ export interface Course {
   videoUrl?: string; 
   lessons_content?: Lesson[]; 
   status?: 'active' | 'full' | 'coming_soon'; 
+  is_hidden?: boolean; // NUOVO: Se true, il corso non appare nel catalogo pubblico
   resource_file_url?: string; // NUOVO: URL del file allegato
   resource_file_name?: string; // NUOVO: Nome del file allegato
 }

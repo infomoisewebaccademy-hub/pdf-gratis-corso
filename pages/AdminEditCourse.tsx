@@ -29,6 +29,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     duration: '',
     lessons_content: [],
     status: 'active',
+    is_hidden: false,
     resource_file_url: '',
     resource_file_name: '',
   });
@@ -92,6 +93,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             lessons_content: courseToEdit.lessons_content || [],
             discounted_price: courseToEdit.discounted_price || 0,
             status: courseToEdit.status || 'active',
+            is_hidden: courseToEdit.is_hidden || false,
             resource_file_url: courseToEdit.resource_file_url || '',
             resource_file_name: courseToEdit.resource_file_name || '',
         });
@@ -101,7 +103,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             id: '', title: '', description: '', price: 0, discounted_price: 0,
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
-            lessons_content: [], status: 'active', resource_file_url: '', resource_file_name: '',
+            lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
         });
     }
   }, [id, courses, isNew]);
@@ -124,6 +126,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       lessons_content: (formData.lessons_content || []).map(l => ({...l, videoUrl: l.video_storage_path ? '' : l.videoUrl})),
       discounted_price: formData.discounted_price || null,
       status: formData.status || 'active',
+      is_hidden: formData.is_hidden || false,
       resource_file_url: formData.resource_file_url || null,
       resource_file_name: formData.resource_file_name || null,
     } as Course;
@@ -195,7 +198,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">
       <form onSubmit={handleSubmit} className="w-full px-4 sm:px-6 lg:px-8">
         
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 sticky top-20 z-30 bg-gray-50/95 backdrop-blur py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 py-4 border-b border-gray-200">
             <div className="flex items-center">
                 <button type="button" onClick={() => navigate('/admin')} className="mr-4 p-2 rounded-full hover:bg-gray-200 text-gray-500"><ArrowLeft className="h-6 w-6" /></button>
                 <div>
@@ -324,13 +327,28 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             <div className="lg:col-span-1 space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><AlertCircle className="h-5 w-5 mr-2 text-brand-600" /> Disponibilità</h2>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Stato</label>
-                        <select value={formData.status || 'active'} onChange={e => setFormData({...formData, status: e.target.value as any})} className="block w-full border border-gray-300 rounded-lg p-3 font-semibold"><option value="active">Attivo</option><option value="full">Pieno</option><option value="coming_soon">In Arrivo</option></select>
-                        <p className="mt-2 text-xs text-gray-500">{formData.status === 'full' && "Acquisto disabilitato."}{formData.status === 'coming_soon' && "Acquisto disabilitato."}{formData.status === 'active' && "Corso acquistabile."}</p>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Stato</label>
+                            <select value={formData.status || 'active'} onChange={e => setFormData({...formData, status: e.target.value as any})} className="block w-full border border-gray-300 rounded-lg p-3 font-semibold"><option value="active">Attivo</option><option value="full">Pieno</option><option value="coming_soon">In Arrivo</option></select>
+                            <p className="mt-2 text-xs text-gray-500">{formData.status === 'full' && "Acquisto disabilitato."}{formData.status === 'coming_soon' && "Acquisto disabilitato."}{formData.status === 'active' && "Corso acquistabile."}</p>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Nascondi dal Catalogo</label>
+                                <p className="text-xs text-gray-500">Il corso sarà accessibile solo tramite link diretto.</p>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData({...formData, is_hidden: !formData.is_hidden})}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.is_hidden ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_hidden ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-40">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><DollarSign className="h-5 w-5 mr-2 text-brand-600" /> Prezzi & Offerte</h2>
                     <div className="space-y-4">
                          <div>
