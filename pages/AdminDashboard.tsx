@@ -852,11 +852,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                 <button onClick={() => setShowHelp(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X className="h-5 w-5"/></button>
                 <h3 className="text-white font-bold text-lg mb-4 flex items-center"><Terminal className="mr-2 h-5 w-5"/> Comandi Database Utili</h3>
                 <p className="text-slate-400 mb-4">Esegui questi comandi nell'SQL Editor di Supabase per aggiornare la struttura.</p>
-                <div className="bg-black p-4 rounded border border-slate-700 mb-2">
-                    <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
-                    <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
-                    <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
-                </div>
+                    <div className="bg-black p-4 rounded border border-slate-700 mb-2">
+                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
+                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
+                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS favicon_url text;</code>
+                        <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
+                    </div>
             </div>
         )}
 
@@ -1037,6 +1038,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Il codice di tracciamento per le tue campagne Meta Ads.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">URL Favicon</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.favicon_url || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, favicon_url: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: https://.../favicon.ico"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    L'icona che appare nella scheda del browser (formato .ico, .png o .svg).
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">

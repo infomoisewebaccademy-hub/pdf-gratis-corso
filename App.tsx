@@ -234,6 +234,21 @@ const AppContent: React.FC = () => {
   }, [settings.font_family]);
 
   useEffect(() => { if (settings.meta_pixel_id) initMetaPixel(settings.meta_pixel_id); }, [settings.meta_pixel_id]);
+
+  useEffect(() => {
+    if (settings.favicon_url) {
+      const linkId = 'dynamic-favicon';
+      let link = document.getElementById(linkId) as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = settings.favicon_url;
+    }
+  }, [settings.favicon_url]);
+
   useEffect(() => { if (!firstLoad.current) trackPageView(); firstLoad.current = false; }, [location]);
 
   const fetchCourses = async () => {

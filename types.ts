@@ -277,6 +277,7 @@ export interface LandingPageConfig {
 export interface PlatformSettings {
   id: number;
   logo_url?: string;
+  favicon_url?: string; // NUOVO: URL della favicon
   logo_height: number;
   logo_offset_x?: number;
   logo_offset_y?: number;
