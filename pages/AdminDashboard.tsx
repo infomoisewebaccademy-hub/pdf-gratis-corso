@@ -856,6 +856,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                         <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS active_mode text DEFAULT 'public';</code>
                         <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS pdf_guide_config jsonb;</code>
                         <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS favicon_url text;</code>
+                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS rating numeric DEFAULT 5.0;</code>
+                        <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_discount_badge boolean DEFAULT true;</code>
                         <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
                     </div>
             </div>

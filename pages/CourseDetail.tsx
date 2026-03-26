@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -13,8 +13,26 @@ interface CourseDetailProps {
   isPurchased: boolean;
   onBack: () => void;
   user: UserProfile | null;
-  settings: PlatformSettings; // Aggiunta per accedere all'URL del PDF
+  settings: PlatformSettings;
 }
+
+const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  
+  return (
+    <div className="flex items-center gap-1 text-amber-400">
+      {[...Array(fullStars)].map((_, i) => (
+        <Star key={i} className="h-4 w-4 fill-current" />
+      ))}
+      {hasHalfStar && <StarHalf className="h-4 w-4 fill-current" />}
+      {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, i) => (
+        <Star key={i} className="h-4 w-4 text-gray-300" />
+      ))}
+      <span className="ml-2 text-sm font-bold text-gray-600">{rating.toFixed(1)}</span>
+    </div>
+  );
+};
 
 const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ lesson, onEnded }) => {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -177,14 +195,38 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 {isPurchased && activeLesson ? (
                     <SecureVideoPlayer lesson={activeLesson} onEnded={() => markLessonAsCompleted(activeLesson.id)} />
                 ) : (
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <span className="text-brand-600 font-bold tracking-wider text-sm uppercase block">{course.level}</span>
-                            {isFull && <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-red-200">Posti Esauriti</span>}
-                            {isComingSoon && <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
+                    <div className="space-y-6">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-bold uppercase tracking-wider border border-brand-100">{course.level}</span>
+                            {course.rating && <StarRating rating={course.rating} />}
+                            {isFull && <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-red-200">Posti Esauriti</span>}
+                            {isComingSoon && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-900 mb-4">{course.title}</h1>
-                        <p className="text-xl text-gray-600 leading-relaxed whitespace-pre-wrap">{course.description}</p>
+                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">{course.title}</h1>
+                        <p className="text-xl text-gray-600 leading-relaxed whitespace-pre-wrap max-w-3xl">{course.description}</p>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                                <Clock className="h-6 w-6 text-brand-500 mb-2" />
+                                <span className="text-xs text-gray-400 uppercase font-bold">Durata</span>
+                                <span className="text-sm font-bold text-gray-900">{course.duration}</span>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                                <Book className="h-6 w-6 text-brand-500 mb-2" />
+                                <span className="text-xs text-gray-400 uppercase font-bold">Lezioni</span>
+                                <span className="text-sm font-bold text-gray-900">{course.lessons_content?.length || course.lessons}</span>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                                <Users className="h-6 w-6 text-brand-500 mb-2" />
+                                <span className="text-xs text-gray-400 uppercase font-bold">Accesso</span>
+                                <span className="text-sm font-bold text-gray-900">Illimitato</span>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                                <Award className="h-6 w-6 text-brand-500 mb-2" />
+                                <span className="text-xs text-gray-400 uppercase font-bold">Certificato</span>
+                                <span className="text-sm font-bold text-gray-900">Incluso</span>
+                            </div>
+                        </div>
                     </div>
                 )}
                 
@@ -342,12 +384,22 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                         <div className="flex items-end">
                                             <span className="text-4xl font-bold text-purple-600">€{finalPrice}</span>
                                             <span className="text-gray-400 ml-2 mb-1 line-through text-lg">€{course.price}</span>
+                                            {course.show_discount_badge !== false && (
+                                                <span className="ml-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
+                                                    -{Math.round(((course.price - course.discounted_price!) / course.price) * 100)}%
+                                                </span>
+                                            )}
                                         </div>
                                     </>
                                 ) : (
                                     <div className="flex items-end">
                                         <span className="text-4xl font-bold text-gray-900">€{course.price}</span>
                                         <span className="text-gray-400 ml-2 mb-1 line-through">€{course.price * 1.5}</span>
+                                        {course.show_discount_badge !== false && (
+                                            <span className="ml-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
+                                                -33%
+                                            </span>
+                                        )}
                                     </div>
                                 )}
                             </div>

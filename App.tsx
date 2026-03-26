@@ -86,6 +86,11 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const firstLoad = useRef(true);
 
+  // Reset scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // NUOVA LOGICA: Determina se l'utente deve essere reindirizzato
   const activeMode = settings.active_mode || 'public';
   const shouldRedirect = activeMode === 'pre_launch' && !user?.is_admin;

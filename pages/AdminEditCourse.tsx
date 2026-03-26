@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson } from '../types';
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2 } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
@@ -32,6 +32,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     is_hidden: false,
     resource_file_url: '',
     resource_file_name: '',
+    rating: 5,
+    show_discount_badge: true,
   });
 
   const [imgError, setImgError] = useState(false);
@@ -96,6 +98,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             is_hidden: courseToEdit.is_hidden || false,
             resource_file_url: courseToEdit.resource_file_url || '',
             resource_file_name: courseToEdit.resource_file_name || '',
+            rating: courseToEdit.rating || 5,
+            show_discount_badge: courseToEdit.show_discount_badge !== undefined ? courseToEdit.show_discount_badge : true,
         });
       }
     } else {
@@ -104,6 +108,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
             lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
+            rating: 5, show_discount_badge: true,
         });
     }
   }, [id, courses, isNew]);
@@ -129,6 +134,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       is_hidden: formData.is_hidden || false,
       resource_file_url: formData.resource_file_url || null,
       resource_file_name: formData.resource_file_name || null,
+      rating: formData.rating || 5,
+      show_discount_badge: formData.show_discount_badge !== undefined ? formData.show_discount_badge : true,
     } as Course;
     onSave(courseToSave);
     navigate('/admin');
@@ -368,6 +375,32 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                          <div className="grid grid-cols-2 gap-3">
                              <div><label className="block text-sm font-medium mb-1">Durata</label><input type="text" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="block w-full border rounded-lg p-2 text-sm" /></div>
                              <div><label className="block text-sm font-medium mb-1">Lezioni (Auto)</label><input type="number" disabled value={formData.lessons_content?.length || 0} className="block w-full bg-gray-50 border text-gray-500 rounded-lg p-2 text-sm" /></div>
+                         </div>
+                         <hr className="border-gray-100" />
+                         <div className="space-y-3">
+                             <div>
+                                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><Star className="h-3 w-3 text-amber-400 fill-current" /> Valutazione (Stelle)</label>
+                                 <input 
+                                     type="number" 
+                                     min="1" 
+                                     max="5" 
+                                     step="0.1" 
+                                     value={formData.rating || 5} 
+                                     onChange={e => setFormData({...formData, rating: Number(e.target.value)})} 
+                                     className="block w-full border border-gray-300 rounded-lg p-2 text-sm font-bold" 
+                                 />
+                                 <p className="text-[10px] text-gray-400 mt-1 italic">Valore da 1.0 a 5.0</p>
+                             </div>
+                             <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100">
+                                 <label className="text-sm font-medium text-gray-700">Mostra Badge Sconto</label>
+                                 <button 
+                                     type="button" 
+                                     onClick={() => setFormData({...formData, show_discount_badge: !formData.show_discount_badge})}
+                                     className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none ${formData.show_discount_badge ? 'bg-green-600' : 'bg-gray-200'}`}
+                                 >
+                                     <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${formData.show_discount_badge ? 'translate-x-6' : 'translate-x-1'}`} />
+                                 </button>
+                             </div>
                          </div>
                     </div>
                 </div>

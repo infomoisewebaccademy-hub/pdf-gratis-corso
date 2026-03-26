@@ -26,6 +26,8 @@ export interface Course {
   is_hidden?: boolean; // NUOVO: Se true, il corso non appare nel catalogo pubblico
   resource_file_url?: string; // NUOVO: URL del file allegato
   resource_file_name?: string; // NUOVO: Nome del file allegato
+  rating?: number; // NUOVO: Valutazione in stelle (es. 4.5)
+  show_discount_badge?: boolean; // NUOVO: Se mostrare la percentuale di sconto
 }
 
 export interface UserProfile {
