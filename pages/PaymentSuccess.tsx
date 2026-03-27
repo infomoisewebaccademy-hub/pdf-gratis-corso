@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, Mail, ArrowRight, Star, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { initMetaPixel, trackPurchase, trackLead, trackContact } from '../services/metaPixel';
@@ -157,12 +157,12 @@ export const PaymentSuccess: React.FC = () => {
                     </div>
                 )}
 
-                <button 
-                    onClick={() => window.location.href = isNewUser ? '/login' : '/dashboard'}
+                <Link 
+                    to={isNewUser ? '/login' : '/dashboard'}
                     className="w-full bg-white text-slate-900 py-4 rounded-xl font-bold text-lg hover:bg-brand-50 hover:text-brand-700 transition-all flex items-center justify-center group shadow-lg shadow-white/10"
                 >
                     {isNewUser ? "Vai al Login" : "Vai ai miei Corsi"} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
              </div>
              
              <p className="mt-8 text-slate-500 text-sm text-center">

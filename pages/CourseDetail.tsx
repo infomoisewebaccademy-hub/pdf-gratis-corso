@@ -274,7 +274,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                 </h2>
                                 <p className="text-brand-100 mb-8 max-w-xl text-lg leading-relaxed">
                                     {upsellDiscountAvailable 
-                                        ? "Essendo già un utente della nostra piattaforma, il prezzo che vedi qui sotto è quello della \"Offerta Fedeltà Attiva\" a te riservata."
+                                        ? "Essendo già un utente della nostra piattaforma, hai diritto a un prezzo speciale riservato per questo percorso completo."
                                         : "Hai appena iniziato con la nostra guida gratuita. Per ottenere risultati professionali e velocizzare il tuo percorso, ti consigliamo il nostro percorso completo."
                                     }
                                 </p>
@@ -285,14 +285,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                     >
                                         Scopri il Percorso <ArrowLeft className="h-5 w-5 rotate-180" />
                                     </button>
-                                    <div className="flex flex-col items-center sm:items-start">
-                                        <span className="text-xs text-brand-200 font-bold uppercase tracking-wider mb-1">
-                                            {upsellDiscountAvailable ? 'Prezzo Offerta Fedeltà' : 'Prezzo Speciale'}
-                                        </span>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-3xl font-black">€{upsellFinalPrice}</span>
-                                            <span className="text-white/50 line-through text-lg">€{upsellCourse.price * (upsellDiscountAvailable ? 1 : 1.5)}</span>
-                                        </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-3xl font-black">€{upsellFinalPrice}</span>
+                                        <span className="text-white/50 line-through text-lg">€{upsellCourse.price * (upsellDiscountAvailable ? 1 : 1.5)}</span>
                                     </div>
                                 </div>
                             </div>
