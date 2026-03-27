@@ -823,6 +823,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                   <input name="form_email_placeholder" value={config.form_email_placeholder} onChange={handleChange} className="w-full border p-2 rounded text-sm" placeholder="Placeholder Email" />
                   <input name="cta_text" value={config.cta_text} onChange={handleChange} className="w-full border p-2 rounded text-sm" placeholder="Testo Bottone" />
                   <input name="form_disclaimer_text" value={config.form_disclaimer_text} onChange={handleChange} className="w-full border p-2 rounded text-sm" placeholder="Disclaimer Sotto il Form" />
+                  {isPdfPage && (
+                      <div className="bg-white p-4 rounded-xl border border-gray-200 mt-4">
+                          <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Immagine Modulo Guida PDF</label>
+                          <div className="flex items-center gap-4">
+                              {localSettings.pdf_guide_form_image && (
+                                  <img src={localSettings.pdf_guide_form_image} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-gray-200" />
+                              )}
+                              <button 
+                                  onClick={() => setShowPdfFormImagePicker(true)}
+                                  className="flex-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl py-4 px-4 text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center justify-center gap-2"
+                              >
+                                  <Image className="h-5 w-5" /> {localSettings.pdf_guide_form_image ? 'Cambia Immagine' : 'Seleziona Immagine'}
+                              </button>
+                          </div>
+                          <p className="text-[10px] text-gray-500 mt-2">
+                              Immagine mostrata nel modulo di iscrizione della guida PDF.
+                          </p>
+                      </div>
+                  )}
               </div>
           </details>
 
@@ -833,6 +852,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                    <textarea name="success_text" rows={2} value={config.success_text} onChange={handleChange} className="w-full border p-2 rounded text-sm" placeholder="Testo Successo Generico"></textarea>
               </div>
           </details>
+          {isPdfPage && showPdfFormImagePicker && (
+              <ImagePicker 
+                  isOpen={showPdfFormImagePicker}
+                  onSelect={(url) => {
+                      setLocalSettings({...localSettings, pdf_guide_form_image: url});
+                      setShowPdfFormImagePicker(false);
+                  }}
+                  onClose={() => setShowPdfFormImagePicker(false)}
+              />
+          )}
       </div>
   );
 
@@ -1070,32 +1099,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     Pixel per la pagina di ringraziamento dopo un acquisto. <span className="font-mono text-brand-600">(/payment-success)</span>
                                 </p>
                             </div>
-                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <label className="block text-sm font-bold mb-2 text-gray-700">Immagine Modulo Guida PDF</label>
-                                <div className="flex items-center gap-4">
-                                    {localSettings.pdf_guide_form_image && (
-                                        <img src={localSettings.pdf_guide_form_image} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-gray-200" />
-                                    )}
-                                    <button 
-                                        onClick={() => setShowPdfFormImagePicker(true)}
-                                        className="flex-1 bg-white border-2 border-dashed border-gray-300 rounded-xl py-4 px-4 text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <Image className="h-5 w-5" /> {localSettings.pdf_guide_form_image ? 'Cambia Immagine' : 'Seleziona Immagine'}
-                                    </button>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">
-                                    Immagine mostrata nel modulo di iscrizione della guida PDF.
-                                </p>
-                            </div>
-                            {showPdfFormImagePicker && (
-                                <ImagePicker 
-                                    onSelect={(url) => {
-                                        setLocalSettings({...localSettings, pdf_guide_form_image: url});
-                                        setShowPdfFormImagePicker(false);
-                                    }}
-                                    onClose={() => setShowPdfFormImagePicker(false)}
-                                />
-                            )}
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                 <label className="block text-sm font-bold mb-2 text-gray-700">URL Favicon</label>
                                 <input 
