@@ -63,6 +63,7 @@ export const PdfGuideLanding: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [config, setConfig] = useState<PdfGuideConfig>(DEFAULT_PDF_CONFIG);
+    const [formImage, setFormImage] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -70,10 +71,11 @@ export const PdfGuideLanding: React.FC = () => {
             try {
                 const { data, error } = await supabase
                     .from('platform_settings')
-                    .select('pdf_guide_config')
+                    .select('pdf_guide_config, pdf_guide_form_image')
                     .single();
                 
                 if (error) throw error;
+                if (data?.pdf_guide_form_image) setFormImage(data.pdf_guide_form_image);
                 if (data?.pdf_guide_config) {
                     // Mantieni i colori del tema scuro di default, aggiorna solo il contenuto
                     const { 
@@ -191,6 +193,16 @@ export const PdfGuideLanding: React.FC = () => {
         <div id={isBottom ? "bottom-form" : "form-section"} className={`scroll-mt-24 bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
             <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-30 pointer-events-none"></div>
             <div className="relative z-10">
+                {formImage && (
+                    <div className="flex justify-center mb-6">
+                        <img 
+                            src={formImage} 
+                            alt="Guida PDF" 
+                            className="h-24 md:h-32 w-auto object-contain rounded-xl shadow-lg shadow-brand-500/10"
+                            referrerPolicy="no-referrer"
+                        />
+                    </div>
+                )}
                 <div className="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4" style={{ backgroundColor: `${config.gradient_start}1a`, color: config.gradient_start }}>
                     {config.offer_badge}
                 </div>

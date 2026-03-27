@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 import { Sidebar, SidebarItem } from '../components/Sidebar';
+import { ImagePicker } from '../components/ImagePicker';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
@@ -415,6 +416,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const [showPdfFormImagePicker, setShowPdfFormImagePicker] = useState(false);
 
   const handleClearCache = async () => {
     if (!confirm("⚠️ Questa azione svuoterà la cache locale del browser (LocalStorage, SessionStorage) e forzerà il ricaricamento della pagina. Continuare?")) return;
@@ -1039,7 +1041,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     placeholder="Es: 1825625164777432"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Pixel principale per la Home Page.
+                                    Pixel principale per la Home Page. <span className="font-mono text-brand-600">(/)</span>
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
@@ -1052,7 +1054,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     placeholder="Es: 1825625164777432"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Pixel per la pagina di ringraziamento della guida PDF.
+                                    Pixel per la pagina di ringraziamento della guida PDF. <span className="font-mono text-brand-600">(/thank-you-pdf-gratuita)</span>
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
@@ -1065,9 +1067,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     placeholder="Es: 1825625164777432"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Pixel per la pagina di ringraziamento dopo un acquisto.
+                                    Pixel per la pagina di ringraziamento dopo un acquisto. <span className="font-mono text-brand-600">(/payment-success)</span>
                                 </p>
                             </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Immagine Modulo Guida PDF</label>
+                                <div className="flex items-center gap-4">
+                                    {localSettings.pdf_guide_form_image && (
+                                        <img src={localSettings.pdf_guide_form_image} alt="Preview" className="h-16 w-16 object-cover rounded-lg border border-gray-200" />
+                                    )}
+                                    <button 
+                                        onClick={() => setShowPdfFormImagePicker(true)}
+                                        className="flex-1 bg-white border-2 border-dashed border-gray-300 rounded-xl py-4 px-4 text-gray-500 hover:border-brand-500 hover:text-brand-500 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Image className="h-5 w-5" /> {localSettings.pdf_guide_form_image ? 'Cambia Immagine' : 'Seleziona Immagine'}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Immagine mostrata nel modulo di iscrizione della guida PDF.
+                                </p>
+                            </div>
+                            {showPdfFormImagePicker && (
+                                <ImagePicker 
+                                    onSelect={(url) => {
+                                        setLocalSettings({...localSettings, pdf_guide_form_image: url});
+                                        setShowPdfFormImagePicker(false);
+                                    }}
+                                    onClose={() => setShowPdfFormImagePicker(false)}
+                                />
+                            )}
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                 <label className="block text-sm font-bold mb-2 text-gray-700">URL Favicon</label>
                                 <input 

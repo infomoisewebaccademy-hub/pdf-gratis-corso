@@ -280,6 +280,7 @@ const AppContent: React.FC = () => {
               logo_height: data.logo_height ?? 64,
               logo_offset_x: data.logo_offset_x ?? 0,
               logo_offset_y: data.logo_offset_y ?? 0,
+              pdf_guide_form_image: data.pdf_guide_form_image,
               // Override with the new requested Pixel ID if not set or to force update
               meta_pixel_id: data.meta_pixel_id || '1825625164777432',
           };

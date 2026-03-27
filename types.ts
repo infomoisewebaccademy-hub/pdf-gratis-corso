@@ -287,6 +287,7 @@ export interface PlatformSettings {
   meta_pixel_id?: string;
   pdf_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page del PDF
   general_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page generale
+  pdf_guide_form_image?: string; // NUOVO: Immagine per il modulo della guida PDF
   font_family?: string;
   
   // Campo 'is_pre_launch' deprecato e sostituito da 'active_mode'
