@@ -116,19 +116,25 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row">
+    <div className="pt-20 min-h-screen bg-slate-950 flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/10 rounded-full blur-[120px]" />
+      </div>
+
       <Sidebar activeItem="community" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 
-      <main className="flex-1 flex flex-col bg-gray-50/50 h-[calc(100vh-80px)]">
+      <main className="flex-1 flex flex-col bg-slate-900/50 h-[calc(100vh-80px)] relative z-10">
         
         {/* Chat Header */}
-        <div className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between shadow-sm">
+        <div className="bg-slate-900 border-b border-slate-800 px-8 py-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4">
-                <div className="bg-brand-500/10 p-2.5 rounded-xl text-brand-600">
+                <div className="bg-brand-500/10 p-2.5 rounded-xl text-brand-400">
                     <Users className="h-6 w-6" />
                 </div>
                 <div>
-                    <h1 className="text-xl font-black text-gray-900 tracking-tight">Community Chat</h1>
+                    <h1 className="text-xl font-black text-white tracking-tight">Community Chat</h1>
                     <p className="text-xs text-green-500 font-bold flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                         Area Studenti Real-time
@@ -141,29 +147,29 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
                     <button 
                         onClick={handleClearChat}
                         disabled={isClearing}
-                        className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight hover:bg-red-100 transition-all border border-red-100 disabled:opacity-50"
+                        className="flex items-center gap-2 bg-red-500/10 text-red-500 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight hover:bg-red-500/20 transition-all border border-red-500/20 disabled:opacity-50"
                         title="Resetta tutta la chat"
                     >
                         {isClearing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                         Reset Chat
                     </button>
                 )}
-                <div className="hidden md:flex items-center gap-2 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-100">
-                    <ShieldCheck className="h-4 w-4 text-brand-600" />
-                    <span className="text-xs font-bold text-brand-700 uppercase tracking-tighter">Supporto Moderato</span>
+                <div className="hidden md:flex items-center gap-2 bg-brand-500/10 px-3 py-1.5 rounded-lg border border-brand-500/20">
+                    <ShieldCheck className="h-4 w-4 text-brand-400" />
+                    <span className="text-xs font-bold text-brand-400 uppercase tracking-tighter">Supporto Moderato</span>
                 </div>
             </div>
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-gray-200">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-800">
             {isLoading ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-4">
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-4">
                     <Loader2 className="h-10 w-10 animate-spin text-brand-500" />
                     <p className="font-bold">Caricamento messaggi...</p>
                 </div>
             ) : messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-2">
                     <Sparkles className="h-12 w-12 opacity-20" />
                     <p className="font-bold text-center">La chat è stata ripulita.<br/>Inizia una nuova conversazione!</p>
                 </div>
@@ -173,17 +179,17 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
                     return (
                         <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                             <div className="flex items-center gap-2 mb-1 px-1">
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                     {isMe ? 'Tu' : msg.user_name}
                                 </span>
-                                <span className="text-[9px] text-gray-300">
+                                <span className="text-[9px] text-slate-600">
                                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </div>
                             <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm shadow-sm ${
                                 isMe 
                                 ? 'bg-brand-600 text-white rounded-tr-none' 
-                                : 'bg-white text-gray-700 border border-gray-100 rounded-tl-none'
+                                : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-none'
                             }`}>
                                 {msg.text}
                             </div>
@@ -195,14 +201,14 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
         </div>
 
         {/* Input Area */}
-        <div className="p-6 bg-white border-t border-gray-100">
+        <div className="p-6 bg-slate-900 border-t border-slate-800">
             <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-4">
                 <input 
                     type="text" 
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Scrivi un messaggio alla community..."
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all text-gray-700 font-medium"
+                    className="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all text-white font-medium placeholder:text-slate-500"
                     disabled={isSending || isClearing}
                 />
                 <button 
@@ -213,7 +219,7 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
                     {isSending ? <Loader2 className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
                 </button>
             </form>
-            <p className="text-center text-[10px] text-gray-400 mt-4 uppercase font-bold tracking-widest">
+            <p className="text-center text-[10px] text-slate-500 mt-4 uppercase font-bold tracking-widest">
                 Comportati con rispetto verso gli altri studenti.
             </p>
         </div>
