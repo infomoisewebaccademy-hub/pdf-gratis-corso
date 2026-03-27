@@ -16,7 +16,6 @@ import { ComingSoon } from './pages/ComingSoon';
 import { PdfGuideLanding } from './pages/PdfGuideLanding'; // NUOVO
 import { ThankYouPdf } from './pages/ThankYouPdf';
 import { ProfilePage } from './pages/ProfilePage';
-import { CertificatesPage } from './pages/CertificatesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { UserProfile, Course, PlatformSettings } from './types';
 import { supabase, createCheckoutSession } from './services/supabase';
@@ -391,9 +390,8 @@ const AppContent: React.FC = () => {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} courses={courses} onRefresh={refreshUserData} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={user ? <ProfilePage user={user} /> : <Navigate to="/login" />} />
-        <Route path="/certificates" element={user ? <CertificatesPage user={user} /> : <Navigate to="/login" />} />
-        <Route path="/settings" element={user ? <SettingsPage user={user} /> : <Navigate to="/login" />} />
+        <Route path="/profile" element={user ? <ProfilePage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={user ? <SettingsPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         
         <Route path="/admin" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} /> : <Navigate to="/" />} />
         <Route path="/admin/course/:id" element={user?.is_admin ? <AdminEditCourse courses={courses} onSave={handleSaveCourse} /> : <Navigate to="/" />} />

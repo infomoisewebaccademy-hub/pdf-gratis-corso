@@ -28,6 +28,7 @@ export interface Course {
   resource_file_name?: string; // NUOVO: Nome del file allegato
   rating?: number; // NUOVO: Valutazione in stelle (es. 4.5)
   show_discount_badge?: boolean; // NUOVO: Se mostrare la percentuale di sconto
+  upsell_course_id?: string; // NUOVO: ID del corso da upsellare
 }
 
 export interface UserProfile {

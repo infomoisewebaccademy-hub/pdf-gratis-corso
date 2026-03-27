@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson } from '../types';
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+import { ImagePicker } from '../components/ImagePicker';
 
 interface AdminEditCourseProps {
   courses: Course[];
@@ -34,9 +35,13 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     resource_file_name: '',
     rating: 5,
     show_discount_badge: true,
+    upsell_course_id: '',
   });
 
   const [imgError, setImgError] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '' });
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
@@ -53,7 +58,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
 
     setIsUploadingVideo(lessonIndex);
     try {
-        const filePath = `${courseId}/${Date.now()}_${file.name}`;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const filePath = `${courseId}/videos/${fileName}`;
         const { error } = await supabase.storage.from('course-videos').upload(filePath, file, { upsert: true });
         if (error) throw error;
 
@@ -65,7 +72,13 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
         }
     } catch (err: any) {
-        alert("Errore upload video: " + err.message);
+        console.error("Errore upload video:", err);
+        const msg = err.message || '';
+        if (msg.includes('row-level security')) {
+            alert('Errore di permessi (RLS): Esegui lo script SQL per configurare le policy del bucket "course-videos".');
+        } else {
+            alert("Errore upload video: " + err.message);
+        }
     } finally {
         setIsUploadingVideo(null);
     }
@@ -86,6 +99,68 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const courseId = isNew ? formData.id : id;
+
+    if (!file || !courseId) {
+        if (!courseId) alert("Per favore, imposta prima un 'ID Corso' per poter caricare l'immagine.");
+        return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `${courseId}/covers/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('course-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('course-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image: publicUrl });
+    } catch (error: any) {
+      console.error('Errore caricamento immagine:', error);
+      const msg = error.message || '';
+      if (msg.includes('row-level security')) {
+        alert('Errore di permessi (RLS): Esegui lo script SQL per configurare le policy del bucket "course-images".');
+      } else {
+        alert('Errore durante il caricamento dell\'immagine: ' + error.message);
+      }
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const applyFormatting = (tag: 'b' | 'u') => {
+    if (!descriptionRef.current) return;
+    
+    const textarea = descriptionRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+    
+    const openTag = `<${tag}>`;
+    const closeTag = `</${tag}>`;
+    
+    const newText = text.substring(0, start) + openTag + selectedText + closeTag + text.substring(end);
+    
+    setFormData({ ...formData, description: newText });
+    
+    // Ripristina il focus e la selezione
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + openTag.length, end + openTag.length);
+    }, 0);
+  };
+
   useEffect(() => {
     if (!isNew && id) {
       const courseToEdit = courses.find(c => c.id === id);
@@ -100,6 +175,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             resource_file_name: courseToEdit.resource_file_name || '',
             rating: courseToEdit.rating || 5,
             show_discount_badge: courseToEdit.show_discount_badge !== undefined ? courseToEdit.show_discount_badge : true,
+            upsell_course_id: courseToEdit.upsell_course_id || '',
         });
       }
     } else {
@@ -108,7 +184,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
             lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
-            rating: 5, show_discount_badge: true,
+            rating: 5, show_discount_badge: true, upsell_course_id: '',
         });
     }
   }, [id, courses, isNew]);
@@ -136,6 +212,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       resource_file_name: formData.resource_file_name || null,
       rating: formData.rating || 5,
       show_discount_badge: formData.show_discount_badge !== undefined ? formData.show_discount_badge : true,
+      upsell_course_id: formData.upsell_course_id || null,
     } as Course;
     onSave(courseToSave);
     navigate('/admin');
@@ -158,7 +235,15 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         
         const { data: { publicUrl } } = supabase.storage.from('course-resources').getPublicUrl(filePath);
         setFormData({ ...formData, resource_file_url: publicUrl, resource_file_name: file.name });
-    } catch (err: any) { alert("Errore upload: " + err.message); } 
+    } catch (err: any) { 
+        console.error("Errore upload file:", err);
+        const msg = err.message || '';
+        if (msg.includes('row-level security')) {
+            alert('Errore di permessi (RLS): Esegui lo script SQL per configurare le policy del bucket "course-resources".');
+        } else {
+            alert("Errore upload: " + err.message); 
+        }
+    } 
     finally { setIsUploadingFile(false); }
   };
   
@@ -235,8 +320,35 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                             <input type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 text-lg" placeholder="Es. Master in React..." />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Descrizione Completa</label>
-                            <textarea rows={8} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3" placeholder="Descrivi cosa impareranno gli studenti..." />
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="block text-sm font-medium text-gray-700">Descrizione Completa</label>
+                                <div className="flex gap-2">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => applyFormatting('b')}
+                                        className="p-1 hover:bg-gray-100 rounded border border-gray-200 text-gray-600"
+                                        title="Grassetto"
+                                    >
+                                        <Bold className="h-4 w-4" />
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => applyFormatting('u')}
+                                        className="p-1 hover:bg-gray-100 rounded border border-gray-200 text-gray-600"
+                                        title="Sottolineato"
+                                    >
+                                        <Underline className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea 
+                                ref={descriptionRef}
+                                rows={8} 
+                                value={formData.description} 
+                                onChange={e => setFormData({...formData, description: e.target.value})} 
+                                className="block w-full border border-gray-300 rounded-lg p-3" 
+                                placeholder="Descrivi cosa impareranno gli studenti... (Usa i pulsanti sopra per formattare)" 
+                            />
                         </div>
                     </div>
                 </div>
@@ -369,6 +481,24 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                          </div>
                          <hr className="border-gray-100" />
                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Corso Upsell (Opzionale)</label>
+                            <select 
+                                value={formData.upsell_course_id || ''} 
+                                onChange={e => setFormData({...formData, upsell_course_id: e.target.value})} 
+                                className="block w-full border border-gray-300 rounded-lg p-3 text-sm"
+                            >
+                                <option value="">Nessun Upsell</option>
+                                {courses
+                                    .filter(c => c.id !== id)
+                                    .map(course => (
+                                        <option key={course.id} value={course.id}>{course.title}</option>
+                                    ))
+                                }
+                            </select>
+                            <p className="text-[10px] text-gray-400 mt-1">Verrà mostrato come offerta speciale se questo è il percorso gratuito.</p>
+                         </div>
+                         <hr className="border-gray-100" />
+                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Livello</label>
                             <select value={formData.level} onChange={e => setFormData({...formData, level: e.target.value as any})} className="block w-full border border-gray-300 rounded-lg p-3"><option>Principiante</option><option>Intermedio</option><option>Avanzato</option></select>
                          </div>
@@ -418,14 +548,42 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><ImageIcon className="h-5 w-5 mr-2 text-brand-600" /> Copertina</h2>
-                    <input type="text" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} className="block w-full border rounded-lg p-2 text-xs mb-3" placeholder="URL Immagine..." />
-                    <div className={`relative w-full h-32 bg-gray-50 rounded-lg overflow-hidden border flex items-center justify-center ${imgError ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}>
-                        {formData.image && !imgError ? <img src={formData.image} alt="Preview" className="w-full h-full object-cover" onError={() => setImgError(true)} /> : <ImageIcon className="h-8 w-8 text-gray-300" />}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                            <label className="cursor-pointer bg-brand-50 text-brand-700 px-4 py-2 rounded-lg font-bold hover:bg-brand-100 text-sm flex items-center gap-2">
+                                {isUploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
+                                Carica Immagine
+                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploadingImage || (isNew && !formData.id)} />
+                            </label>
+                            <button 
+                                type="button" 
+                                onClick={() => setIsPickerOpen(true)}
+                                className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold hover:bg-gray-50 text-sm flex items-center gap-2"
+                            >
+                                <ImageIcon className="h-4 w-4" />
+                                Libreria
+                            </button>
+                            {isNew && !formData.id && <p className="text-red-500 text-[10px]">Imposta ID prima.</p>}
+                        </div>
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-100"></span></div>
+                            <div className="relative flex justify-center text-[10px]"><span className="bg-white px-2 text-gray-400 uppercase tracking-widest">oppure URL</span></div>
+                        </div>
+                        <input type="text" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} className="block w-full border rounded-lg p-2 text-xs" placeholder="URL Immagine..." />
+                        <div className={`relative w-full h-40 bg-gray-50 rounded-lg overflow-hidden border flex items-center justify-center ${imgError ? 'border-red-200 bg-red-50' : 'border-gray-200'}`}>
+                            {formData.image && !imgError ? <img src={formData.image} alt="Preview" className="w-full h-full object-cover" onError={() => setImgError(true)} /> : <ImageIcon className="h-10 w-10 text-gray-300" />}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
       </form>
+
+      <ImagePicker 
+        isOpen={isPickerOpen} 
+        onClose={() => setIsPickerOpen(false)} 
+        onSelect={(url) => setFormData({ ...formData, image: url })} 
+      />
     </div>
   );
 };

@@ -549,7 +549,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
     } catch (err: any) {
       console.error("Errore upload PDF:", err);
-      alert("Errore upload PDF: " + err.message);
+      const msg = err.message || '';
+      if (msg.includes('row-level security')) {
+        alert('Errore di permessi (RLS): Esegui lo script SQL per configurare le policy del bucket "pdf-guides".');
+      } else {
+        alert("Errore upload PDF: " + err.message);
+      }
     } finally {
       setIsUploading(false);
     }

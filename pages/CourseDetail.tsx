@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -110,10 +110,28 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
+  const [upsellCourse, setUpsellCourse] = useState<Course | null>(null);
 
   // Special check for the PDF guide course
   const isPdfGuideCourse = course.id === 'course_pdf_guide_free';
   const pdfUrl = settings.pdf_guide_config?.guide_pdf_url;
+
+  // Carica corso upsell se presente
+  useEffect(() => {
+    if (course.upsell_course_id) {
+      const fetchUpsell = async () => {
+        const { data } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', course.upsell_course_id)
+          .single();
+        if (data) setUpsellCourse(data as Course);
+      };
+      fetchUpsell();
+    } else {
+      setUpsellCourse(null);
+    }
+  }, [course.upsell_course_id]);
 
   // Carica progresso lezioni se acquistato
   useEffect(() => {
@@ -185,8 +203,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         
-        <button onClick={onBack} className="mb-8 text-gray-500 hover:text-gray-900 font-medium flex items-center">
-            ← Torna ai Percorsi
+        <button 
+            onClick={() => activeLesson ? setActiveLesson(null) : onBack()} 
+            className="mb-8 text-gray-500 hover:text-gray-900 font-medium flex items-center"
+        >
+            ← {activeLesson ? 'Torna al Percorso' : 'Torna ai Percorsi'}
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -203,7 +224,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             {isComingSoon && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
                         </div>
                         <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{course.title}</h1>
-                        <p className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl">{course.description}</p>
+                        <div 
+                            className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl"
+                            dangerouslySetInnerHTML={{ __html: course.description }}
+                        />
                         
                         <div className="grid grid-cols-3 gap-4 pt-4">
                             <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
@@ -220,6 +244,39 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                 <Users className="h-6 w-6 text-brand-500 mb-2" />
                                 <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Accesso</span>
                                 <span className="text-sm font-bold text-slate-900">Illimitato</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* BLOCCO UPSELL (Offerta Speciale) */}
+                {isPurchased && upsellCourse && !user?.purchased_courses.includes(upsellCourse.id) && (
+                    <div className="bg-gradient-to-r from-brand-600 to-brand-800 p-8 rounded-3xl text-white shadow-2xl shadow-brand-500/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                            <Sparkles className="h-32 w-32" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+                                <Zap className="h-3 w-3 mr-1 fill-current" /> Offerta Esclusiva per Te
+                            </div>
+                            <h2 className="text-2xl md:text-3xl font-black mb-4 leading-tight">
+                                Vuoi passare al livello successivo?<br/>
+                                <span className="text-brand-200">Ottieni {upsellCourse.title}</span>
+                            </h2>
+                            <p className="text-brand-100 mb-8 max-w-xl text-lg leading-relaxed">
+                                Hai appena iniziato con la nostra guida gratuita. Per ottenere risultati professionali e velocizzare il tuo percorso, ti consigliamo il nostro percorso completo.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center gap-6">
+                                <button 
+                                    onClick={() => navigate(`/course/${upsellCourse.id}`)}
+                                    className="w-full sm:w-auto bg-white text-brand-700 px-8 py-4 rounded-2xl font-black text-lg hover:bg-brand-50 transition-all shadow-xl flex items-center justify-center gap-2"
+                                >
+                                    Scopri il Percorso <ArrowLeft className="h-5 w-5 rotate-180" />
+                                </button>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl font-black">€{upsellCourse.price}</span>
+                                    <span className="text-white/50 line-through text-lg">€{upsellCourse.price * 1.5}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

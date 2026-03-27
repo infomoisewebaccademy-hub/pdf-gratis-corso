@@ -1,16 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course } from '../types';
-import { X, Save, Plus, Trash } from 'lucide-react';
+import { X, Save, Plus, Trash, Upload, Bold, Underline, Loader2, Image as ImageIcon } from 'lucide-react';
+import { supabase } from '../services/supabase';
+import { ImagePicker } from './ImagePicker';
 
 interface CourseFormProps {
   initialData?: Course | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (course: Course) => void;
+  allCourses?: Course[]; // Aggiunto per l'upsell
 }
 
-export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onClose, onSave }) => {
+export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onClose, onSave, allCourses = [] }) => {
   const [formData, setFormData] = useState<Partial<Course>>({
     title: '',
     description: '',
@@ -20,11 +23,19 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
     features: [''],
     lessons: 0,
     duration: '',
+    upsell_course_id: '',
   });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const descriptionRef = React.useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        upsell_course_id: initialData.upsell_course_id || '',
+      });
     } else {
       // Reset for new course
       setFormData({
@@ -36,11 +47,69 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
         features: [''],
         lessons: 0,
         duration: '',
+        upsell_course_id: '',
       });
     }
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+      const filePath = `course-covers/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('course-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('course-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image: publicUrl });
+    } catch (error: any) {
+      console.error('Errore caricamento immagine:', error);
+      const msg = error.message || '';
+      if (msg.includes('row-level security')) {
+        alert('Errore di permessi (RLS): Esegui lo script SQL fornito per configurare le policy del bucket "course-images".');
+      } else {
+        alert('Errore durante il caricamento dell\'immagine. Assicurati che il bucket "course-images" esista e sia pubblico.');
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const applyFormatting = (tag: 'b' | 'u') => {
+    if (!descriptionRef.current) return;
+    
+    const textarea = descriptionRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+    
+    const openTag = `<${tag}>`;
+    const closeTag = `</${tag}>`;
+    
+    const newText = text.substring(0, start) + openTag + selectedText + closeTag + text.substring(end);
+    
+    setFormData({ ...formData, description: newText });
+    
+    // Ripristina il focus e la selezione
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + openTag.length, end + openTag.length);
+    }, 0);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,12 +187,34 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Descrizione</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-medium text-gray-700">Descrizione</label>
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => applyFormatting('b')}
+                      className="p-1 hover:bg-gray-100 rounded border border-gray-200 text-gray-600"
+                      title="Grassetto"
+                    >
+                      <Bold className="h-4 w-4" />
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => applyFormatting('u')}
+                      className="p-1 hover:bg-gray-100 rounded border border-gray-200 text-gray-600"
+                      title="Sottolineato"
+                    >
+                      <Underline className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
                 <textarea 
+                  ref={descriptionRef}
                   rows={6}
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-brand-500 focus:border-brand-500"
+                  placeholder="Usa i pulsanti sopra per formattare il testo..."
                 />
               </div>
 
@@ -160,8 +251,51 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
                  </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">URL Immagine</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700">Corso Upsell (Opzionale)</label>
+                    <select 
+                      value={formData.upsell_course_id}
+                      onChange={e => setFormData({...formData, upsell_course_id: e.target.value})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="">Nessun Upsell</option>
+                      {allCourses
+                        .filter(c => c.id !== initialData?.id)
+                        .map(course => (
+                          <option key={course.id} value={course.id}>{course.title}</option>
+                        ))
+                      }
+                    </select>
+                    <p className="text-[10px] text-gray-400 mt-1">Verrà mostrato come offerta speciale se questo è il percorso gratuito.</p>
+                 </div>
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700">Immagine Copertina</label>
+                    <div className="mt-1 flex items-center gap-3">
+                      <label className="cursor-pointer bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                        {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                        Carica Immagine
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploading} />
+                      </label>
+                      <button 
+                        type="button" 
+                        onClick={() => setIsPickerOpen(true)}
+                        className="bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <ImageIcon className="h-4 w-4" />
+                        Libreria
+                      </button>
+                      {formData.image && (
+                        <div className="h-10 w-10 rounded border border-gray-200 overflow-hidden">
+                          <img src={formData.image} alt="Preview" className="h-full w-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                 </div>
+              </div>
+
+              <div className="hidden">
+                <label className="block text-sm font-medium text-gray-700">URL Immagine (Manuale)</label>
                 <input 
                   type="text"
                   value={formData.image}
@@ -203,6 +337,12 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
           </div>
         </div>
       </div>
+
+      <ImagePicker 
+        isOpen={isPickerOpen} 
+        onClose={() => setIsPickerOpen(false)} 
+        onSelect={(url) => setFormData({ ...formData, image: url })} 
+      />
     </div>
   );
 };

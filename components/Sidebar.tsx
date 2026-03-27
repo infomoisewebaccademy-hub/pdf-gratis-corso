@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen, User, Settings, GraduationCap, MessageSquare, HelpCircle } from 'lucide-react';
+import { BookOpen, User, Settings, MessageSquare, HelpCircle } from 'lucide-react';
 
 export interface SidebarItem {
   id: string;
@@ -20,10 +20,9 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unreadCount = 0, items, onItemClick }) => {
   const defaultMenuItems: SidebarItem[] = [
-    { id: 'my-courses', label: 'I miei corsi', icon: BookOpen, path: '/dashboard' },
+    { id: 'dashboard', label: 'I miei corsi', icon: BookOpen, path: '/dashboard' },
     { id: 'community', label: 'Chat Community', icon: MessageSquare, path: '/community' },
     { id: 'profile', label: 'Profilo', icon: User, path: '/profile' },
-    { id: 'certificates', label: 'Certificati', icon: GraduationCap, path: '/certificates' },
     { id: 'settings', label: 'Impostazioni', icon: Settings, path: '/settings' },
   ];
 

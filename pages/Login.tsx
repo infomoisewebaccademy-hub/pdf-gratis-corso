@@ -68,7 +68,7 @@ export const Login: React.FC<LoginProps> = ({ landingConfig }) => {
 
             {/* Login Card */}
             <div className="relative z-10 bg-white/5 backdrop-blur-xl border border-white/20 rounded-[20px] p-10 w-[350px] shadow-[0_0_40px_rgba(2,83,157,0.3)] animate-float-in">
-                <h2 className="text-center text-white mb-6 font-semibold text-2xl tracking-wide">Welcome Back</h2>
+                <h2 className="text-center text-white mb-6 font-semibold text-2xl tracking-wide">Bentornato</h2>
                 
                 {error && (
                     <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-2 text-red-200 text-sm">
@@ -109,13 +109,13 @@ export const Login: React.FC<LoginProps> = ({ landingConfig }) => {
                                 Accesso in corso...
                             </>
                         ) : (
-                            'Log In'
+                            'Accedi'
                         )}
                     </button>
                 </form>
 
                 <div className="text-center text-xs text-[#888] mt-6">
-                    Forgot password? | <span onClick={() => navigate('/register')} className="text-[#02539D] no-underline cursor-pointer hover:underline ml-1">Sign up</span>
+                    Password dimenticata? | <span onClick={() => navigate('/register')} className="text-[#02539D] no-underline cursor-pointer hover:underline ml-1">Registrati</span>
                 </div>
             </div>
         </div>

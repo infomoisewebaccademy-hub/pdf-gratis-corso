@@ -70,7 +70,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
   return (
     <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row">
       {/* Sidebar Menu - Come richiesto nell'immagine */}
-      <Sidebar activeItem={location.pathname.substring(1) || 'my-courses'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
+      <Sidebar activeItem={location.pathname.substring(1) || 'dashboard'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 
       {/* Main Content Area */}
       <main className="flex-1 bg-gray-50/50 pb-20">
@@ -99,7 +99,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
               </div>
           )}
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
               <div>
                   <h1 className="text-3xl font-black text-gray-900 tracking-tight">Bentornato, {user.full_name || 'Studente'}!</h1>
                   <p className="text-gray-500 mt-1">Ecco i tuoi progressi di apprendimento.</p>
@@ -115,29 +115,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
               </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Percorsi Attivi</div>
-                  <div className="text-4xl font-black text-gray-900">{myCourses.length}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                  <div className="text-gray-400 text-xs font-bold uppercase tracking-wider">Percorsi Attivi</div>
+                  <div className="text-2xl font-black text-gray-900">{myCourses.length}</div>
               </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Completamento Medio</div>
-                  <div className="text-4xl font-black text-gray-900">
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                  <div className="text-gray-400 text-xs font-bold uppercase tracking-wider">Completamento Medio</div>
+                  <div className="text-2xl font-black text-gray-900">
                       {myCourses.length > 0 
-                          /* Fix: Added explicit type cast to Object.values result to resolve arithmetic operation type error */
                           ? Math.round((Object.values(progressMap) as number[]).reduce((a: number, b: number) => a + b, 0) / myCourses.length) 
                           : 0}%
                   </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                  <div className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-2">Certificati</div>
-                  <div className="text-4xl font-black text-gray-900">
-                      {Object.values(progressMap).filter(v => v === 100).length}
-                  </div>
-              </div>
           </div>
 
-          <h2 className="text-2xl font-black text-gray-900 mb-8 tracking-tight">I Tuoi Percorsi</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">I Tuoi Percorsi</h2>
 
           {myCourses.length === 0 ? (
               <div className="bg-white rounded-3xl shadow-sm p-16 text-center border border-gray-100">

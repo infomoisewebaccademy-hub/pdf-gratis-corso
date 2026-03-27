@@ -811,34 +811,116 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                     })}
                 </div>
 
-                {/* Courses Preview CTA */}
-                <div id="percorsi-preview" className="mt-16 md:mt-20 pt-10 md:pt-12 border-t border-white/5 text-center">
-                    <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-4">I Nostri Percorsi Più Popolari</h2>
-                    <p className="text-slate-400 mb-10 max-w-2xl mx-auto">Scelti da migliaia di studenti per qualità e completezza.</p>
+                {/* Courses Preview Section */}
+                <div id="percorsi-preview" className="mt-32 md:mt-48 relative w-full">
+                    {/* Section Header */}
+                    <div className="mb-20 relative w-full">
+                        <div className="flex items-center gap-8 mb-16">
+                            <span className="text-xs text-brand-400 tracking-[0.4em] font-mono">
+                                03
+                            </span>
+                            <div className="h-px w-20 bg-gradient-to-r from-brand-500/60 to-transparent"></div>
+                            <span className="text-xs uppercase font-semibold text-white/60 tracking-[0.35em]">
+                                I Nostri Percorsi
+                            </span>
+                        </div>
+
+                        <div className="flex flex-col lg:flex-row lg:items-end gap-16 justify-between">
+                            <div className="flex-1 space-y-8">
+                                <h2 className="leading-[1.05] md:text-7xl text-5xl text-white tracking-tight font-bold max-w-3xl">
+                                    Semplice, trasparente
+                                    <br />
+                                    <span className="bg-clip-text font-medium text-transparent bg-gradient-to-b from-white to-white/40">
+                                        formazione per il futuro
+                                    </span>
+                                </h2>
+                            </div>
+
+                            <div className="flex-1 max-w-xl space-y-10">
+                                <p className="leading-relaxed text-lg font-light text-neutral-400">
+                                    Inizia oggi. Scala le tue competenze man mano che la tua carriera cresce. 
+                                    Scegli il percorso che più si adatta alle tue esigenze attuali e aggiornati 
+                                    mentre l'IA si espande in ogni settore.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                         {processedCourses.slice(0,3).map(course => {
                              const displayPrice = course.price;
                              const fakeOriginalPrice = Math.round(course.price * 1.4);
                              const discountPercent = Math.round(((fakeOriginalPrice - displayPrice) / fakeOriginalPrice) * 100);
+                             
                              return (
-                                <div key={course.id} className="bg-slate-900 rounded-2xl border border-white/10 overflow-hidden group hover:border-brand-500/50 transition-all cursor-pointer text-left" onClick={() => onCourseSelect(course.id)}>
-                                    <div className="relative h-48 overflow-hidden">
-                                        <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"/>
-                                        <div className="absolute top-4 right-4 bg-brand-600 text-white px-2 py-1 rounded text-xs font-bold shadow-lg">-{discountPercent}%</div>
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-xs font-bold text-brand-400 uppercase tracking-wider">{course.level}</span>
-                                            <div className="flex items-center gap-1"><Star className="h-3 w-3 text-yellow-500 fill-current"/><span className="text-xs text-white">4.9</span></div>
-                                        </div>
-                                        <h3 className="font-bold text-white text-lg mb-2 line-clamp-1 group-hover:text-brand-400 transition-colors">{course.title}</h3>
-                                        <div className="flex justify-between items-center mt-4">
-                                            <div>
-                                                <span className="text-xl font-bold text-white">€{displayPrice}</span>
-                                                <span className="text-sm text-slate-500 line-through ml-2">€{fakeOriginalPrice}</span>
+                                <div key={course.id} className="group relative flex flex-col p-2 rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-slate-800 to-slate-900 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.6)] transition-all duration-300 hover:-translate-y-4">
+                                    {/* Top Accent Line */}
+                                    <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-50 z-30"></div>
+                                    
+                                    <div className="relative h-full bg-[#0B1120] rounded-[2.25rem] p-8 overflow-hidden flex flex-col shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] border-b border-white/5">
+                                        {/* Background Orb */}
+                                        <div className="absolute -top-20 -right-20 w-64 h-64 bg-brand-500/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-brand-500/20 transition-colors duration-500"></div>
+
+                                        <div className="relative z-10 mb-8">
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-800 to-black border border-white/5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                                                    <Zap className="h-6 w-6 text-brand-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                                                </div>
+                                                <div className="flex flex-col gap-2 items-end">
+                                                    <div className="bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-brand-400 uppercase tracking-widest border border-white/10 shadow-lg">
+                                                        {course.level}
+                                                    </div>
+                                                    <div className="bg-brand-600/20 text-brand-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-brand-500/30 shadow-lg">
+                                                        -{discountPercent}%
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Vedi</button>
+                                            
+                                            <h3 className="text-xl font-bold text-white mb-2 tracking-tight line-clamp-2 group-hover:text-brand-400 transition-colors cursor-pointer" onClick={() => onCourseSelect(course.id)}>
+                                                {course.title}
+                                            </h3>
+                                            
+                                            <div className="flex items-center gap-1 mb-4">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star key={i} className="h-3 w-3 text-yellow-500 fill-current" />
+                                                ))}
+                                                <span className="text-[10px] text-slate-400 ml-1 font-bold">4.9/5</span>
+                                            </div>
+
+                                            <p className="text-sm text-slate-400 font-medium leading-relaxed line-clamp-3">
+                                                {course.description}
+                                            </p>
+                                        </div>
+
+                                        <div className="relative z-10 mb-8 flex items-baseline gap-1">
+                                            <span className="text-5xl font-semibold text-white tracking-tighter">€{displayPrice}</span>
+                                            <div className="flex flex-col ml-2">
+                                                <span className="text-sm text-slate-500 line-through">€{fakeOriginalPrice}</span>
+                                                <span className="text-[10px] text-brand-400 font-semibold uppercase tracking-widest">Investimento</span>
+                                            </div>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => onCourseSelect(course.id)}
+                                            className="relative w-full py-4 rounded-xl bg-gradient-to-b from-brand-500 to-brand-700 border-t border-brand-400 shadow-[0_4px_15px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.2)] text-white text-sm font-bold hover:brightness-110 active:translate-y-[1px] active:shadow-none transition-all duration-200 overflow-hidden group/btn mb-10 z-10"
+                                        >
+                                            <span className="relative z-10 flex items-center justify-center gap-2">
+                                                Scopri di più <ArrowRight className="h-4 w-4" />
+                                            </span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-shimmer"></div>
+                                        </button>
+
+                                        <div className="space-y-4 relative z-10 mt-auto">
+                                            {course.features.slice(0, 3).map((feat, idx) => (
+                                                <div key={idx} className="flex items-center gap-3 group/item">
+                                                    <div className="w-5 h-5 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                                                        <CheckCircle className="h-3 w-3 text-brand-400 group-hover/item:text-brand-300 transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm text-slate-400 group-hover/item:text-slate-300 transition-colors line-clamp-1">
+                                                        {feat}
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
