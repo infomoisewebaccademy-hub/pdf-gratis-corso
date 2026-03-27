@@ -59,15 +59,21 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
 
   if (items.length === 0) {
     return (
-      <div className="pt-32 min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
-        <div className="bg-gray-100 p-6 rounded-full mb-6">
-          <ShoppingCart className="h-12 w-12 text-gray-400" />
+      <div className="pt-32 min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 relative overflow-hidden">
+        {/* Background Glows */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/10 rounded-full blur-[120px]" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Il tuo carrello è vuoto</h2>
-        <p className="text-gray-500 mb-8">Sembra che tu non abbia ancora aggiunto nessun corso.</p>
+
+        <div className="bg-slate-900 p-6 rounded-full mb-6 relative z-10 border border-slate-800">
+          <ShoppingCart className="h-12 w-12 text-slate-500" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2 relative z-10">Il tuo carrello è vuoto</h2>
+        <p className="text-slate-400 mb-8 relative z-10">Sembra che tu non abbia ancora aggiunto nessun corso.</p>
         <button 
           onClick={() => navigate('/')}
-          className="bg-brand-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/30"
+          className="bg-brand-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/30 relative z-10"
         >
           Esplora i Corsi
         </button>
@@ -78,9 +84,15 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
   const hasPurchases = user && user.purchased_courses.length > 0;
 
   return (
-    <div className="pt-32 min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Il tuo Carrello</h1>
+    <div className="pt-32 min-h-screen bg-slate-950 pb-20 relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/10 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <h1 className="text-3xl font-bold text-white mb-8">Il tuo Carrello</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
@@ -91,29 +103,29 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
               const price = isDiscounted ? course.discounted_price! : course.price;
               
               return (
-                <div key={course.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+                <div key={course.id} className="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-sm flex flex-col sm:flex-row items-center gap-6">
                   <img 
                     src={course.image} 
                     alt={course.title} 
-                    className="w-24 h-24 object-cover rounded-lg flex-shrink-0 bg-gray-100"
+                    className="w-24 h-24 object-cover rounded-lg flex-shrink-0 bg-slate-800"
                   />
                   <div className="flex-1 text-center sm:text-left">
-                    <h3 className="text-lg font-bold text-gray-900">{course.title}</h3>
-                    <p className="text-sm text-gray-500 line-clamp-1">{course.description}</p>
-                    <div className="mt-2 text-sm text-gray-400">
+                    <h3 className="text-lg font-bold text-white mb-1">{course.title}</h3>
+                    <p className="text-sm text-slate-400 line-clamp-1">{course.description}</p>
+                    <div className="mt-2 text-sm text-slate-500">
                       {course.lessons} Lezioni • Livello {course.level}
                     </div>
                   </div>
                   <div className="flex flex-col items-center sm:items-end min-w-[100px]">
-                    <div className="font-bold text-xl text-gray-900">€{price.toFixed(2)}</div>
+                    <div className="font-bold text-xl text-white">€{price.toFixed(2)}</div>
                     {isDiscounted && (
-                       <span className="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-full mt-1 flex items-center">
+                       <span className="text-xs text-brand-400 font-bold bg-brand-500/10 px-2 py-0.5 rounded-full mt-1 flex items-center">
                          <Sparkles className="h-3 w-3 mr-1" /> Fedeltà
                        </span>
                     )}
                     <button 
                       onClick={() => removeFromCart(course.id)}
-                      className="text-red-500 hover:text-red-700 text-sm mt-3 flex items-center"
+                      className="text-red-500 hover:text-red-400 text-sm mt-3 flex items-center transition-colors"
                     >
                       <Trash2 className="h-4 w-4 mr-1" /> Rimuovi
                     </button>
@@ -125,16 +137,16 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
 
           {/* Riepilogo Ordine */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 sticky top-32">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Riepilogo Ordine</h2>
+            <div className="bg-slate-900 rounded-3xl shadow-xl border border-slate-800 p-8 sticky top-32">
+              <h2 className="text-xl font-bold text-white mb-6">Riepilogo Ordine</h2>
               
-              <div className="space-y-4 mb-6 border-b border-gray-100 pb-6">
-                <div className="flex justify-between text-gray-600">
+              <div className="space-y-4 mb-6 border-b border-slate-800 pb-6">
+                <div className="flex justify-between text-slate-400">
                   <span>Subtotale ({items.length} corsi)</span>
                   <span>€{calculateTotal().toFixed(2)}</span>
                 </div>
                 {!user && (
-                    <div className="bg-blue-50 text-blue-800 p-3 rounded-lg text-xs flex items-start">
+                    <div className="bg-brand-500/10 text-brand-400 p-3 rounded-lg text-xs flex items-start border border-brand-500/20">
                         <Mail className="h-4 w-4 mr-2 flex-shrink-0"/>
                         Le credenziali d'accesso verranno inviate alla mail che userai per il pagamento.
                     </div>
@@ -142,8 +154,8 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
               </div>
 
               <div className="flex justify-between items-end mb-8">
-                <span className="text-lg font-bold text-gray-900">Totale</span>
-                <span className="text-3xl font-extrabold text-brand-600">€{calculateTotal().toFixed(2)}</span>
+                <span className="text-lg font-bold text-white">Totale</span>
+                <span className="text-3xl font-extrabold text-brand-400">€{calculateTotal().toFixed(2)}</span>
               </div>
 
               <button 
@@ -158,7 +170,7 @@ export const Cart: React.FC<CartProps> = ({ user }) => {
                 )}
               </button>
               
-              <p className="text-center text-xs text-gray-400 mt-4">
+              <p className="text-center text-xs text-slate-500 mt-4 uppercase font-bold tracking-widest">
                 Checkout sicuro via Stripe. Account creato automaticamente.
               </p>
             </div>
