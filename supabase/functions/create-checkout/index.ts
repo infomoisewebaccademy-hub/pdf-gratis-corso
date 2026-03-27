@@ -58,7 +58,28 @@ Deno.serve(async (req: Request) => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 3. RECUPERA CORSI DAL DB
+    // 1. DETERMINA SE È UN NUOVO UTENTE
+    // Se l'utente è loggato (ha user_id), non è un nuovo utente.
+    // Se non è loggato, controlliamo se l'email esiste già nel database dei profili.
+    let isNewUser = true;
+    const isValidUser = user_id && typeof user_id === 'string' && user_id.trim().length > 0;
+
+    if (isValidUser) {
+        isNewUser = false;
+    } else if (email) {
+        // Controlliamo se esiste un profilo con questa email (chi ha scaricato la guida ha un profilo)
+        const { data: existingProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle();
+        
+        if (existingProfile) {
+            isNewUser = false;
+        }
+    }
+
+    // 2. RECUPERA CORSI DAL DB
     const { data: courses, error: courseError } = await supabaseAdmin
         .from('courses')
         .select('*')
@@ -68,10 +89,8 @@ Deno.serve(async (req: Request) => {
         throw new Error(`Corsi non trovati nel DB (IDs: ${finalIds.join(', ')}).`);
     }
 
-    // 4. CHECK FEDELTÀ UTENTE
+    // 3. CHECK FEDELTÀ UTENTE
     let isLoyalCustomer = false;
-    const isValidUser = user_id && typeof user_id === 'string' && user_id.trim().length > 0;
-
     if (isValidUser) {
         try {
             const { count } = await supabaseAdmin
@@ -85,7 +104,7 @@ Deno.serve(async (req: Request) => {
         }
     }
 
-    // 5. PREPARA LINE ITEMS & CALCOLA TOTALE
+    // 4. PREPARA LINE ITEMS & CALCOLA TOTALE
     let totalAmountCents = 0;
 
     const line_items = courses.map((course: any) => {
@@ -120,7 +139,7 @@ Deno.serve(async (req: Request) => {
 
     const totalAmountEur = (totalAmountCents / 100).toFixed(2);
 
-    // 6. CONFIGURAZIONE STRIPE
+    // 5. CONFIGURAZIONE STRIPE
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY non configurata.");
 
@@ -132,18 +151,21 @@ Deno.serve(async (req: Request) => {
     const origin = req.headers.get('origin') || 'http://localhost:5173';
     const metadataIds = finalIds.join(',');
 
-    // 7. CONFIGURAZIONE SESSIONE
+    // 6. CONFIGURAZIONE SESSIONE
     // Passiamo il totale nell'URL di successo per il Pixel
+    // RIMOSSO /#/ perché l'app usa BrowserRouter
+    const newUserParam = isNewUser ? '1' : '0';
     const sessionConfig: any = {
       payment_method_types: ['card'],
       line_items: line_items,
       mode: 'payment',
-      allow_promotion_codes: true, // <--- ABILITA I CODICI SCONTO QUI
-      success_url: `${origin}/#/payment-success?session_id={CHECKOUT_SESSION_ID}&total=${totalAmountEur}`, 
-      cancel_url: `${origin}/#/cart`,
+      allow_promotion_codes: true,
+      success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}&total=${totalAmountEur}&new_user=${newUserParam}`, 
+      cancel_url: `${origin}/cart`,
       metadata: {
         course_ids: metadataIds,
-        type: 'multi_course_purchase'
+        type: 'multi_course_purchase',
+        is_new_user: newUserParam
       },
     };
 
