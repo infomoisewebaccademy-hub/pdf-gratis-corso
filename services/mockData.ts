@@ -7,7 +7,7 @@ export const COURSES: Course[] = [
     description: 'Diventa un esperto di React, TypeScript e Modern UI/UX. Il corso definitivo per lanciare la tua carriera.',
     price: 97.00,
     image: 'https://picsum.photos/800/600?random=1',
-    features: ['150+ Lezioni', 'Progetti Reali', 'Certificato Incluso', 'Mentoring 1:1'],
+    features: ['150+ Lezioni', 'Progetti Reali', 'Mentoring 1:1'],
     lessons: 152,
     duration: '45 Ore',
     level: 'Avanzato'

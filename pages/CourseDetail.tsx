@@ -202,29 +202,24 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             {isFull && <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-red-200">Posti Esauriti</span>}
                             {isComingSoon && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">{course.title}</h1>
-                        <p className="text-xl text-gray-600 leading-relaxed whitespace-pre-wrap max-w-3xl">{course.description}</p>
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{course.title}</h1>
+                        <p className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl">{course.description}</p>
                         
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
-                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                        <div className="grid grid-cols-3 gap-4 pt-4">
+                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
                                 <Clock className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-gray-400 uppercase font-bold">Durata</span>
-                                <span className="text-sm font-bold text-gray-900">{course.duration}</span>
+                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Durata</span>
+                                <span className="text-sm font-bold text-slate-900">{course.duration}</span>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
                                 <Book className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-gray-400 uppercase font-bold">Lezioni</span>
-                                <span className="text-sm font-bold text-gray-900">{course.lessons_content?.length || course.lessons}</span>
+                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Lezioni</span>
+                                <span className="text-sm font-bold text-slate-900">{course.lessons_content?.length || course.lessons}</span>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
+                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
                                 <Users className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-gray-400 uppercase font-bold">Accesso</span>
-                                <span className="text-sm font-bold text-gray-900">Illimitato</span>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
-                                <Award className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-gray-400 uppercase font-bold">Certificato</span>
-                                <span className="text-sm font-bold text-gray-900">Incluso</span>
+                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Accesso</span>
+                                <span className="text-sm font-bold text-slate-900">Illimitato</span>
                             </div>
                         </div>
                     </div>

@@ -669,14 +669,16 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                     </p>
                 )}
 
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+                <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
                   <button 
                     onClick={handleNavigateToCourses}
-                    className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(37,99,235,0.6)] group transform hover:-translate-y-1"
+                    className="inline-flex items-center justify-center px-8 sm:px-10 py-4 sm:py-5 text-lg font-bold text-white bg-brand-600 hover:bg-brand-500 rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(37,99,235,0.6)] group transform hover:-translate-y-1"
                   >
                     {config.hero.cta_primary} <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
                   </button>
-                  
+                </div>
+
+                <div className="mt-10 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                   <div className="flex -space-x-3 items-center">
                       {[1,2,3,4].map(i => (
                           <img key={i} src={`https://i.pravatar.cc/100?u=${i}`} className="w-10 h-10 rounded-full border-2 border-slate-950 ring-1 ring-white/10" alt="Student" />
@@ -709,12 +711,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                       
                       <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
                           {/* Left Content */}
-                          <div>
+                          <div className="flex flex-col items-center md:items-start">
                               <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-6">
                                   <Sparkles className="h-3 w-3" />
                                   {config.ai_era_section?.subtitle}
                               </div>
-                              <h2 className="text-4xl md:text-5xl font-semibold text-white mb-8 tracking-tight leading-tight">
+                              <h2 className="text-3xl md:text-5xl font-semibold text-white mb-8 tracking-tight leading-tight text-center md:text-left">
                                   {config.ai_era_section?.title}
                               </h2>
                               <div className="text-lg text-slate-300 leading-relaxed space-y-6">
@@ -776,7 +778,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                         <Cpu className="h-3 w-3" />
                         Skills
                     </div>
-                    <h2 className="text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight">{config.features_section.title}</h2>
+                    <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6 tracking-tight text-center">{config.features_section.title}</h2>
                     <p className="text-xl text-slate-400">{config.features_section.subtitle}</p>
                 </div>
 
@@ -810,8 +812,8 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                 </div>
 
                 {/* Courses Preview CTA */}
-                <div className="mt-16 md:mt-20 pt-10 md:pt-12 border-t border-white/5 text-center">
-                    <h2 className="text-3xl font-semibold text-white mb-4">I Nostri Corsi Più Popolari</h2>
+                <div id="percorsi-preview" className="mt-16 md:mt-20 pt-10 md:pt-12 border-t border-white/5 text-center">
+                    <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-4">I Nostri Percorsi Più Popolari</h2>
                     <p className="text-slate-400 mb-10 max-w-2xl mx-auto">Scelti da migliaia di studenti per qualità e completezza.</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -943,13 +945,13 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                     </div>
 
                     {/* RIGHT COLUMN: Text */}
-                    <div className="pt-8">
+                    <div className="pt-8 flex flex-col items-center md:items-start">
                         <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-slate-300 bg-white/5 ring-1 ring-white/10 rounded-full mb-6">
                             <div className="h-1.5 w-1.5 rounded-full bg-brand-500"></div>
                             {config.about_section.subtitle}
                         </div>
                         
-                        <h2 className="text-4xl md:text-5xl font-semibold text-white mb-8 tracking-tight leading-tight">
+                        <h2 className="text-3xl md:text-5xl font-semibold text-white mb-8 tracking-tight leading-tight text-center md:text-left">
                             {config.about_section.title}
                         </h2>
                         
@@ -1002,12 +1004,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           <section className="py-16 md:py-24 bg-slate-900/50 border-t border-white/5 relative">
               <div className="max-w-7xl mx-auto px-6">
                   <div className="grid lg:grid-cols-12 gap-16 items-center">
-                      <div className="lg:col-span-5">
+                      <div className="lg:col-span-5 flex flex-col items-center md:items-start">
                           <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8">
                               <Layout className="h-3 w-3" />
                               Process
                           </div>
-                          <h2 className="text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight">
+                          <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight text-center md:text-left">
                               {config.how_it_works_section?.title}
                           </h2>
                           <p className="text-xl text-slate-400 leading-relaxed mb-12">
@@ -1077,12 +1079,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           <section className="pt-16 md:pt-24 pb-8 md:pb-12 bg-slate-950 border-t border-white/5 relative overflow-hidden">
               <div className={`max-w-7xl mx-auto px-6 ${config.ai_showcase_section?.urls?.length > 0 ? 'mb-12 md:mb-16' : ''}`}>
                   <div className="grid lg:grid-cols-12 gap-16 items-center">
-                      <div className="lg:col-span-5">
+                      <div className="lg:col-span-5 flex flex-col items-center md:items-start">
                           <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-8">
                               <Monitor className="h-3 w-3" />
                               Showcase
                           </div>
-                          <h2 className="text-4xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight">
+                          <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-6 tracking-tight leading-tight text-center md:text-left">
                               {config.ai_showcase_section?.title}
                           </h2>
                           <p className="text-xl text-slate-400 leading-relaxed mb-8 whitespace-pre-wrap">
@@ -1165,7 +1167,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           <div className="max-w-7xl mx-auto px-6">
               
               <div className="text-center mb-12 md:mb-16 relative z-10">
-                  <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">Moise Web Academy È Perfetto Per Te Se...</h2>
+                  <h2 className="text-3xl md:text-5xl font-semibold text-white mb-6 tracking-tight text-center">Moise Web Academy È Perfetto Per Te Se...</h2>
               </div>
 
               <div className="grid lg:grid-cols-12 gap-12 items-center">
@@ -1232,7 +1234,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           
           <div className="max-w-5xl mx-auto px-6 relative z-10">
               <div className="text-center mb-12 md:mb-16">
-                  <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
+                  <h2 className="text-3xl md:text-5xl font-semibold text-white mb-4 tracking-tight text-center">
                       Questo Percorso NON È Per Te Se...
                   </h2>
                   <div className="w-24 h-1 bg-red-500/50 mx-auto rounded-full"></div>
@@ -1273,7 +1275,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
          <section className="py-16 md:py-24 bg-slate-950 border-t border-white/5">
              <div className="max-w-7xl mx-auto px-6">
                  <div className="text-center max-w-4xl mx-auto mb-12 md:mb-16">
-                     <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">{config.comparison_section?.title || "La Tua Vita Prima e Dopo"}</h2>
+                     <h2 className="text-3xl md:text-5xl font-semibold text-white mb-6 tracking-tight text-center">{config.comparison_section?.title || "La Tua Vita Prima e Dopo"}</h2>
                      <p className="text-xl text-slate-400">{config.comparison_section?.subtitle}</p>
                  </div>
 
@@ -1325,7 +1327,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                         <MessageCircle className="h-3 w-3" />
                         {config.testimonials_section.subtitle}
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">
+                    <h2 className="text-3xl md:text-5xl font-semibold text-white mb-6 tracking-tight text-center">
                         {config.testimonials_section.title}
                     </h2>
                     
@@ -1337,9 +1339,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                     </button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 md:gap-8 pb-8 md:pb-0 scrollbar-hide">
                     {config.testimonials_section.reviews.map((review, idx) => (
-                         <div key={idx} className="bg-white/5 p-8 rounded-3xl ring-1 ring-white/10 hover:bg-white/10 transition-all flex flex-col h-full">
+                         <div key={idx} className="min-w-[85vw] md:min-w-0 snap-center bg-white/5 p-8 rounded-3xl ring-1 ring-white/10 hover:bg-white/10 transition-all flex flex-col h-full">
                              <div className="flex items-center gap-4 mb-6">
                                 <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-800 ring-1 ring-white/20 flex-shrink-0">
                                     {review.avatar ? (
@@ -1465,7 +1467,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       {config.usp_section.is_visible && (
           <section className="py-16 md:py-24 bg-slate-950 border-t border-white/5">
             <div className="max-w-7xl mx-auto px-6">
-                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-10 md:mb-12 text-center tracking-tight">{config.usp_section.title}</h2>
+                <h2 className="text-3xl md:text-5xl font-semibold text-white mb-10 md:mb-12 text-center tracking-tight">{config.usp_section.title}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {config.usp_section.items.map((item, idx) => (
                         <div key={idx} className="flex gap-6 p-6 rounded-2xl bg-white/5 ring-1 ring-white/5 hover:bg-white/10 transition-colors">
@@ -1489,7 +1491,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       <section className="py-16 md:py-24 bg-slate-900/50 border-t border-white/5">
           <div className="max-w-4xl mx-auto px-6">
               <div className="text-center mb-12 md:mb-16">
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white mb-4 tracking-tight">
+                  <h2 className="text-3xl lg:text-5xl font-semibold text-white mb-4 tracking-tight text-center">
                       Domande Frequenti
                   </h2>
                   <p className="text-xl text-slate-400">
@@ -1550,7 +1552,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/30 rounded-full blur-[100px]"></div>
             
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
+                <h2 className="text-3xl md:text-6xl font-black text-white mb-6 leading-tight tracking-tight text-center">
                     {config.cta_section.title}
                 </h2>
                 <p className="text-xl md:text-2xl text-brand-100 mb-10 font-medium">
