@@ -213,7 +213,7 @@ const AppContent: React.FC = () => {
         if (config.bg_color) {
             css += `  --bg-main: ${config.bg_color};\n`;
             css += `}\n`;
-            css += `body { background-color: ${config.bg_color} !important; }\n`;
+            // Removed global body background override to prevent dark background in admin/user areas
         } else {
             css += `}\n`;
         }
