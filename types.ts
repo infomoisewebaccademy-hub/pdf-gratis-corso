@@ -286,7 +286,9 @@ export interface PlatformSettings {
   logo_offset_y?: number;
   meta_pixel_id?: string;
   pdf_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page del PDF
-  general_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page generale
+  purchase_new_user_pixel_id?: string; // NUOVO: Pixel per nuovo utente post-acquisto
+  purchase_returning_user_pixel_id?: string; // NUOVO: Pixel per utente esistente post-acquisto
+  general_thank_you_pixel_id?: string; // Deprecato, mantenuto per compatibilità
   pdf_guide_form_image?: string; // NUOVO: Immagine per il modulo della guida PDF
   font_family?: string;
   

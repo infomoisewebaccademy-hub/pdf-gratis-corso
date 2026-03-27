@@ -1087,16 +1087,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Thank You Generale)</label>
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Acquisto - Nuovo Utente)</label>
                                 <input 
                                     type="text" 
-                                    value={localSettings.general_thank_you_pixel_id || ''} 
-                                    onChange={(e) => setLocalSettings({...localSettings, general_thank_you_pixel_id: e.target.value})} 
+                                    value={localSettings.purchase_new_user_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, purchase_new_user_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
                                     placeholder="Es: 1825625164777432"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Pixel per la pagina di ringraziamento dopo un acquisto. <span className="font-mono text-brand-600">(/payment-success)</span>
+                                    Pixel per nuovi utenti (prima volta). Mostra messaggio credenziali email. <span className="font-mono text-brand-600">(/payment-success?new_user=1)</span>
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Acquisto - Utente Esistente)</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.purchase_returning_user_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, purchase_returning_user_pixel_id: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: 1825625164777432"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Pixel per utenti già registrati. Mostra messaggio "I miei corsi". <span className="font-mono text-brand-600">(/payment-success?new_user=0)</span>
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">

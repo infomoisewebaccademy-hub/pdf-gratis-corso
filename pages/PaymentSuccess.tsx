@@ -10,6 +10,7 @@ export const PaymentSuccess: React.FC = () => {
     const [searchParams] = useSearchParams();
     const sessionId = searchParams.get('session_id');
     const totalAmount = searchParams.get('total');
+    const isNewUser = searchParams.get('new_user') === '1';
     
     const navigate = useNavigate();
     const { clearCart } = useCart();
@@ -38,11 +39,16 @@ export const PaymentSuccess: React.FC = () => {
                 try {
                     const { data } = await supabase
                         .from('platform_settings')
-                        .select('general_thank_you_pixel_id')
+                        .select('purchase_new_user_pixel_id, purchase_returning_user_pixel_id, general_thank_you_pixel_id')
                         .single();
                     
-                    if (data?.general_thank_you_pixel_id) {
-                        initMetaPixel(data.general_thank_you_pixel_id);
+                    // Seleziona il Pixel ID corretto in base al tipo di utente
+                    const pixelId = isNewUser 
+                        ? (data?.purchase_new_user_pixel_id || data?.general_thank_you_pixel_id)
+                        : (data?.purchase_returning_user_pixel_id || data?.general_thank_you_pixel_id);
+
+                    if (pixelId) {
+                        initMetaPixel(pixelId);
                     }
 
                     const value = totalAmount ? parseFloat(totalAmount) : 0;
@@ -50,14 +56,10 @@ export const PaymentSuccess: React.FC = () => {
                     setTimeout(() => {
                         sessionStorage.setItem(storageKey, 'true');
 
-                        // Evento Purchase
-                        if (value > 0) {
-                            trackPurchase(value, sessionId);
-                        } else {
-                            trackPurchase(0, sessionId);
-                        }
+                        // Evento Purchase con valore dinamico
+                        trackPurchase(value || 0, sessionId);
 
-                        // Eventi richiesti
+                        // Eventi richiesti (Lead e Contact)
                         trackLead();
                         trackContact();
                         
@@ -71,7 +73,7 @@ export const PaymentSuccess: React.FC = () => {
         };
 
         fetchSettingsAndTrack();
-    }, [sessionId, totalAmount, clearCart, navigate]);
+    }, [sessionId, totalAmount, clearCart, navigate, isNewUser]);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white relative overflow-hidden px-4 font-sans">
@@ -88,40 +90,64 @@ export const PaymentSuccess: React.FC = () => {
                     </div>
                 </div>
 
-                <h1 className="text-4xl font-black mb-4 tracking-tight">Grazie dell'acquisto!</h1>
+                <h1 className="text-4xl font-black mb-4 tracking-tight">
+                    {isNewUser ? "Grazie dell'acquisto!" : "Bentornato!"}
+                </h1>
                 
                 <p className="text-lg text-slate-300 mb-8 leading-relaxed">
-                    Il pagamento è stato confermato con successo. <br/>Benvenuto a bordo.
+                    {isNewUser 
+                        ? "Il pagamento è stato confermato con successo. Benvenuto a bordo."
+                        : "Il tuo nuovo corso è ora disponibile nella tua area riservata."
+                    }
                 </p>
 
                 {/* Box Istruzioni */}
                 <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 mb-8 text-left shadow-inner">
-                    <div className="flex items-start gap-4 mb-4">
-                        <div className="bg-brand-500/20 p-2 rounded-xl text-brand-400">
-                            <Mail className="h-6 w-6" />
+                    {isNewUser ? (
+                        <>
+                            <div className="flex items-start gap-4 mb-4">
+                                <div className="bg-brand-500/20 p-2 rounded-xl text-brand-400">
+                                    <Mail className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-lg">Controlla la tua Email</h3>
+                                    <p className="text-slate-400 text-sm mt-1">
+                                        Le tue <strong>credenziali di accesso</strong> sono state inviate all'indirizzo email usato per il pagamento.
+                                    </p>
+                                    <p className="text-amber-400 text-xs mt-2 font-semibold">
+                                        ⚠️ Importante: Controlla anche nella cartella SPAM o Posta Indesiderata se non trovi l'email nella posta in arrivo.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-start gap-4">
+                                <div className="bg-purple-500/20 p-2 rounded-xl text-purple-400">
+                                    <Star className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-white text-lg">Accesso Immediato</h3>
+                                    <p className="text-slate-400 text-sm mt-1">
+                                        Usa email e password ricevute per accedere alla dashboard e iniziare a studiare.
+                                    </p>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex items-start gap-4">
+                            <div className="bg-brand-500/20 p-2 rounded-xl text-brand-400">
+                                <Star className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-white text-lg">Tutto Pronto!</h3>
+                                <p className="text-slate-400 text-sm mt-1">
+                                    Il percorso è stato aggiunto al tuo account. Puoi trovarlo nella sezione <strong>"I miei corsi"</strong> della tua dashboard.
+                                </p>
+                                <p className="text-slate-400 text-sm mt-4">
+                                    Non hai bisogno di nuove credenziali, usa quelle che già possiedi.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-bold text-white text-lg">Controlla la tua Email</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Le tue <strong>credenziali di accesso</strong> sono state inviate all'indirizzo email usato per il pagamento.
-                            </p>
-                            <p className="text-amber-400 text-xs mt-2 font-semibold">
-                                ⚠️ Importante: Controlla anche nella cartella SPAM o Posta Indesiderata se non trovi l'email nella posta in arrivo.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-4">
-                        <div className="bg-purple-500/20 p-2 rounded-xl text-purple-400">
-                            <Star className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-white text-lg">Accesso Immediato</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Usa email e password ricevute per accedere alla dashboard e iniziare a studiare.
-                            </p>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Totale Pagato (Opzionale, visivo per l'utente) */}
@@ -132,10 +158,10 @@ export const PaymentSuccess: React.FC = () => {
                 )}
 
                 <button 
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate(isNewUser ? '/login' : '/dashboard')}
                     className="w-full bg-white text-slate-900 py-4 rounded-xl font-bold text-lg hover:bg-brand-50 hover:text-brand-700 transition-all flex items-center justify-center group shadow-lg shadow-white/10"
                 >
-                    Vai al Login <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {isNewUser ? "Vai al Login" : "Vai ai miei Corsi"} <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
              </div>
              
