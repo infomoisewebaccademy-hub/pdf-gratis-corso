@@ -183,9 +183,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     }
   };
 
-  const hasPreviousPurchases = user && user.purchased_courses.length > 0;
-  const isDiscountAvailable = hasPreviousPurchases && course.discounted_price && course.discounted_price > 0 && !isPurchased;
-  
+  const isDiscountAvailable = user && course.discounted_price && course.discounted_price > 0 && !isPurchased;
   const finalPrice = isDiscountAvailable ? course.discounted_price! : course.price;
   const inCart = isInCart(course.id);
 
@@ -250,37 +248,52 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 )}
 
                 {/* BLOCCO UPSELL (Offerta Speciale) */}
-                {isPurchased && upsellCourse && !user?.purchased_courses.includes(upsellCourse.id) && (
-                    <div className="bg-gradient-to-r from-brand-600 to-brand-800 p-8 rounded-3xl text-white shadow-2xl shadow-brand-500/20 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                            <Sparkles className="h-32 w-32" />
-                        </div>
-                        <div className="relative z-10">
-                            <div className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-                                <Zap className="h-3 w-3 mr-1 fill-current" /> Offerta Esclusiva per Te
+                {isPurchased && upsellCourse && !user?.purchased_courses.includes(upsellCourse.id) && (() => {
+                    const upsellDiscountAvailable = user && upsellCourse.discounted_price && upsellCourse.discounted_price > 0;
+                    const upsellFinalPrice = upsellDiscountAvailable ? upsellCourse.discounted_price : upsellCourse.price;
+                    
+                    return (
+                        <div className="bg-gradient-to-r from-brand-600 to-brand-800 p-8 rounded-3xl text-white shadow-2xl shadow-brand-500/20 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                <Sparkles className="h-32 w-32" />
                             </div>
-                            <h2 className="text-2xl md:text-3xl font-black mb-4 leading-tight">
-                                Vuoi passare al livello successivo?<br/>
-                                <span className="text-brand-200">Ottieni {upsellCourse.title}</span>
-                            </h2>
-                            <p className="text-brand-100 mb-8 max-w-xl text-lg leading-relaxed">
-                                Hai appena iniziato con la nostra guida gratuita. Per ottenere risultati professionali e velocizzare il tuo percorso, ti consigliamo il nostro percorso completo.
-                            </p>
-                            <div className="flex flex-col sm:flex-row items-center gap-6">
-                                <button 
-                                    onClick={() => navigate(`/course/${upsellCourse.id}`)}
-                                    className="w-full sm:w-auto bg-white text-brand-700 px-8 py-4 rounded-2xl font-black text-lg hover:bg-brand-50 transition-all shadow-xl flex items-center justify-center gap-2"
-                                >
-                                    Scopri il Percorso <ArrowLeft className="h-5 w-5 rotate-180" />
-                                </button>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-3xl font-black">€{upsellCourse.price}</span>
-                                    <span className="text-white/50 line-through text-lg">€{upsellCourse.price * 1.5}</span>
+                            <div className="relative z-10">
+                                <div className="flex flex-wrap items-center gap-3 mb-4">
+                                    <div className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-widest">
+                                        <Zap className="h-3 w-3 mr-1 fill-current" /> Offerta Esclusiva per Te
+                                    </div>
+                                    {upsellDiscountAvailable && (
+                                        <div className="inline-flex items-center px-3 py-1 bg-purple-500/40 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-widest animate-pulse border border-purple-400/30">
+                                            <Sparkles className="h-3 w-3 mr-1" /> Offerta Fedeltà Attiva
+                                        </div>
+                                    )}
+                                </div>
+                                <h2 className="text-2xl md:text-3xl font-black mb-4 leading-tight">
+                                    Vuoi passare al livello successivo?<br/>
+                                    <span className="text-brand-200">Ottieni {upsellCourse.title}</span>
+                                </h2>
+                                <p className="text-brand-100 mb-8 max-w-xl text-lg leading-relaxed">
+                                    {upsellDiscountAvailable 
+                                        ? "Essendo già un utente della nostra piattaforma, hai diritto a un prezzo speciale riservato per questo percorso completo."
+                                        : "Hai appena iniziato con la nostra guida gratuita. Per ottenere risultati professionali e velocizzare il tuo percorso, ti consigliamo il nostro percorso completo."
+                                    }
+                                </p>
+                                <div className="flex flex-col sm:flex-row items-center gap-6">
+                                    <button 
+                                        onClick={() => navigate(`/course/${upsellCourse.id}`)}
+                                        className="w-full sm:w-auto bg-white text-brand-700 px-8 py-4 rounded-2xl font-black text-lg hover:bg-brand-50 transition-all shadow-xl flex items-center justify-center gap-2"
+                                    >
+                                        Scopri il Percorso <ArrowLeft className="h-5 w-5 rotate-180" />
+                                    </button>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-3xl font-black">€{upsellFinalPrice}</span>
+                                        <span className="text-white/50 line-through text-lg">€{upsellCourse.price * (upsellDiscountAvailable ? 1 : 1.5)}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
                 
                 {/* BLOCCO DOWNLOAD GUIDA (Speciale) */}
                 {isPdfGuideCourse && isPurchased && pdfUrl && (
