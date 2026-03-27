@@ -95,7 +95,14 @@ export const trackInitiateCheckout = (contentIds: string[], value: number, curre
 // NUOVO: Tracciamento Lead (Contatto generico)
 export const trackLead = () => {
     trackEvent('Lead', {
-        content_name: 'Payment Success User'
+        content_name: 'Lead User'
+    });
+};
+
+// NUOVO: Tracciamento Contatto
+export const trackContact = () => {
+    trackEvent('Contact', {
+        content_name: 'Contact User'
     });
 };
 

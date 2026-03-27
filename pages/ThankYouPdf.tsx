@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../services/supabase';
+import { initMetaPixel, trackLead, trackContact } from '../services/metaPixel';
 
 export const ThankYouPdf: React.FC = () => {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('platform_settings')
+                    .select('pdf_thank_you_pixel_id')
+                    .single();
+                
+                if (error) throw error;
+                if (data?.pdf_thank_you_pixel_id) {
+                    initMetaPixel(data.pdf_thank_you_pixel_id);
+                    // Traccia eventi richiesti
+                    setTimeout(() => {
+                        trackLead();
+                        trackContact();
+                    }, 500);
+                }
+            } catch (err) {
+                console.error("Errore caricamento pixel settings:", err);
+            }
+        };
+
+        fetchSettings();
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-4 font-sans">

@@ -3,7 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Mail, ArrowRight, Star, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { trackPurchase, trackLead } from '../services/metaPixel';
+import { initMetaPixel, trackPurchase, trackLead, trackContact } from '../services/metaPixel';
+import { supabase } from '../services/supabase';
 
 export const PaymentSuccess: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -22,44 +23,54 @@ export const PaymentSuccess: React.FC = () => {
             return;
         }
 
-        // --- SISTEMA ANTI-DUPLICAZIONE EVENTI PIXEL ---
-        // Usiamo sessionStorage per ricordare che QUESTO specifico ordine (sessionId) è già stato tracciato.
-        // Questo risolve il problema dei doppi eventi (gialli) e dei refresh di pagina.
-        const storageKey = `mwa_pixel_tracked_${sessionId}`;
-        const alreadyTracked = sessionStorage.getItem(storageKey);
+        const fetchSettingsAndTrack = async () => {
+            // --- SISTEMA ANTI-DUPLICAZIONE EVENTI PIXEL ---
+            const storageKey = `mwa_pixel_tracked_${sessionId}`;
+            const alreadyTracked = sessionStorage.getItem(storageKey);
 
-        if (!alreadyTracked && !processingRef.current) {
-            processingRef.current = true; // Blocco locale per React Strict Mode
-            
-            // 1. Pulisce il carrello (solo se è un nuovo successo)
-            clearCart();
-            
-            // 2. Traccia gli eventi sul Pixel
-            const value = totalAmount ? parseFloat(totalAmount) : 0;
-
-            setTimeout(() => {
-                // Segna come tracciato PRIMA di inviare, per sicurezza
-                sessionStorage.setItem(storageKey, 'true');
-
-                // Evento Purchase (Priorità Alta)
-                if (value > 0) {
-                    console.log(`💰 Tracking Purchase (Unique): €${value} (Session: ${sessionId})`);
-                    trackPurchase(value, sessionId);
-                } else {
-                    console.log(`💰 Tracking Purchase (Fallback Unique): €0 (Session: ${sessionId})`);
-                    trackPurchase(0, sessionId);
-                }
-
-                // Evento Lead
-                trackLead();
+            if (!alreadyTracked && !processingRef.current) {
+                processingRef.current = true;
                 
-            }, 750); // Leggero ritardo aumentato per assicurare il caricamento completo del Pixel
-        } else {
-            console.log("ℹ️ Pixel events already tracked for this session. Skipping.");
-            // Pulisce comunque il carrello per sicurezza UX
-            clearCart();
-        }
+                // 1. Pulisce il carrello
+                clearCart();
+                
+                // 2. Recupera Pixel ID e traccia
+                try {
+                    const { data } = await supabase
+                        .from('platform_settings')
+                        .select('general_thank_you_pixel_id')
+                        .single();
+                    
+                    if (data?.general_thank_you_pixel_id) {
+                        initMetaPixel(data.general_thank_you_pixel_id);
+                    }
 
+                    const value = totalAmount ? parseFloat(totalAmount) : 0;
+
+                    setTimeout(() => {
+                        sessionStorage.setItem(storageKey, 'true');
+
+                        // Evento Purchase
+                        if (value > 0) {
+                            trackPurchase(value, sessionId);
+                        } else {
+                            trackPurchase(0, sessionId);
+                        }
+
+                        // Eventi richiesti
+                        trackLead();
+                        trackContact();
+                        
+                    }, 750);
+                } catch (err) {
+                    console.error("Errore tracking pixel:", err);
+                }
+            } else {
+                clearCart();
+            }
+        };
+
+        fetchSettingsAndTrack();
     }, [sessionId, totalAmount, clearCart, navigate]);
 
     return (

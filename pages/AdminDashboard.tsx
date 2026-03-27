@@ -1030,7 +1030,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                         <div className="space-y-6">
                             <h4 className="font-bold text-gray-400 uppercase text-xs tracking-widest flex items-center"><Image className="h-4 w-4 mr-2"/> Branding</h4>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID</label>
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Home)</label>
                                 <input 
                                     type="text" 
                                     value={localSettings.meta_pixel_id || ''} 
@@ -1039,7 +1039,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     placeholder="Es: 1825625164777432"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Il codice di tracciamento per le tue campagne Meta Ads.
+                                    Pixel principale per la Home Page.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Thank You PDF)</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.pdf_thank_you_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, pdf_thank_you_pixel_id: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: 1825625164777432"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Pixel per la pagina di ringraziamento della guida PDF.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Thank You Generale)</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.general_thank_you_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, general_thank_you_pixel_id: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: 1825625164777432"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Pixel per la pagina di ringraziamento dopo un acquisto.
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">

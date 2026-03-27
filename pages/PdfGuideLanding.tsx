@@ -226,10 +226,6 @@ export const PdfGuideLanding: React.FC = () => {
             {/* 1. HERO SECTION */}
             <header className="relative text-center pt-16 pb-8 md:pt-32 md:pb-24 px-4 overflow-hidden">
                 <div className="max-w-5xl mx-auto relative z-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-brand-400 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-6 md:mb-8 backdrop-blur-md">
-                        <Monitor className="h-3 w-3" />
-                        Guida PDF Gratuita 2025
-                    </div>
                     <h1 className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.95] mb-6 md:mb-8">
                         {config.headline_solid} <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${config.gradient_start}, ${config.gradient_end})` }}>

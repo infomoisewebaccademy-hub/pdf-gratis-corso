@@ -285,6 +285,8 @@ export interface PlatformSettings {
   logo_offset_x?: number;
   logo_offset_y?: number;
   meta_pixel_id?: string;
+  pdf_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page del PDF
+  general_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page generale
   font_family?: string;
   
   // Campo 'is_pre_launch' deprecato e sostituito da 'active_mode'
