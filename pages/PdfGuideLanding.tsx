@@ -308,58 +308,6 @@ export const PdfGuideLanding: React.FC = () => {
                     </div>
                 </section>
                 
-                {/* WEBSITE SHOWCASE */}
-                <section className="space-y-8 md:space-y-12 py-4 md:py-12">
-                    <div className="text-center space-y-4 max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium text-brand-300 bg-brand-500/10 ring-1 ring-brand-500/20 rounded-full mb-2 md:mb-4">
-                            <Monitor className="h-3 w-3" />
-                            Esempi Reali
-                        </div>
-                        <h2 className="text-2xl md:text-5xl font-bold text-white tracking-tight">Cosa puoi creare davvero</h2>
-                        <p className="text-base md:text-lg text-slate-400 leading-relaxed">
-                            Questi sono esempi reali di siti e piattaforme creati interamente con l'AI. 
-                            <span className="text-brand-400 font-semibold block mt-1 md:mt-2">
-                                Nella guida PDF questi siti sono già compresi e potrai modificarli a tuo piacimento per poi pubblicarli online.
-                            </span>
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                        {(config.showcase_items && config.showcase_items.length > 0 
-                          ? config.showcase_items.map(item => item.url)
-                          : []
-                        ).map((url, idx) => (
-                            <div key={idx} className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-brand-500/50 transition-all duration-500">
-                                <div className="h-10 bg-slate-900 flex items-center px-4 gap-2 border-b border-white/5">
-                                    <div className="flex gap-1.5">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-                                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
-                                    </div>
-                                    <div className="flex-1 text-[10px] text-slate-500 font-mono truncate text-center opacity-50">
-                                        {url.replace('https://', '')}
-                                    </div>
-                                </div>
-                                <div className="h-[300px] md:h-[450px] overflow-hidden relative">
-                                    <iframe 
-                                        src={url} 
-                                        className="w-full h-full border-none"
-                                        title={`Showcase PDF ${idx}`}
-                                        loading="lazy"
-                                    />
-                                </div>
-                                <div className="p-4 bg-slate-900/80 backdrop-blur-md border-t border-white/5 flex justify-between items-center">
-                                    <span className="text-xs font-medium text-slate-400">Template Incluso #{idx + 1}</span>
-                                    <div className="flex items-center gap-2 text-brand-400 text-[10px] md:text-xs font-bold">
-                                        <CheckCircle className="h-3 w-3" />
-                                        EDITABILE
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
                 {/* 4. TESTIMONIALS */}
                 {config.testimonials_section?.is_visible && config.testimonials_section.reviews.length > 0 && (
                     <section className="space-y-8 md:space-y-12">
@@ -367,9 +315,9 @@ export const PdfGuideLanding: React.FC = () => {
                             <h2 className="text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-brand-400">{config.testimonials_section.subtitle}</h2>
                             <h3 className="text-2xl md:text-5xl font-bold text-white tracking-tight">{config.testimonials_section.title}</h3>
                         </div>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory pb-8 md:pb-0 no-scrollbar">
                             {config.testimonials_section.reviews.map((review, idx) => (
-                                <div key={idx} className="bg-white/5 p-6 md:p-8 rounded-3xl border border-white/10 flex flex-col h-full">
+                                <div key={idx} className="bg-white/5 p-6 md:p-8 rounded-3xl border border-white/10 flex flex-col h-full flex-shrink-0 w-[85vw] md:w-auto snap-center">
                                     <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
                                         <img src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=random`} alt={review.name} className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover ring-2 ring-white/10" referrerPolicy="no-referrer" />
                                         <div>
