@@ -188,7 +188,7 @@ export const PdfGuideLanding: React.FC = () => {
     };
 
     const renderForm = (isBottom = false) => (
-        <div id={isBottom ? "bottom-form" : "form-section"} className={`bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
+        <div id={isBottom ? "bottom-form" : "form-section"} className={`scroll-mt-24 bg-slate-900/50 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden ${isBottom ? 'max-w-xl mx-auto' : ''}`}>
             <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent opacity-30 pointer-events-none"></div>
             <div className="relative z-10">
                 <div className="inline-block px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4" style={{ backgroundColor: `${config.gradient_start}1a`, color: config.gradient_start }}>
