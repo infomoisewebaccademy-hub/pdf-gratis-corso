@@ -40,7 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
   };
 
   return (
-    <aside className="flex lg:flex-col w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 border-gray-100 lg:h-[calc(100vh-80px)] lg:sticky lg:top-20 overflow-x-auto lg:overflow-y-auto z-10 scrollbar-hide">
+    <aside className="flex lg:flex-col w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 border-gray-200 lg:h-[calc(100vh-80px)] lg:sticky lg:top-20 overflow-x-auto lg:overflow-y-auto z-10 scrollbar-hide">
       <div className="p-4 lg:p-6 flex lg:flex-col gap-2 lg:space-y-2 min-w-max lg:min-w-0">
         <nav className="flex lg:flex-col gap-2 lg:space-y-2">
           {menuItems.map((item) => {
@@ -54,8 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
                 onClick={() => handleItemClick(item)}
                 className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   isActive 
-                    ? 'bg-brand-50 text-brand-600 shadow-sm ring-1 ring-brand-100' 
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -74,10 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
         </nav>
       </div>
 
-      <div className="hidden lg:block mt-auto p-6 border-t border-gray-50">
+      <div className="hidden lg:block mt-auto p-6 border-t border-gray-200">
         <button 
           onClick={() => onNavigate && onNavigate('/support')}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all"
         >
           <HelpCircle className="h-5 w-5" />
           Supporto

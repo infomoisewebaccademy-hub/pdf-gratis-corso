@@ -49,13 +49,13 @@ export const ThankYouPdf: React.FC = () => {
                         ⚠️ <span className="font-bold">Importante:</span> Se non vedi l'email entro 5 minuti, controlla la cartella <span className="underline">SPAM</span> o <span className="underline">Promozioni</span>.
                     </p>
                 </div>
-                <button 
-                    onClick={() => navigate('/')} 
-                    className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center mx-auto group"
+                <a 
+                    href="/" 
+                    className="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 ease-in-out flex items-center justify-center mx-auto group w-fit"
                 >
                     <ArrowLeft className="h-5 w-5 mr-2 transition-transform duration-300 group-hover:-translate-x-1" />
                     Torna alla Home
-                </button>
+                </a>
             </div>
             <div className="absolute bottom-4 text-xs text-slate-600">
                 &copy; {new Date().getFullYear()} Moise Web Academy

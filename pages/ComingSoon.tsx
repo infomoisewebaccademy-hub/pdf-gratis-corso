@@ -263,9 +263,9 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({ launchDate: initialLaunc
             </div>
 
             <div className="absolute bottom-4 right-4 z-50">
-                <button onClick={() => navigate('/login')} className="flex items-center gap-2 p-2 text-xs font-bold uppercase tracking-widest opacity-10 hover:opacity-100 transition-all duration-300" title="Area Staff" style={{color: text.text_color_body}}>
+                <a href="/login" className="flex items-center gap-2 p-2 text-xs font-bold uppercase tracking-widest opacity-10 hover:opacity-100 transition-all duration-300" title="Area Staff" style={{color: text.text_color_body}}>
                     <Key className="h-3 w-3" /> {text.admin_login_text}
-                </button>
+                </a>
             </div>
             
             <div className="absolute bottom-4 w-full text-center pointer-events-none opacity-30">
