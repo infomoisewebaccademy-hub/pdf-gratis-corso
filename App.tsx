@@ -394,7 +394,7 @@ const AppContent: React.FC = () => {
         <Route path="/profile" element={user ? <ProfilePage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={user ? <SettingsPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         
-        <Route path="/admin" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} /> : <Navigate to="/" />} />
+        <Route path="/admin/dashboard" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} /> : <Navigate to="/" />} />
         <Route path="/admin/course/:id" element={user?.is_admin ? <AdminEditCourse courses={courses} onSave={handleSaveCourse} /> : <Navigate to="/" />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login landingConfig={settings.landing_page_config} />} />
         <Route path="/update-password" element={<UpdatePassword />} />

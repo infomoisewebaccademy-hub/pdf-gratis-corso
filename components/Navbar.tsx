@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
 
                                     {user.is_admin && (
                                         <>
-                                            <button onClick={() => handleNavigate('/admin')} className="w-full text-left px-4 py-2.5 text-sm text-brand-600 hover:bg-gray-50 flex items-center font-semibold transition-colors">
+                                            <button onClick={() => handleNavigate('/admin/dashboard')} className="w-full text-left px-4 py-2.5 text-sm text-brand-600 hover:bg-gray-50 flex items-center font-semibold transition-colors">
                                                 <Settings className="h-4 w-4 mr-2" /> Admin Dashboard
                                             </button>
                                             <div className="h-px bg-gray-100 my-1 mx-2"></div>
@@ -205,7 +205,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onNavigate, logo
                             <p className="text-xs text-gray-500">{user.email}</p>
                         </div>
                          {user.is_admin && (
-                            <button onClick={() => handleNavigate('/admin')} className="w-full text-left px-4 py-3 rounded-lg bg-brand-50 text-brand-700 font-medium flex items-center">
+                            <button onClick={() => handleNavigate('/admin/dashboard')} className="w-full text-left px-4 py-3 rounded-lg bg-brand-50 text-brand-700 font-medium flex items-center">
                                 <Settings className="h-4 w-4 mr-2" /> Pannello Admin
                             </button>
                         )}
