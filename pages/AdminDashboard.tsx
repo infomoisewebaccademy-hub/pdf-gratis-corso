@@ -524,7 +524,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
     
     setIsUploading(true);
     try {
-      const oldFilePath = new URL(pdfGuideConfig.guide_pdf_url).pathname.split('/pdf-guides/')[1];
+      console.log("Attempting to delete file at:", pdfGuideConfig.guide_pdf_url);
+      const url = new URL(pdfGuideConfig.guide_pdf_url);
+      const pathParts = url.pathname.split('/');
+      const oldFilePath = pathParts[pathParts.length - 1]; // Get the filename
+      
       if (oldFilePath) {
         await supabase.storage.from('pdf-guides').remove([decodeURIComponent(oldFilePath)]);
       }
@@ -544,7 +548,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
     try {
       // 1. Rimuovi il vecchio file se esiste
       if (pdfGuideConfig.guide_pdf_url) {
-        const oldFilePath = new URL(pdfGuideConfig.guide_pdf_url).pathname.split('/pdf-guides/')[1];
+        console.log("Attempting to remove old file at:", pdfGuideConfig.guide_pdf_url);
+        const url = new URL(pdfGuideConfig.guide_pdf_url);
+        const pathParts = url.pathname.split('/');
+        const oldFilePath = pathParts[pathParts.length - 1]; // Get the filename
+        
         if (oldFilePath) {
           await supabase.storage.from('pdf-guides').remove([decodeURIComponent(oldFilePath)]);
         }
@@ -694,6 +702,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                               <div className="flex items-center gap-2">
                                   <a href={pdfGuideConfig.guide_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-800 font-mono truncate hover:underline">{pdfGuideConfig.guide_pdf_url}</a>
                                   <button onClick={() => navigator.clipboard.writeText(pdfGuideConfig.guide_pdf_url || '')} className="text-purple-500 hover:text-purple-800"><Copy className="h-3 w-3"/></button>
+                                  <button onClick={handlePdfDelete} className="text-red-500 hover:text-red-800"><Trash2 className="h-3 w-3"/></button>
                               </div>
                           </div>
                       )}

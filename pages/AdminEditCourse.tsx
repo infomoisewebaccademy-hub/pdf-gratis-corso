@@ -239,7 +239,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     
     setIsUploadingFile(true);
     try {
-        const filePath = `${courseId}/${file.name}`;
+        // Sanitize filename: remove quotes and other potentially problematic characters
+        const sanitizedFileName = file.name.replace(/["']/g, '').replace(/\s+/g, '_');
+        const filePath = `${courseId}/${sanitizedFileName}`;
         const { error } = await supabase.storage.from('course-resources').upload(filePath, file, { upsert: true });
         if (error) throw error;
         
