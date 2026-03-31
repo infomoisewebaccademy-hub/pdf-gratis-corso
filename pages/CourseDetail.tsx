@@ -111,6 +111,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
   const [upsellCourse, setUpsellCourse] = useState<Course | null>(null);
+  const [isBuying, setIsBuying] = useState(false);
 
   // Special check for the PDF guide course
   const isPdfGuideCourse = course.id === 'course_pdf_guide_free';
@@ -189,6 +190,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
 
   const handleBuyNow = () => {
       if (course.status && course.status !== 'active') return;
+      setIsBuying(true);
       trackInitiateCheckout([course.id], finalPrice);
       onPurchase();
   };
@@ -479,9 +481,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                     <>
                                         <button 
                                             onClick={handleBuyNow}
-                                            className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/30 mb-2 flex items-center justify-center"
+                                            disabled={isBuying}
+                                            className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/30 mb-2 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
                                         >
-                                            <Zap className="mr-2 h-5 w-5 fill-current" /> Acquista Subito
+                                            {isBuying ? 'Caricamento...' : <><Zap className="mr-2 h-5 w-5 fill-current" /> Acquista Subito</>}
                                         </button>
 
                                         <button 
