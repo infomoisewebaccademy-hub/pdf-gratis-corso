@@ -233,24 +233,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl"
                             dangerouslySetInnerHTML={{ __html: course.description }}
                         />
-                        
-                        <div className="grid grid-cols-3 gap-4 pt-4">
-                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
-                                <Clock className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Durata</span>
-                                <span className="text-sm font-bold text-slate-900">{course.duration}</span>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
-                                <Book className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Lezioni</span>
-                                <span className="text-sm font-bold text-slate-900">{course.lessons_content?.length || course.lessons}</span>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:shadow-md">
-                                <Users className="h-6 w-6 text-brand-500 mb-2" />
-                                <span className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Accesso</span>
-                                <span className="text-sm font-bold text-slate-900">Illimitato</span>
-                            </div>
-                        </div>
                     </div>
                 )}
 
@@ -404,25 +386,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         </div>
                     </div>
                 )}
-
-                {!activeLesson && course.additional_benefits && course.additional_benefits.length > 0 && course.additional_benefits.some(b => b.trim() !== '') && (
-                    <div className="bg-gradient-to-br from-brand-50 to-white rounded-xl shadow-sm border border-brand-100 p-8">
-                        <h2 className="text-2xl font-bold mb-6 text-brand-900 flex items-center">
-                            <Sparkles className="h-6 w-6 mr-2 text-brand-500" />
-                            Cosa avrai in più
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {course.additional_benefits.filter(b => b.trim() !== '').map((benefit, i) => (
-                                <div key={i} className="flex items-start bg-white p-4 rounded-lg border border-brand-50 shadow-sm">
-                                    <div className="bg-brand-100 p-1.5 rounded-full mr-3 mt-0.5">
-                                        <Check className="h-4 w-4 text-brand-600" />
-                                    </div>
-                                    <span className="text-gray-700 font-medium">{benefit}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
             <div className="lg:col-span-1">
@@ -550,18 +513,35 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         
                         <div className="space-y-4 pt-6 mt-6 border-t border-gray-100">
                              <div className="flex justify-between text-sm">
-                                 <span className="text-gray-600">Lezioni</span>
-                                 <span className="font-bold text-gray-900">{course.lessons_content?.length || 0}</span>
+                                 <span className="text-gray-600 flex items-center"><Clock className="h-4 w-4 mr-2 text-brand-500" /> Durata</span>
+                                 <span className="font-bold text-gray-900">{course.duration}</span>
                              </div>
                              <div className="flex justify-between text-sm">
-                                 <span className="text-gray-600">Completate</span>
-                                 <span className="font-bold text-green-600">{completedLessons.length} / {course.lessons_content?.length || 0}</span>
+                                 <span className="text-gray-600 flex items-center"><Book className="h-4 w-4 mr-2 text-brand-500" /> Lezioni</span>
+                                 <span className="font-bold text-gray-900">{course.lessons_content?.length || course.lessons}</span>
                              </div>
                              <div className="flex justify-between text-sm">
-                                 <span className="text-gray-600">Accesso illimitato</span>
-                                 <span className="font-bold text-gray-900">Sì</span>
+                                 <span className="text-gray-600 flex items-center"><Users className="h-4 w-4 mr-2 text-brand-500" /> Accesso</span>
+                                 <span className="font-bold text-gray-900">Illimitato</span>
                              </div>
                         </div>
+
+                        {course.additional_benefits && course.additional_benefits.length > 0 && course.additional_benefits.some(b => b.trim() !== '') && (
+                            <div className="pt-6 mt-6 border-t border-gray-100">
+                                <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                                    <Sparkles className="h-4 w-4 mr-2 text-brand-500" />
+                                    Cosa avrai in più
+                                </h3>
+                                <ul className="space-y-2">
+                                    {course.additional_benefits.filter(b => b.trim() !== '').map((benefit, i) => (
+                                        <li key={i} className="flex items-start text-sm text-gray-700">
+                                            <Check className="h-4 w-4 text-brand-600 mr-2 mt-0.5 flex-shrink-0" />
+                                            {benefit}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
