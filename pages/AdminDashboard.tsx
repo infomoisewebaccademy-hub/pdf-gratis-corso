@@ -372,6 +372,7 @@ interface AdminDashboardProps {
   onRefresh: () => Promise<void>;
   currentSettings: PlatformSettings;
   onUpdateSettings: (newSettings: PlatformSettings) => Promise<void>;
+  initialTab?: 'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community';
 }
 
 const ColorInput: React.FC<{label: string, value: string, name: string, onChange: (name: string, value: string) => void}> = ({label, value, name, onChange}) => (
@@ -384,9 +385,13 @@ const ColorInput: React.FC<{label: string, value: string, name: string, onChange
     </div>
 );
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, onDelete, onRefresh, currentSettings, onUpdateSettings }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, onDelete, onRefresh, currentSettings, onUpdateSettings, initialTab = 'dashboard' }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community'>('dashboard');
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isClearingChat, setIsClearingChat] = useState(false);
