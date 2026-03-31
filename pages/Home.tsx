@@ -861,14 +861,16 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                         </div>
 
                                         {/* Features */}
-                                        <div className="space-y-3 mb-8">
-                                            {course.features.slice(0, 3).map((feat, idx) => (
-                                                <div key={idx} className="flex items-start gap-3">
-                                                    <CheckCircle className="h-5 w-5 text-brand-500 flex-shrink-0 mt-0.5" />
-                                                    <span className="text-sm text-slate-300 line-clamp-2">{feat}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        {course.show_features !== false && (
+                                            <div className="space-y-3 mb-8">
+                                                {course.features.slice(0, 3).map((feat, idx) => (
+                                                    <div key={idx} className="flex items-start gap-3">
+                                                        <CheckCircle className="h-5 w-5 text-brand-500 flex-shrink-0 mt-0.5" />
+                                                        <span className="text-sm text-slate-300 line-clamp-2">{feat}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
 
                                         {/* Price & Actions */}
                                         <div className="mt-auto pt-6 border-t border-slate-800">

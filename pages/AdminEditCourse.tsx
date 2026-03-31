@@ -36,6 +36,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     rating: 5,
     show_discount_badge: true,
     upsell_course_id: '',
+    show_features: true,
   });
 
   const [imgError, setImgError] = useState(false);
@@ -176,6 +177,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             rating: courseToEdit.rating || 5,
             show_discount_badge: courseToEdit.show_discount_badge !== undefined ? courseToEdit.show_discount_badge : true,
             upsell_course_id: courseToEdit.upsell_course_id || '',
+            show_features: courseToEdit.show_features !== false,
         });
       }
     } else {
@@ -184,7 +186,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
             lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
-            rating: 5, show_discount_badge: true, upsell_course_id: '',
+            rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
         });
     }
   }, [id, courses, isNew]);
@@ -213,6 +215,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       rating: formData.rating || 5,
       show_discount_badge: formData.show_discount_badge !== undefined ? formData.show_discount_badge : true,
       upsell_course_id: formData.upsell_course_id || null,
+      show_features: formData.show_features !== false,
     } as Course;
     onSave(courseToSave);
     navigate('/admin');
@@ -535,16 +538,33 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                     </div>
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><CheckCircle2 className="h-5 w-5 mr-2 text-brand-600" /> Cosa Imparerai</h2>
-                    <div className="space-y-3">
-                        {formData.features?.map((feat, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                                <input type="text" value={feat} onChange={e => updateFeature(idx, e.target.value)} className="flex-1 block w-full border border-gray-300 rounded-lg p-3" placeholder="Es. Creare un sito web da zero..." />
-                                <button type="button" onClick={() => removeFeature(idx)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full"><Trash className="h-4 w-4" /></button>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-bold text-gray-900 flex items-center"><CheckCircle2 className="h-5 w-5 mr-2 text-brand-600" /> Cosa Imparerai</h2>
+                        <label className="flex items-center cursor-pointer">
+                            <div className="relative">
+                                <input 
+                                    type="checkbox" 
+                                    className="sr-only" 
+                                    checked={formData.show_features !== false}
+                                    onChange={(e) => setFormData({...formData, show_features: e.target.checked})}
+                                />
+                                <div className={`block w-10 h-6 rounded-full transition-colors ${formData.show_features !== false ? 'bg-brand-500' : 'bg-gray-300'}`}></div>
+                                <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${formData.show_features !== false ? 'transform translate-x-4' : ''}`}></div>
                             </div>
-                        ))}
-                        <button type="button" onClick={addFeature} className="text-sm bg-brand-50 text-brand-700 px-4 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center"><Plus className="h-4 w-4 mr-2" /> Aggiungi Punto</button>
+                            <span className="ml-2 text-sm text-gray-600 font-medium">Mostra Sezione</span>
+                        </label>
                     </div>
+                    {formData.show_features !== false && (
+                        <div className="space-y-3">
+                            {formData.features?.map((feat, idx) => (
+                                <div key={idx} className="flex items-center gap-2">
+                                    <input type="text" value={feat} onChange={e => updateFeature(idx, e.target.value)} className="flex-1 block w-full border border-gray-300 rounded-lg p-3" placeholder="Es. Creare un sito web da zero..." />
+                                    <button type="button" onClick={() => removeFeature(idx)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full"><Trash className="h-4 w-4" /></button>
+                                </div>
+                            ))}
+                            <button type="button" onClick={addFeature} className="text-sm bg-brand-50 text-brand-700 px-4 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center"><Plus className="h-4 w-4 mr-2" /> Aggiungi Punto</button>
+                        </div>
+                    )}
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><ImageIcon className="h-5 w-5 mr-2 text-brand-600" /> Copertina</h2>

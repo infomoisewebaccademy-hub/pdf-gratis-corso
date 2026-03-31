@@ -202,7 +202,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
       <div className="w-full px-4 sm:px-6 lg:px-8">
         
         <button 
-            onClick={() => activeLesson ? setActiveLesson(null) : onBack()} 
+            onClick={() => {
+                if (activeLesson) {
+                    setActiveLesson(null);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    onBack();
+                }
+            }} 
             className="mb-8 text-gray-500 hover:text-gray-900 font-medium flex items-center"
         >
             ← {activeLesson ? 'Torna al Percorso' : 'Torna ai Percorsi'}
@@ -385,7 +392,12 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                 return (
                                     <div 
                                         key={idx} 
-                                        onClick={() => isPurchased ? setActiveLesson(lesson) : null}
+                                        onClick={() => {
+                                            if (isPurchased) {
+                                                setActiveLesson(lesson);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }
+                                        }}
                                         className={`border rounded-lg p-4 transition-all cursor-pointer ${
                                             activeLesson?.id === lesson.id 
                                             ? 'bg-brand-50 border-brand-200 ring-1 ring-brand-200' 
@@ -423,7 +435,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     </div>
                 </div>
 
-                {!activeLesson && (
+                {!activeLesson && course.show_features !== false && (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
                         <h2 className="text-2xl font-bold mb-6">Cosa Imparerai</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

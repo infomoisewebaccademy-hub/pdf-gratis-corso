@@ -38,13 +38,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ user, unreadChatCoun
     };
 
     return (
-        <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative overflow-hidden">
-            {/* Background Glows */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/10 rounded-full blur-[120px]" />
-            </div>
-
+        <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative">
             <Sidebar activeItem={location.pathname.substring(1) || 'settings'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
             
             <main className="flex-1 bg-gray-50/50 pb-20 relative z-10">

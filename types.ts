@@ -29,6 +29,7 @@ export interface Course {
   rating?: number; // NUOVO: Valutazione in stelle (es. 4.5)
   show_discount_badge?: boolean; // NUOVO: Se mostrare la percentuale di sconto
   upsell_course_id?: string; // NUOVO: ID del corso da upsellare
+  show_features?: boolean; // NUOVO: Se mostrare la sezione "Cosa Imparerai"
 }
 
 export interface UserProfile {

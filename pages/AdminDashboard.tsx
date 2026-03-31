@@ -8,6 +8,8 @@ import { supabase } from '../services/supabase';
 import { GoogleGenAI } from "@google/genai";
 import { Sidebar, SidebarItem } from '../components/Sidebar';
 import { ImagePicker } from '../components/ImagePicker';
+import { AdminAnalyticsDashboard } from '../components/AdminAnalyticsDashboard';
+import { AdminUsersList } from '../components/AdminUsersList';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
@@ -198,13 +200,6 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
     how_it_works_video_id: 'v1765456382/come-funziona-MWA_mpdave',
     target_section_video_id: 'v1765392297/uomo-affari-consegna-carta_f3tj6t',
     about_video_url: 'https://res.cloudinary.com/dhj0ztos6/video/upload/v1765452611/Home_page_rnk0zw.webm'
-  },
-  ai_showcase_section: {
-    title: 'Esempi Reali di Progetti AI',
-    subtitle: 'Guarda cosa puoi costruire con le competenze di MWA',
-    text: 'Questi sono solo alcuni esempi di piattaforme e siti web creati interamente con l\'intelligenza artificiale e gli strumenti che imparerai a usare nei nostri percorsi.',
-    is_visible: true,
-    urls: []
   }
 };
 
@@ -391,7 +386,7 @@ const ColorInput: React.FC<{label: string, value: string, name: string, onChange
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, onDelete, onRefresh, currentSettings, onUpdateSettings }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community'>('courses');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community'>('dashboard');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isClearingChat, setIsClearingChat] = useState(false);
@@ -866,12 +861,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   );
 
   const adminMenuItems: SidebarItem[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
+    { id: 'users', label: 'Utenti', icon: Users },
     { id: 'courses', label: 'Corsi', icon: Book },
     { id: 'launch', label: 'Pre-Lancio', icon: Rocket },
     { id: 'pdf_guide', label: 'Guida PDF', icon: Download },
     { id: 'landing_manual', label: 'Editor Home', icon: LayoutTemplate },
     { id: 'community', label: 'Community', icon: Users },
-    { id: 'general', label: 'Impostazioni', icon: Settings },
+    { id: 'general', label: 'Gestione Piattaforma', icon: Settings },
   ];
 
   return (
@@ -887,20 +884,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
               <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Gestione Piattaforma</h1>
-                  <p className="text-gray-500 mt-1">Controlla ogni aspetto della tua Academy.</p>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                      {adminMenuItems.find(item => item.id === activeTab)?.label || 'Admin'}
+                  </h1>
+                  <p className="text-gray-500 mt-1">
+                      {activeTab === 'dashboard' && 'Panoramica delle performance della tua Academy.'}
+                      {activeTab === 'users' && 'Gestisci gli iscritti e i loro progressi.'}
+                      {activeTab === 'courses' && 'Crea e modifica i tuoi percorsi formativi.'}
+                      {activeTab === 'launch' && 'Configura la pagina di pre-lancio.'}
+                      {activeTab === 'pdf_guide' && 'Gestisci il funnel della guida PDF.'}
+                      {activeTab === 'landing_manual' && 'Personalizza la pagina di vendita.'}
+                      {activeTab === 'community' && 'Modera le discussioni della community.'}
+                      {activeTab === 'general' && 'Controlla ogni aspetto della tua Academy.'}
+                  </p>
               </div>
               <div className="flex gap-3">
-                  <button onClick={() => setShowHelp(!showHelp)} className="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all flex items-center">
-                      <Terminal className="h-5 w-5 mr-2" /> SQL Help
-                  </button>
-                  <button onClick={() => navigate('/admin/course/new')} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all flex items-center">
-                      <Plus className="h-5 w-5 mr-2" /> Nuovo Percorso
-                  </button>
+                  {activeTab === 'general' && (
+                      <button onClick={() => setShowHelp(!showHelp)} className="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all flex items-center">
+                          <Terminal className="h-5 w-5 mr-2" /> SQL Help
+                      </button>
+                  )}
+                  {activeTab === 'courses' && (
+                      <button onClick={() => navigate('/admin/course/new')} className="bg-brand-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 transition-all flex items-center">
+                          <Plus className="h-5 w-5 mr-2" /> Nuovo Percorso
+                      </button>
+                  )}
               </div>
           </div>
 
-          {showHelp && (
+          {showHelp && activeTab === 'general' && (
               <div className="bg-slate-900 text-slate-200 p-6 rounded-xl mb-8 shadow-xl border border-slate-700 font-mono text-sm relative">
                   <button onClick={() => setShowHelp(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X className="h-5 w-5"/></button>
                   <h3 className="text-white font-bold text-lg mb-4 flex items-center"><Terminal className="mr-2 h-5 w-5"/> Comandi Database Utili</h3>
@@ -911,7 +923,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.platform_settings ADD COLUMN IF NOT EXISTS favicon_url text;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS rating numeric DEFAULT 5.0;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_discount_badge boolean DEFAULT true;</code>
-                          <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_features boolean DEFAULT true;</code>
+                          <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS upsell_course_id text;</code>
                       </div>
               </div>
           )}
@@ -919,6 +933,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
           {/* CONTENT */}
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             
+            {activeTab === 'dashboard' && (
+                <AdminAnalyticsDashboard courses={courses} />
+            )}
+
+            {activeTab === 'users' && (
+                <AdminUsersList courses={courses} />
+            )}
+
             {activeTab === 'courses' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {courses.map(course => (
@@ -1369,11 +1391,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
             )}
         </div>
 
-        <div className="fixed bottom-6 right-6 z-50 flex gap-4">
-             <button onClick={handleSaveSettings} disabled={isSavingSettings} className="px-10 py-5 bg-brand-600 text-white rounded-full font-black hover:bg-brand-700 shadow-2xl shadow-brand-500/50 flex items-center text-xl transform hover:scale-110 transition-all disabled:opacity-70">
-                {isSavingSettings ? <Loader className="h-6 w-6 animate-spin mr-3"/> : <Settings className="mr-3 h-6 w-6" />} Salva Tutto
-            </button>
-        </div>
+        {['launch', 'pdf_guide', 'landing_manual', 'general'].includes(activeTab) && (
+            <div className="fixed bottom-6 right-6 z-50 flex gap-4">
+                 <button onClick={handleSaveSettings} disabled={isSavingSettings} className="px-10 py-5 bg-brand-600 text-white rounded-full font-black hover:bg-brand-700 shadow-2xl shadow-brand-500/50 flex items-center text-xl transform hover:scale-110 transition-all disabled:opacity-70">
+                    {isSavingSettings ? <Loader className="h-6 w-6 animate-spin mr-3"/> : <Settings className="mr-3 h-6 w-6" />} Salva Tutto
+                </button>
+            </div>
+        )}
 
         </div>
       </main>

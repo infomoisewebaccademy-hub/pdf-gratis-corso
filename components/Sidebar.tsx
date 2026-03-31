@@ -40,8 +40,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
   };
 
   return (
-    <aside className="flex lg:flex-col w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 border-gray-200 lg:h-[calc(100vh-80px)] lg:sticky lg:top-20 overflow-x-auto lg:overflow-y-auto z-10 scrollbar-hide">
-      <div className="p-4 lg:p-6 flex lg:flex-col gap-2 lg:space-y-2 min-w-max lg:min-w-0">
+    <aside className="flex lg:flex-col w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 border-gray-200 lg:h-[calc(100vh-80px)] sticky top-20 self-start overflow-x-auto lg:overflow-y-auto z-30 scrollbar-hide">
+      <div className="p-4 lg:px-6 lg:pt-4 lg:pb-6 flex lg:flex-col gap-2 lg:space-y-2 min-w-max lg:min-w-0">
         <nav className="flex lg:flex-col gap-2 lg:space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -52,9 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap border border-transparent ${
                   isActive 
-                    ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200' 
+                    ? 'text-brand-700 shadow-sm border-brand-200 bg-white' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >

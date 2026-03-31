@@ -24,6 +24,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
     lessons: 0,
     duration: '',
     upsell_course_id: '',
+    show_features: true,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -35,6 +36,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
       setFormData({
         ...initialData,
         upsell_course_id: initialData.upsell_course_id || '',
+        show_features: initialData.show_features !== false,
       });
     } else {
       // Reset for new course
@@ -48,6 +50,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
         lessons: 0,
         duration: '',
         upsell_course_id: '',
+        show_features: true,
       });
     }
   }, [initialData, isOpen]);
@@ -305,24 +308,44 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, isOpen, onC
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Cosa Imparerai (Features)</label>
-                {formData.features?.map((feat, idx) => (
-                  <div key={idx} className="flex gap-2 mb-2">
-                    <input 
-                      type="text" 
-                      value={feat}
-                      onChange={e => updateFeature(idx, e.target.value)}
-                      className="flex-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
-                      placeholder={`Punto ${idx + 1}`}
-                    />
-                    <button type="button" onClick={() => removeFeature(idx)} className="text-red-500 hover:text-red-700 p-2">
-                      <Trash className="h-4 w-4" />
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Cosa Imparerai (Features)</label>
+                  <label className="flex items-center cursor-pointer">
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only" 
+                        checked={formData.show_features !== false}
+                        onChange={(e) => setFormData({...formData, show_features: e.target.checked})}
+                      />
+                      <div className={`block w-10 h-6 rounded-full transition-colors ${formData.show_features !== false ? 'bg-brand-500' : 'bg-gray-300'}`}></div>
+                      <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${formData.show_features !== false ? 'transform translate-x-4' : ''}`}></div>
+                    </div>
+                    <span className="ml-2 text-sm text-gray-600">Mostra Sezione</span>
+                  </label>
+                </div>
+                
+                {formData.show_features !== false && (
+                  <>
+                    {formData.features?.map((feat, idx) => (
+                      <div key={idx} className="flex gap-2 mb-2">
+                        <input 
+                          type="text" 
+                          value={feat}
+                          onChange={e => updateFeature(idx, e.target.value)}
+                          className="flex-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm"
+                          placeholder={`Punto ${idx + 1}`}
+                        />
+                        <button type="button" onClick={() => removeFeature(idx)} className="text-red-500 hover:text-red-700 p-2">
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" onClick={addFeature} className="text-sm text-brand-600 font-medium flex items-center mt-2 hover:text-brand-800">
+                      <Plus className="h-4 w-4 mr-1" /> Aggiungi punto
                     </button>
-                  </div>
-                ))}
-                <button type="button" onClick={addFeature} className="text-sm text-brand-600 font-medium flex items-center mt-2 hover:text-brand-800">
-                  <Plus className="h-4 w-4 mr-1" /> Aggiungi punto
-                </button>
+                  </>
+                )}
               </div>
               
               <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">

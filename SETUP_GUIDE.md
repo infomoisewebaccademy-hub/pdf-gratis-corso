@@ -76,6 +76,10 @@ Vai su Supabase Dashboard > SQL Editor ed esegui questi script in ordine.
 ### Script 1: Struttura Tabelle
 Esegui questo script per creare o aggiornare le tabelle del database.
 ```sql
+-- Tabella profiles (aggiunta colonna created_at se mancante)
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS created_at timestamp with time zone default timezone('utc'::text, now()) not null;
+
 -- Tabella platform_settings
 alter table public.platform_settings
   add column if not exists active_mode text default 'public' not null,
@@ -149,7 +153,9 @@ $$;
 -- === PROFILES, COURSES, ETC. (SCHEMA PUBLIC) ===
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Gli utenti possono vedere/aggiornare il proprio profilo" ON public.profiles;
+DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 CREATE POLICY "Gli utenti possono vedere/aggiornare il proprio profilo" ON public.profiles FOR ALL USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (is_admin());
 
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public can view courses" ON public.courses;
@@ -159,11 +165,15 @@ CREATE POLICY "Admins can manage courses" ON public.courses FOR ALL USING (is_ad
 
 ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view own purchases" ON public.purchases;
+DROP POLICY IF EXISTS "Admins can view all purchases" ON public.purchases;
 CREATE POLICY "Users can view own purchases" ON public.purchases FOR SELECT USING ( auth.uid() = user_id );
+CREATE POLICY "Admins can view all purchases" ON public.purchases FOR SELECT USING (is_admin());
 
 ALTER TABLE public.lesson_progress ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Gli utenti possono gestire il proprio progresso" ON public.lesson_progress;
+DROP POLICY IF EXISTS "Admins can view all lesson progress" ON public.lesson_progress;
 CREATE POLICY "Gli utenti possono gestire il proprio progresso" ON public.lesson_progress FOR ALL USING ( auth.uid() = user_id );
+CREATE POLICY "Admins can view all lesson progress" ON public.lesson_progress FOR SELECT USING (is_admin());
 
 ALTER TABLE public.community_messages ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Tutti gli autenticati possono leggere i messaggi" ON public.community_messages;

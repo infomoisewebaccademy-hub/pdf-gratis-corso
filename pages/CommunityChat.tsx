@@ -116,13 +116,7 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-600/10 rounded-full blur-[120px]" />
-      </div>
-
+    <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative">
       <Sidebar activeItem="community" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
 
       <main className="flex-1 flex flex-col bg-gray-50/50 h-[calc(100vh-80px)] relative z-10">
