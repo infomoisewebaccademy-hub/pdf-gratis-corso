@@ -189,7 +189,19 @@ export const CoursesPage: React.FC<CoursesPageProps> = ({ courses, onCourseSelec
 
         {/* Griglia Percorsi */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {courses.filter(c => !c.is_hidden).map((course) => (
+            {courses
+                .filter(c => !c.is_hidden)
+                .sort((a, b) => {
+                    // 1. Inactive courses last
+                    const aIsActive = a.status === 'active' || !a.status;
+                    const bIsActive = b.status === 'active' || !b.status;
+                    if (aIsActive && !bIsActive) return -1;
+                    if (!aIsActive && bIsActive) return 1;
+                    
+                    // 2. Sort by price (low to high)
+                    return a.price - b.price;
+                })
+                .map((course) => (
                 <CourseCard 
                     key={course.id} 
                     course={course} 

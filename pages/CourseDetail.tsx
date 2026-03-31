@@ -404,6 +404,25 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         </div>
                     </div>
                 )}
+
+                {!activeLesson && course.additional_benefits && course.additional_benefits.length > 0 && course.additional_benefits.some(b => b.trim() !== '') && (
+                    <div className="bg-gradient-to-br from-brand-50 to-white rounded-xl shadow-sm border border-brand-100 p-8">
+                        <h2 className="text-2xl font-bold mb-6 text-brand-900 flex items-center">
+                            <Sparkles className="h-6 w-6 mr-2 text-brand-500" />
+                            Cosa avrai in più
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {course.additional_benefits.filter(b => b.trim() !== '').map((benefit, i) => (
+                                <div key={i} className="flex items-start bg-white p-4 rounded-lg border border-brand-50 shadow-sm">
+                                    <div className="bg-brand-100 p-1.5 rounded-full mr-3 mt-0.5">
+                                        <Check className="h-4 w-4 text-brand-600" />
+                                    </div>
+                                    <span className="text-gray-700 font-medium">{benefit}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="lg:col-span-1">
@@ -474,7 +493,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                         download={course.resource_file_name || 'materiale_corso'}
                                         className="w-full bg-blue-50 text-blue-700 py-3 px-4 rounded-xl font-bold hover:bg-blue-100 transition-all flex items-center justify-center gap-2 border border-blue-200"
                                     >
-                                        <FileText className="h-5 w-5"/> {course.resource_file_name ? `Scarica ${course.resource_file_name}` : 'Scarica Materiale'}
+                                        <FileText className="h-5 w-5"/> {isPdfGuideCourse ? 'Scarica Guida PDF' : (course.resource_file_name ? `Scarica ${course.resource_file_name}` : 'Scarica Materiale')}
                                     </a>
                                 )}
                             </div>

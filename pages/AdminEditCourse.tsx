@@ -37,6 +37,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     show_discount_badge: true,
     upsell_course_id: '',
     show_features: true,
+    additional_benefits: [''],
   });
 
   const [imgError, setImgError] = useState(false);
@@ -178,6 +179,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             show_discount_badge: courseToEdit.show_discount_badge !== undefined ? courseToEdit.show_discount_badge : true,
             upsell_course_id: courseToEdit.upsell_course_id || '',
             show_features: courseToEdit.show_features !== false,
+            additional_benefits: courseToEdit.additional_benefits || [''],
         });
       }
     } else {
@@ -187,6 +189,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             level: 'Principiante', features: [''], lessons: 0, duration: '',
             lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
             rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
+            additional_benefits: [''],
         });
     }
   }, [id, courses, isNew]);
@@ -216,6 +219,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       show_discount_badge: formData.show_discount_badge !== undefined ? formData.show_discount_badge : true,
       upsell_course_id: formData.upsell_course_id || null,
       show_features: formData.show_features !== false,
+      additional_benefits: formData.additional_benefits?.filter(b => b.trim() !== '') || [],
     } as Course;
     onSave(courseToSave);
     navigate('/admin');
@@ -274,6 +278,17 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     const newFeatures = [...(formData.features || [])]; newFeatures.splice(index, 1);
     setFormData({ ...formData, features: newFeatures });
   };
+
+  const updateBenefit = (index: number, value: string) => {
+    const newBenefits = [...(formData.additional_benefits || [])]; newBenefits[index] = value;
+    setFormData({ ...formData, additional_benefits: newBenefits });
+  };
+  const addBenefit = () => setFormData({ ...formData, additional_benefits: [...(formData.additional_benefits || []), ''] });
+  const removeBenefit = (index: number) => {
+    const newBenefits = [...(formData.additional_benefits || [])]; newBenefits.splice(index, 1);
+    setFormData({ ...formData, additional_benefits: newBenefits });
+  };
+
   const addLesson = () => {
     if (!newLesson.title) return;
     const lesson: Lesson = { id: `lesson_${Date.now()}`, title: newLesson.title || 'Nuova Lezione', description: newLesson.description || '', videoUrl: newLesson.videoUrl || '', video_storage_path: newLesson.video_storage_path, duration: '10:00' };
@@ -566,6 +581,22 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                         </div>
                     )}
                 </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-bold text-gray-900 flex items-center"><Sparkles className="h-5 w-5 mr-2 text-brand-600" /> Cosa avrai in più</h2>
+                    </div>
+                    <div className="space-y-3">
+                        {formData.additional_benefits?.map((benefit, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                                <input type="text" value={benefit} onChange={e => updateBenefit(idx, e.target.value)} className="flex-1 block w-full border border-gray-300 rounded-lg p-3" placeholder="Es. Assistenza premium in piattaforma..." />
+                                <button type="button" onClick={() => removeBenefit(idx)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full"><Trash className="h-4 w-4" /></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={addBenefit} className="text-sm bg-brand-50 text-brand-700 px-4 py-2 rounded-lg font-bold hover:bg-brand-100 flex items-center"><Plus className="h-4 w-4 mr-2" /> Aggiungi Benefit</button>
+                    </div>
+                </div>
+
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><ImageIcon className="h-5 w-5 mr-2 text-brand-600" /> Copertina</h2>
                     <div className="space-y-3">

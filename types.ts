@@ -30,6 +30,7 @@ export interface Course {
   show_discount_badge?: boolean; // NUOVO: Se mostrare la percentuale di sconto
   upsell_course_id?: string; // NUOVO: ID del corso da upsellare
   show_features?: boolean; // NUOVO: Se mostrare la sezione "Cosa Imparerai"
+  additional_benefits?: string[]; // NUOVO: Punti "Cosa avrai in più"
 }
 
 export interface UserProfile {

@@ -249,7 +249,7 @@ export const PdfGuideLanding: React.FC = () => {
                     </p>
                     <div className="mt-10 md:mt-12">
                         <a href="#form-section" className="inline-flex items-center justify-center px-8 md:px-10 py-4 md:py-5 text-base md:text-lg font-bold text-white rounded-2xl transition-all shadow-[0_0_50px_-10px_rgba(99,102,241,0.6)] group transform hover:-translate-y-1" style={{ backgroundColor: config.gradient_start }}>
-                            Scarica la Guida Gratuita <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
+                            Scarica Guida PDF <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
                         </a>
                     </div>
                 </div>
