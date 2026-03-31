@@ -180,6 +180,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             upsell_course_id: courseToEdit.upsell_course_id || '',
             show_features: courseToEdit.show_features !== false,
             additional_benefits: courseToEdit.additional_benefits || [''],
+            program_title: courseToEdit.program_title || '',
         });
       }
     } else {
@@ -190,6 +191,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
             rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
             additional_benefits: [''],
+            program_title: '',
         });
     }
   }, [id, courses, isNew]);
@@ -220,6 +222,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       upsell_course_id: formData.upsell_course_id || null,
       show_features: formData.show_features !== false,
       additional_benefits: formData.additional_benefits?.filter(b => b.trim() !== '') || [],
+      program_title: formData.program_title || null,
     } as Course;
     onSave(courseToSave);
     navigate('/admin');
@@ -336,6 +339,11 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Titolo del Corso</label>
                             <input type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 text-lg" placeholder="Es. Master in React..." />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Titolo Sezione Lezioni (Opzionale)</label>
+                            <input type="text" value={formData.program_title || ''} onChange={e => setFormData({...formData, program_title: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 text-lg" placeholder="Es. Programma del Percorso..." />
+                            <p className="text-xs text-gray-500 mt-1">Lascia vuoto per usare il titolo di default: "Programma del Percorso".</p>
                         </div>
                         <div>
                             <div className="flex justify-between items-center mb-1">

@@ -31,6 +31,7 @@ export interface Course {
   upsell_course_id?: string; // NUOVO: ID del corso da upsellare
   show_features?: boolean; // NUOVO: Se mostrare la sezione "Cosa Imparerai"
   additional_benefits?: string[]; // NUOVO: Punti "Cosa avrai in più"
+  program_title?: string; // NUOVO: Titolo personalizzato per la sezione lezioni
 }
 
 export interface UserProfile {

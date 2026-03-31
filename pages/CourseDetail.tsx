@@ -320,7 +320,20 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 )}
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                    <h2 className="text-2xl font-bold mb-6">Programma del Percorso</h2>
+                    <h2 className="text-2xl font-bold mb-6">{course.program_title || "Programma del Percorso"}</h2>
+                    
+                    {isPdfGuideCourse && (
+                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 flex items-start gap-3">
+                            <div className="bg-amber-100 p-2 rounded-full mt-0.5">
+                                <PlayCircle className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-amber-900">Hai a disposizione anche i video!</h4>
+                                <p className="text-sm text-amber-800">Oltre alla guida PDF, puoi seguire le lezioni video qui sotto per approfondire ogni concetto.</p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         {(!course.lessons_content || course.lessons_content.length === 0) ? (
                             <div className="text-center text-gray-400 py-4">{isPdfGuideCourse ? "Usa il pulsante in alto per scaricare la guida PDF." : "Lezioni in arrivo..."}</div>
