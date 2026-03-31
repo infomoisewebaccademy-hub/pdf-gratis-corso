@@ -518,6 +518,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
     finally { setIsSavingSettings(false); }
   };
 
+  const handlePdfDelete = async () => {
+    if (!pdfGuideConfig.guide_pdf_url) return;
+    if (!confirm("Sei sicuro di voler eliminare il PDF?")) return;
+    
+    setIsUploading(true);
+    try {
+      const oldFilePath = new URL(pdfGuideConfig.guide_pdf_url).pathname.split('/pdf-guides/')[1];
+      if (oldFilePath) {
+        await supabase.storage.from('pdf-guides').remove([decodeURIComponent(oldFilePath)]);
+      }
+      setPdfGuideConfig(prev => ({ ...prev, guide_pdf_url: undefined }));
+      alert("PDF eliminato con successo! Ricorda di salvare le impostazioni.");
+    } catch (err: any) {
+      console.error("Errore eliminazione PDF:", err);
+      alert("Errore eliminazione PDF: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handlePdfUpload = async () => {
     if (!pdfFile) { alert("Seleziona prima un file PDF."); return; }
     setIsUploading(true);
