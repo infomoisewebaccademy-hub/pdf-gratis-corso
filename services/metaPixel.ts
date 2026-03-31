@@ -8,45 +8,33 @@ declare global {
   }
 }
 
+const injectMetaPixelScript = () => {
+    if (window.fbq) return;
+    /* eslint-disable */
+    (function(f:any, b:any, e:any, v:any, n?:any, t?:any, s?:any){
+      if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    /* eslint-enable */
+};
+
 export const initMetaPixel = (pixelId: string) => {
   if (!pixelId) {
       console.warn("⚠️ Meta Pixel ID non fornito.");
       return;
   }
   
-  // Guardrail aggiuntivo: Se abbiamo già inizializzato internamente, stop.
-  if (window._mwaPixelInitialized) {
-      return;
-  }
-
-  // Evita reinizializzazione se fbq esiste già (es. navigazione SPA)
-  if (window.fbq && window.fbq.callMethod) {
-      console.log("ℹ️ Meta Pixel già inizializzato.");
-      // Non settiamo _mwaPixelInitialized a true qui per permettere logiche di re-init se necessario, 
-      // ma il return evita doppio PageView
-      return;
-  }
+  injectMetaPixelScript();
 
   console.log(`🚀 Avvio Meta Pixel con ID: ${pixelId}`);
 
-  /* eslint-disable */
-  (function(f:any, b:any, e:any, v:any, n?:any, t?:any, s?:any){
-    if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)
-  })(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  /* eslint-enable */
-
   window.fbq('init', pixelId);
-  
-  // Flag per evitare doppi PageView al mount
-  window._mwaPixelInitialized = true;
-  
   window.fbq('track', 'PageView');
-  console.log("✅ Evento 'PageView' inviato (Init).");
+  console.log(`✅ Evento 'PageView' inviato per Pixel ${pixelId}.`);
 };
 
 export const trackPageView = () => {
@@ -56,14 +44,22 @@ export const trackPageView = () => {
   }
 };
 
-export const trackEvent = (eventName: string, data: object = {}) => {
+export const trackEvent = (eventName: string, data: object = {}, pixelId?: string) => {
   if (typeof window.fbq === 'function') {
     console.log(`📡 Meta Pixel Event: ${eventName}`, data);
-    window.fbq('track', eventName, data);
+    if (pixelId) {
+        window.fbq('trackSingle', pixelId, eventName, data);
+    } else {
+        window.fbq('track', eventName, data);
+    }
   } else {
       // Retry queueing if pixel script is not fully loaded yet
       if (window._fbq) {
-          window._fbq.push(['track', eventName, data]);
+          if (pixelId) {
+              window._fbq.push(['trackSingle', pixelId, eventName, data]);
+          } else {
+              window._fbq.push(['track', eventName, data]);
+          }
           console.log(`📡 Meta Pixel Event (Queued): ${eventName}`, data);
       } else {
           console.warn(`⚠️ Impossibile tracciare ${eventName}: Pixel non inizializzato.`);
@@ -73,13 +69,13 @@ export const trackEvent = (eventName: string, data: object = {}) => {
 
 // Eventi Standard
 
-export const trackAddToCart = (contentIds: string[], value: number, currency = 'EUR') => {
+export const trackAddToCart = (contentIds: string[], value: number, currency = 'EUR', pixelId?: string) => {
   trackEvent('AddToCart', {
     content_ids: contentIds,
     content_type: 'product',
     value: value,
     currency: currency
-  });
+  }, pixelId);
 };
 
 export const trackInitiateCheckout = (contentIds: string[], value: number, currency = 'EUR') => {

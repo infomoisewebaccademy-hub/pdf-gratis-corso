@@ -97,6 +97,16 @@ export interface PreLaunchConfig {
   container_bg_color: string;
   container_border_color: string;
   input_bg_color: string;
+  pixels?: {
+    meta_pixel_id?: string;
+    add_to_cart_pixel_id?: string;
+    purchase_pixel_id?: string;
+    view_content_pixel_id?: string;
+    pdf_thank_you_pixel_id?: string;
+    purchase_new_user_pixel_id?: string;
+    purchase_returning_user_pixel_id?: string;
+    general_thank_you_pixel_id?: string;
+  };
 }
 
 // NUOVA: Interfaccia per la pagina Guida PDF
@@ -283,25 +293,30 @@ export interface LandingPageConfig {
 export interface PlatformSettings {
   id: number;
   logo_url?: string;
-  favicon_url?: string; // NUOVO: URL della favicon
+  favicon_url?: string;
   logo_height: number;
   logo_offset_x?: number;
   logo_offset_y?: number;
+  
+  // Pixel Settings
   meta_pixel_id?: string;
-  pdf_thank_you_pixel_id?: string; // NUOVO: Pixel per la thank you page del PDF
-  purchase_new_user_pixel_id?: string; // NUOVO: Pixel per nuovo utente post-acquisto
-  purchase_returning_user_pixel_id?: string; // NUOVO: Pixel per utente esistente post-acquisto
-  general_thank_you_pixel_id?: string; // Deprecato, mantenuto per compatibilità
-  pdf_guide_form_image?: string; // NUOVO: Immagine per il modulo della guida PDF
+  add_to_cart_pixel_id?: string;
+  purchase_pixel_id?: string;
+  view_content_pixel_id?: string;
+  pdf_thank_you_pixel_id?: string;
+  purchase_new_user_pixel_id?: string;
+  purchase_returning_user_pixel_id?: string;
+  general_thank_you_pixel_id?: string;
+
+  pdf_guide_form_image?: string;
   font_family?: string;
   
-  // Campo 'is_pre_launch' deprecato e sostituito da 'active_mode'
   active_mode?: 'public' | 'pre_launch' | 'pdf_guide';
   
   pre_launch_date?: string;
   pre_launch_config?: PreLaunchConfig;
   landing_page_config?: LandingPageConfig;
-  pdf_guide_config?: PdfGuideConfig; // Aggiunta configurazione per la guida PDF
+  pdf_guide_config?: PdfGuideConfig;
 }
 
 export enum AuthState {

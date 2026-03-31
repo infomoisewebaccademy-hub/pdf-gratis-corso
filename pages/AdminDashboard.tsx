@@ -1101,6 +1101,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Add to Cart)</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.add_to_cart_pixel_id || ''} 
+                                    onChange={(e) => setLocalSettings({...localSettings, add_to_cart_pixel_id: e.target.value})} 
+                                    className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
+                                    placeholder="Es: 1825625164777432"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Pixel specifico per l'evento "Add to Cart".
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                                 <label className="block text-sm font-bold mb-2 text-gray-700">Meta Pixel ID (Thank You PDF)</label>
                                 <input 
                                     type="text" 

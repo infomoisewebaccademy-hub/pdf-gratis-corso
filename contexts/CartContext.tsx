@@ -5,7 +5,7 @@ import { trackAddToCart } from '../services/metaPixel';
 
 interface CartContextType {
   items: Course[];
-  addToCart: (course: Course) => void;
+  addToCart: (course: Course, pixelId?: string) => void;
   removeFromCart: (courseId: string) => void;
   clearCart: () => void;
   isInCart: (courseId: string) => boolean;
@@ -34,12 +34,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('mwa_cart', JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (course: Course) => {
+  const addToCart = (course: Course, pixelId?: string) => {
     setItems((prev) => {
       if (prev.find(c => c.id === course.id)) return prev;
       
       // Track Pixel Event
-      trackAddToCart([course.id], course.price);
+      trackAddToCart([course.id], course.price, 'EUR', pixelId);
       
       return [...prev, course];
     });

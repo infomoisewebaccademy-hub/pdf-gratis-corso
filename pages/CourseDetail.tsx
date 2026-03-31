@@ -490,7 +490,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                         <button 
                                             onClick={() => {
                                                 if (inCart) navigate('/cart');
-                                                else addToCart(course);
+                                                else addToCart(course, settings.add_to_cart_pixel_id);
                                             }}
                                             className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center border-2 ${
                                                 inCart 

@@ -77,7 +77,7 @@ const AppContent: React.FC = () => {
   
   const [settings, setSettings] = useState<PlatformSettings>({
       id: 1, logo_url: '', logo_height: 64, logo_offset_x: 0, logo_offset_y: 0,
-      meta_pixel_id: '1825625164777432', font_family: 'Inter',
+      pixels: { meta_pixel_id: '1825625164777432' }, font_family: 'Inter',
       active_mode: 'public', pre_launch_date: '', pre_launch_config: undefined
   });
   
@@ -237,7 +237,31 @@ const AppContent: React.FC = () => {
     }
   }, [settings.font_family]);
 
-  useEffect(() => { if (settings.meta_pixel_id) initMetaPixel(settings.meta_pixel_id); }, [settings.meta_pixel_id]);
+  useEffect(() => {
+    const pixelIds = [
+        settings.meta_pixel_id,
+        settings.add_to_cart_pixel_id,
+        settings.purchase_pixel_id,
+        settings.view_content_pixel_id,
+        settings.pdf_thank_you_pixel_id,
+        settings.purchase_new_user_pixel_id,
+        settings.purchase_returning_user_pixel_id,
+        settings.general_thank_you_pixel_id
+    ];
+    
+    pixelIds.forEach(pixelId => {
+        if (pixelId) initMetaPixel(pixelId);
+    });
+  }, [
+      settings.meta_pixel_id,
+      settings.add_to_cart_pixel_id,
+      settings.purchase_pixel_id,
+      settings.view_content_pixel_id,
+      settings.pdf_thank_you_pixel_id,
+      settings.purchase_new_user_pixel_id,
+      settings.purchase_returning_user_pixel_id,
+      settings.general_thank_you_pixel_id
+  ]);
 
   useEffect(() => {
     if (settings.favicon_url) {
@@ -281,8 +305,8 @@ const AppContent: React.FC = () => {
               logo_offset_x: data.logo_offset_x ?? 0,
               logo_offset_y: data.logo_offset_y ?? 0,
               pdf_guide_form_image: data.pdf_guide_form_image,
-              // Override with the new requested Pixel ID if not set or to force update
-              meta_pixel_id: data.meta_pixel_id || '1825625164777432',
+              // Ensure pixels object exists
+              pixels: data.pixels || { meta_pixel_id: '1825625164777432' },
           };
           setSettings(newSettings);
       }
@@ -291,12 +315,13 @@ const AppContent: React.FC = () => {
   
   const handleUpdateSettings = async (newSettings: PlatformSettings) => {
     // Rendiamo la funzione più robusta assicurando che l'ID sia sempre presente per l'upsert.
+    const { pixels, ...settingsWithoutPixels } = newSettings as any;
     const settingsToSave = {
-      ...newSettings,
+      ...settingsWithoutPixels,
       id: 1, // La nostra riga di impostazioni ha sempre ID 1
     };
     
-    setSettings(settingsToSave);
+    setSettings(settingsToSave as PlatformSettings);
 
     const { error } = await supabase
         .from('platform_settings')
