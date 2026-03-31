@@ -294,38 +294,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     );
                 })()}
                 
-                {/* BLOCCO DOWNLOAD GUIDA (Speciale) */}
-                {isPdfGuideCourse && isPurchased && pdfUrl && (
-                    <div className="bg-brand-50 p-6 rounded-2xl border-2 border-dashed border-brand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <h2 className="text-xl font-bold text-brand-900 mb-1">La tua Guida è Pronta!</h2>
-                            <p className="text-brand-700 text-sm">Clicca qui per scaricare il PDF e iniziare a creare.</p>
-                        </div>
-                        <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="bg-brand-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2">
-                            <Download className="h-5 w-5"/> Scarica PDF
-                        </a>
-                    </div>
-                )}
-                
-                {/* BLOCCO DOWNLOAD MATERIALE CORSO (Generico) */}
-                {isPurchased && course.resource_file_url && (
-                    <div className="bg-blue-50 p-6 rounded-2xl border-2 border-dashed border-blue-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <h2 className="text-xl font-bold text-blue-900 mb-1 flex items-center gap-2"><FileText/> Materiale Didattico</h2>
-                            <p className="text-blue-700 text-sm">Scarica il file allegato a questo corso.</p>
-                        </div>
-                        <a 
-                            href={course.resource_file_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            download={course.resource_file_name || 'materiale_corso'}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2"
-                        >
-                            <Download className="h-5 w-5"/> {course.resource_file_name ? `Scarica ${course.resource_file_name}` : 'Scarica File'}
-                        </a>
-                    </div>
-                )}
-
+                {/* I blocchi di download sono stati spostati nella sidebar */}
 
                 {isPurchased && activeLesson && (
                     <div className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -475,18 +444,40 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         )}
                         
                         {isPurchased ? (
-                            !activeLesson ? (
-                                <button 
-                                    onClick={startLearning}
-                                    className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-all mb-4 shadow-lg shadow-green-500/20"
-                                >
-                                    <Play className="inline-block h-5 w-5 mr-2 mb-1" /> Inizia Percorso
-                                </button>
-                            ) : (
-                                <div className="mb-4 p-4 bg-green-50 text-green-800 rounded-lg text-sm text-center font-bold border border-green-100">
-                                    Stai guardando il percorso
-                                </div>
-                            )
+                            <div className="flex flex-col gap-3 mb-4">
+                                {!activeLesson ? (
+                                    <button 
+                                        onClick={startLearning}
+                                        className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-green-500/20"
+                                    >
+                                        <Play className="inline-block h-5 w-5 mr-2 mb-1" /> Inizia Percorso
+                                    </button>
+                                ) : (
+                                    <div className="p-4 bg-green-50 text-green-800 rounded-lg text-sm text-center font-bold border border-green-100">
+                                        Stai guardando il percorso
+                                    </div>
+                                )}
+
+                                {/* BLOCCO DOWNLOAD GUIDA (Speciale) */}
+                                {isPdfGuideCourse && pdfUrl && (
+                                    <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-brand-50 text-brand-700 py-3 px-4 rounded-xl font-bold hover:bg-brand-100 transition-all flex items-center justify-center gap-2 border border-brand-200">
+                                        <Download className="h-5 w-5"/> Scarica Guida PDF
+                                    </a>
+                                )}
+                                
+                                {/* BLOCCO DOWNLOAD MATERIALE CORSO (Generico) */}
+                                {course.resource_file_url && (
+                                    <a 
+                                        href={course.resource_file_url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        download={course.resource_file_name || 'materiale_corso'}
+                                        className="w-full bg-blue-50 text-blue-700 py-3 px-4 rounded-xl font-bold hover:bg-blue-100 transition-all flex items-center justify-center gap-2 border border-blue-200"
+                                    >
+                                        <FileText className="h-5 w-5"/> {course.resource_file_name ? `Scarica ${course.resource_file_name}` : 'Scarica Materiale'}
+                                    </a>
+                                )}
+                            </div>
                         ) : (
                             <div className="space-y-3">
                                 {isPurchasable ? (
