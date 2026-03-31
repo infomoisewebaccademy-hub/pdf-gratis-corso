@@ -275,7 +275,7 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm lg:col-span-2">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Andamento Fatturato</h3>
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -301,7 +301,7 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
           <h3 className="text-lg font-bold text-gray-900 mb-6">Corsi più venduti</h3>
           <div className="h-72 w-full flex items-center justify-center">
             {coursePopularityData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie
                     data={coursePopularityData}
