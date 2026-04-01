@@ -143,17 +143,28 @@ export const SupportPage: React.FC<SupportPageProps> = ({ user, unreadChatCount 
 
       // 3. Notify Admin via Email
       try {
-        await fetch('/api/notify-admin-ticket', {
+        const emailPayload = {
+          ticketId: ticket.id,
+          userEmail: user.email,
+          userName: user.full_name || user.email,
+          subject: newTicketSubject,
+          message: newTicketMessage
+        };
+        
+        console.log('Sending admin notification email...', emailPayload);
+        
+        const response = await fetch('/api/notify-admin-ticket', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ticketId: ticket.id,
-            userEmail: user.email,
-            userName: user.full_name || user.email,
-            subject: newTicketSubject,
-            message: newTicketMessage
-          })
+          body: JSON.stringify(emailPayload)
         });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('API Error notifying admin:', errorData);
+        } else {
+          console.log('Admin notified successfully');
+        }
       } catch (emailErr) {
         console.error('Failed to notify admin via email:', emailErr);
       }

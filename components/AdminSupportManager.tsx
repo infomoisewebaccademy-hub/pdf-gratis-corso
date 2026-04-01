@@ -82,11 +82,15 @@ export const AdminSupportManager: React.FC = () => {
 
       if (error) throw error;
       
-      const formattedTickets = data.map((t: any) => ({
-        ...t,
-        user_name: t.profiles?.full_name,
-        user_email: t.profiles?.email
-      }));
+      const formattedTickets = data.map((t: any) => {
+        // Handle both object and array response for joined profiles
+        const profile = Array.isArray(t.profiles) ? t.profiles[0] : t.profiles;
+        return {
+          ...t,
+          user_name: profile?.full_name,
+          user_email: profile?.email
+        };
+      });
 
       setTickets(formattedTickets);
     } catch (err) {

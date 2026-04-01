@@ -341,8 +341,16 @@ const AppContent: React.FC = () => {
     try {
         let { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
         if (profileError && profileError.code === 'PGRST116') {
-            const { data: newProfile, error: createError } = await supabase.from('profiles').insert([{ id: session.user.id, full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0], is_admin: false }]).select().single();
+            const { data: newProfile, error: createError } = await supabase.from('profiles').insert([{ 
+                id: session.user.id, 
+                full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0], 
+                email: session.user.email,
+                is_admin: false 
+            }]).select().single();
             if (!createError) profile = newProfile;
+        } else if (profile && !profile.email && session.user.email) {
+            // Update existing profile if email is missing
+            await supabase.from('profiles').update({ email: session.user.email }).eq('id', session.user.id);
         }
         const { data: purchases } = await supabase.from('purchases').select('course_id').eq('user_id', session.user.id);
         const purchasedCourseIds = purchases ? purchases.map(p => p.course_id) : [];
