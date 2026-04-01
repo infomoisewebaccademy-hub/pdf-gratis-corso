@@ -127,15 +127,25 @@ export const AdminSupportManager: React.FC = () => {
     setSending(true);
     
     try {
-      const { error } = await supabase
+      const { data: insertedMessage, error } = await supabase
         .from('support_messages')
         .insert([{
           ticket_id: selectedTicket.id,
           sender_id: user.id,
           message: messageText
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Aggiornamento ottimistico locale
+      if (insertedMessage) {
+        setMessages(prev => {
+          if (prev.find(m => m.id === insertedMessage.id)) return prev;
+          return [...prev, insertedMessage as SupportMessage];
+        });
+      }
 
       // Update ticket updated_at
       await supabase

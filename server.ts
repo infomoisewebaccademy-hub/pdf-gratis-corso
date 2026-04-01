@@ -32,7 +32,7 @@ async function startServer() {
 
     try {
       const { data, error } = await resend.emails.send({
-        from: "Moise Web Academy <onboarding@resend.dev>", // Use verified domain if available
+        from: "Moise Web Academy <supporto@mwacademy.eu>", // Use verified domain
         to: [adminEmail],
         subject: `Nuovo Ticket di Supporto: ${subject}`,
         html: `
