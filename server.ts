@@ -20,11 +20,12 @@ async function startServer() {
 
   // API Route for sending email when a ticket is created
   app.post("/api/notify-admin-ticket", async (req, res) => {
+    console.log("Ricevuta richiesta di notifica ticket:", req.body);
     const { ticketId, userEmail, userName, subject, message } = req.body;
 
     if (!resend) {
       console.warn("RESEND_API_KEY non configurata. Email non inviata.");
-      return res.json({ success: true, message: "Resend not configured" });
+      return res.status(500).json({ success: false, error: "Resend not configured" });
     }
 
     const adminEmail = process.env.ADMIN_EMAIL || "info.moisewebaccademy@gmail.com";

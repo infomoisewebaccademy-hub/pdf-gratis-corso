@@ -60,9 +60,17 @@ export const SupportPage: React.FC<SupportPageProps> = ({ user, unreadChatCount 
           table: 'support_messages',
           filter: `ticket_id=eq.${selectedTicket.id}`
         }, (payload) => {
-          setMessages(prev => [...prev, payload.new as SupportMessage]);
+          console.log('New message received via Realtime:', payload);
+          const newMessage = payload.new as SupportMessage;
+          setMessages(prev => {
+            // Evita duplicati se il messaggio è già stato aggiunto localmente
+            if (prev.find(m => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
         })
-        .subscribe();
+        .subscribe((status) => {
+          console.log(`Realtime subscription status for ticket ${selectedTicket.id}:`, status);
+        });
 
       return () => {
         supabase.removeChannel(channel);
@@ -191,15 +199,25 @@ export const SupportPage: React.FC<SupportPageProps> = ({ user, unreadChatCount 
     setNewMessage('');
     
     try {
-      const { error } = await supabase
+      const { data: insertedMessage, error } = await supabase
         .from('support_messages')
         .insert([{
           ticket_id: selectedTicket.id,
           sender_id: user.id,
           message: messageText
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Aggiornamento ottimistico locale per feedback istantaneo
+      if (insertedMessage) {
+        setMessages(prev => {
+          if (prev.find(m => m.id === insertedMessage.id)) return prev;
+          return [...prev, insertedMessage as SupportMessage];
+        });
+      }
 
       // Update ticket updated_at
       await supabase
