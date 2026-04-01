@@ -5,6 +5,7 @@ import { Send, Users, ShieldCheck, Loader2, Sparkles, Trash2, AlertTriangle } fr
 import { Sidebar } from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+import { isPaidStudent } from '../services/authUtils';
 
 interface CommunityChatProps {
   user: UserProfile;
@@ -25,6 +26,11 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
   };
 
   useEffect(() => {
+    if (!isPaidStudent(user)) {
+      navigate('/dashboard');
+      return;
+    }
+
     // 1. Caricamento messaggi iniziali
     const fetchMessages = async () => {
       const { data, error } = await supabase
@@ -65,7 +71,9 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user, navigate]);
+
+  if (!isPaidStudent(user)) return null;
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +125,7 @@ export const CommunityChat: React.FC<CommunityChatProps> = ({ user, unreadChatCo
 
   return (
     <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative">
-      <Sidebar activeItem="community" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
+      <Sidebar activeItem="community" onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} user={user} />
 
       <main className="flex-1 flex flex-col bg-gray-50/50 h-[calc(100vh-80px)] relative z-10">
         

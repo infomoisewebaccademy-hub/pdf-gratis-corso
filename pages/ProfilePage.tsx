@@ -15,7 +15,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, unreadChatCount 
 
     return (
         <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative">
-            <Sidebar activeItem={location.pathname.substring(1) || 'profile'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
+            <Sidebar activeItem={location.pathname.substring(1) || 'profile'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} user={user} />
             
             <main className="flex-1 bg-gray-50/50 pb-20 relative z-10">
                 <div className="max-w-4xl mx-auto px-6 py-10 lg:px-12">

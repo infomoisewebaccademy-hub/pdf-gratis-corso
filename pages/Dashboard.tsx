@@ -70,7 +70,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, courses, onRefresh, 
   return (
     <div className="pt-20 min-h-screen bg-white flex flex-col lg:flex-row relative">
       {/* Sidebar Menu - Come richiesto nell'immagine */}
-      <Sidebar activeItem={location.pathname.substring(1) || 'dashboard'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} />
+      <Sidebar activeItem={location.pathname.substring(1) || 'dashboard'} onNavigate={(path) => navigate(path)} unreadCount={unreadChatCount} user={user} />
 
       {/* Main Content Area */}
       <main className="flex-1 bg-gray-50/50 pb-20 relative z-10">

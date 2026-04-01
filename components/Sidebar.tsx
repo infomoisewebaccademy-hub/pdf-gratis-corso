@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { BookOpen, User, Settings, MessageSquare, HelpCircle } from 'lucide-react';
+import { UserProfile } from '../types';
+import { isPaidStudent } from '../services/authUtils';
 
 export interface SidebarItem {
   id: string;
@@ -16,12 +18,15 @@ interface SidebarProps {
   unreadCount?: number;
   items?: SidebarItem[];
   onItemClick?: (id: string) => void;
+  user: UserProfile | null;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unreadCount = 0, items, onItemClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unreadCount = 0, items, onItemClick, user }) => {
+  const isPaid = isPaidStudent(user);
+
   const defaultMenuItems: SidebarItem[] = [
     { id: 'dashboard', label: 'I miei corsi', icon: BookOpen, path: '/dashboard' },
-    { id: 'community', label: 'Chat Community', icon: MessageSquare, path: '/community' },
+    ...(isPaid ? [{ id: 'community', label: 'Chat Community', icon: MessageSquare, path: '/community' }] : []),
     { id: 'profile', label: 'Profilo', icon: User, path: '/profile' },
     { id: 'settings', label: 'Impostazioni', icon: Settings, path: '/settings' },
   ];
@@ -77,9 +82,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
       <div className="hidden lg:block mt-auto p-6 border-t border-gray-200">
         <button 
           onClick={() => onNavigate && onNavigate('/support')}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all"
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+            activeItem === 'support'
+              ? 'text-brand-700 shadow-sm border border-brand-200 bg-white'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+          }`}
         >
-          <HelpCircle className="h-5 w-5" />
+          <HelpCircle className={`h-5 w-5 ${activeItem === 'support' ? 'text-brand-600' : 'text-gray-400'}`} />
           Supporto
         </button>
       </div>

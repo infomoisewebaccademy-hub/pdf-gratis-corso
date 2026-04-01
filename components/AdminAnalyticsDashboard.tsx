@@ -18,6 +18,7 @@ type TimeRange = '7d' | '30d' | '90d' | 'all';
 export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = ({ courses }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
+  const [isMounted, setIsMounted] = useState(false);
   
   const [rawData, setRawData] = useState<{
     purchases: any[];
@@ -25,7 +26,11 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
   }>({ purchases: [], progress: [] });
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 100);
     fetchRawData();
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchRawData = async () => {
@@ -274,34 +279,36 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
         {/* Revenue Chart */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm lg:col-span-2">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Andamento Fatturato</h3>
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={(value) => `€${value}`} dx={-10} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                  formatter={(value: number) => [`€${value}`, 'Fatturato']}
-                />
-                <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="h-72 w-full" style={{ minWidth: 0, minHeight: '288px' }}>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={(value) => `€${value}`} dx={-10} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                    formatter={(value: number) => [`€${value}`, 'Fatturato']}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
         {/* Popular Courses Pie Chart */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Corsi più venduti</h3>
-          <div className="h-72 w-full flex items-center justify-center">
-            {coursePopularityData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+          <div className="h-72 w-full flex items-center justify-center" style={{ minWidth: 0, minHeight: '288px' }}>
+            {coursePopularityData.length > 0 && isMounted ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                 <PieChart>
                   <Pie
                     data={coursePopularityData}
@@ -325,7 +332,7 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
               </ResponsiveContainer>
             ) : (
               <div className="text-gray-400 text-sm flex flex-col items-center">
-                <Book className="h-8 w-8 mb-2 opacity-50" />
+                <BarChart3 className="h-8 w-8 mb-2 opacity-50" />
                 Nessun dato disponibile
               </div>
             )}

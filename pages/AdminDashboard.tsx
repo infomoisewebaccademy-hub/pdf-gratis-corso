@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig } from '../types';
+import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConfig, PdfGuideConfig, SupportTicket, SupportMessage } from '../types';
 // FIX: Added missing Loader2 import from lucide-react
 import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, EyeOff, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { Sidebar, SidebarItem } from '../components/Sidebar';
 import { ImagePicker } from '../components/ImagePicker';
 import { AdminAnalyticsDashboard } from '../components/AdminAnalyticsDashboard';
 import { AdminUsersList } from '../components/AdminUsersList';
+import { AdminSupportManager } from '../components/AdminSupportManager';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
@@ -372,7 +373,7 @@ interface AdminDashboardProps {
   onRefresh: () => Promise<void>;
   currentSettings: PlatformSettings;
   onUpdateSettings: (newSettings: PlatformSettings) => Promise<void>;
-  initialTab?: 'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community';
+  initialTab?: 'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community' | 'support';
 }
 
 const ColorInput: React.FC<{label: string, value: string, name: string, onChange: (name: string, value: string) => void}> = ({label, value, name, onChange}) => (
@@ -902,6 +903,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
     { id: 'pdf_guide', label: 'Guida PDF', icon: Download },
     { id: 'landing_manual', label: 'Editor Home', icon: LayoutTemplate },
     { id: 'community', label: 'Community', icon: Users },
+    { id: 'support', label: 'Supporto', icon: HelpCircle },
     { id: 'general', label: 'Gestione Piattaforma', icon: Settings },
   ];
 
@@ -929,6 +931,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                       {activeTab === 'pdf_guide' && 'Gestisci il funnel della guida PDF.'}
                       {activeTab === 'landing_manual' && 'Personalizza la pagina di vendita.'}
                       {activeTab === 'community' && 'Modera le discussioni della community.'}
+                      {activeTab === 'support' && 'Gestisci i ticket di assistenza degli studenti.'}
                       {activeTab === 'general' && 'Controlla ogni aspetto della tua Academy.'}
                   </p>
               </div>
@@ -1203,6 +1206,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
                     </div>
                 </div>
+            )}
+
+            {activeTab === 'support' && (
+              <AdminSupportManager />
             )}
 
             {activeTab === 'landing_manual' && (

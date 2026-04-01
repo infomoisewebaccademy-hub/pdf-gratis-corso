@@ -17,6 +17,7 @@ import { PdfGuideLanding } from './pages/PdfGuideLanding'; // NUOVO
 import { ThankYouPdf } from './pages/ThankYouPdf';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SupportPage } from './pages/SupportPage';
 import { UserProfile, Course, PlatformSettings } from './types';
 import { supabase, createCheckoutSession } from './services/supabase';
 import { CartProvider } from './contexts/CartContext';
@@ -418,6 +419,7 @@ const AppContent: React.FC = () => {
         <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/profile" element={user ? <ProfilePage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={user ? <SettingsPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+        <Route path="/support" element={user ? <SupportPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         
         <Route path="/admin/dashboard" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="dashboard" /> : <Navigate to="/" />} />
         <Route path="/admin/users" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="users" /> : <Navigate to="/" />} />

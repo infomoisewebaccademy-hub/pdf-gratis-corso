@@ -324,3 +324,22 @@ export enum AuthState {
   AUTHENTICATED,
   UNAUTHENTICATED
 }
+
+export interface SupportTicket {
+  id: string;
+  user_id: string;
+  subject: string;
+  status: 'open' | 'closed';
+  created_at: string;
+  updated_at: string;
+  user_email?: string;
+  user_name?: string;
+}
+
+export interface SupportMessage {
+  id: string;
+  ticket_id: string;
+  sender_id: string;
+  message: string;
+  created_at: string;
+}
