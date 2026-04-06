@@ -112,6 +112,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const navigate = useNavigate();
   const [upsellCourse, setUpsellCourse] = useState<Course | null>(null);
   const [isBuying, setIsBuying] = useState(false);
+  
+  // Waiting list state
+  const [waitingListEmail, setWaitingListEmail] = useState(user?.email || '');
+  const [waitingListName, setWaitingListName] = useState(user?.full_name || '');
+  const [isWaitingListLoading, setIsWaitingListLoading] = useState(false);
+  const [waitingListSuccess, setWaitingListSuccess] = useState(false);
+  const [waitingListError, setWaitingListError] = useState<string | null>(null);
 
   // Special check for the PDF guide course
   const isPdfGuideCourse = course.id === 'course_pdf_guide_free';
@@ -193,6 +200,33 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
       setIsBuying(true);
       trackInitiateCheckout([course.id], finalPrice);
       onPurchase();
+  };
+
+  const handleJoinWaitingList = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!waitingListEmail) return;
+      
+      setIsWaitingListLoading(true);
+      setWaitingListError(null);
+      
+      try {
+          const { error } = await supabase
+              .from('waiting_list')
+              .insert([{
+                  email: waitingListEmail,
+                  full_name: waitingListName,
+                  course_id: course.id,
+                  source: 'course_full_waiting_list'
+              }]);
+              
+          if (error) throw error;
+          setWaitingListSuccess(true);
+      } catch (err: any) {
+          console.error("Errore iscrizione lista d'attesa:", err);
+          setWaitingListError(err.message || "Si è verificato un errore. Riprova più tardi.");
+      } finally {
+          setIsWaitingListLoading(false);
+      }
   };
 
   const isFull = course.status === 'full';
@@ -509,7 +543,46 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                     <div className="bg-red-50 border border-red-100 p-6 rounded-xl text-center">
                                         <Lock className="h-10 w-10 text-red-400 mx-auto mb-3" />
                                         <h4 className="text-red-800 font-bold text-lg mb-1">Posti Esauriti</h4>
-                                        <p className="text-red-600 text-xs">Questo corso ha raggiunto il limite massimo di studenti per questo mese.</p>
+                                        <p className="text-red-600 text-xs mb-6">Questo corso ha raggiunto il limite massimo di studenti per questo mese.</p>
+                                        
+                                        {course.has_waiting_list !== false && (
+                                            <div className="mt-6 pt-6 border-t border-red-100 text-left">
+                                                {waitingListSuccess ? (
+                                                    <div className="bg-green-100 text-green-700 p-4 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                        <CheckCircle2 className="h-5 w-5" />
+                                                        Ti abbiamo aggiunto alla lista d'attesa! Ti avviseremo appena riapriranno le iscrizioni.
+                                                    </div>
+                                                ) : (
+                                                    <form onSubmit={handleJoinWaitingList} className="space-y-3">
+                                                        <p className="text-sm font-bold text-red-900 mb-2">Iscriviti alla lista d'attesa:</p>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="Il tuo nome" 
+                                                            value={waitingListName}
+                                                            onChange={(e) => setWaitingListName(e.target.value)}
+                                                            className="w-full px-4 py-2 rounded-lg border border-red-200 focus:ring-2 focus:ring-red-500 outline-none text-sm"
+                                                            required
+                                                        />
+                                                        <input 
+                                                            type="email" 
+                                                            placeholder="La tua email" 
+                                                            value={waitingListEmail}
+                                                            onChange={(e) => setWaitingListEmail(e.target.value)}
+                                                            className="w-full px-4 py-2 rounded-lg border border-red-200 focus:ring-2 focus:ring-red-500 outline-none text-sm"
+                                                            required
+                                                        />
+                                                        {waitingListError && <p className="text-xs text-red-500">{waitingListError}</p>}
+                                                        <button 
+                                                            type="submit"
+                                                            disabled={isWaitingListLoading}
+                                                            className="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition-all disabled:opacity-70"
+                                                        >
+                                                            {isWaitingListLoading ? 'Iscrizione...' : 'Avvisami quando riapre'}
+                                                        </button>
+                                                    </form>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl text-center">

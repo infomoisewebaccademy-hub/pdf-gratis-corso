@@ -32,6 +32,7 @@ export interface Course {
   show_features?: boolean; // NUOVO: Se mostrare la sezione "Cosa Imparerai"
   additional_benefits?: string[]; // NUOVO: Punti "Cosa avrai in più"
   program_title?: string; // NUOVO: Titolo personalizzato per la sezione lezioni
+  has_waiting_list?: boolean; // NUOVO: Se abilitare la lista d'attesa quando il corso è pieno
 }
 
 export interface UserProfile {

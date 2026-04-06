@@ -417,7 +417,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [aiPrompt, setAiPrompt] = useState('');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const [waitingList, setWaitingList] = useState<any[]>([]);
+  const [isLoadingWaitingList, setIsLoadingWaitingList] = useState(false);
   const [showPdfFormImagePicker, setShowPdfFormImagePicker] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'launch') {
+      fetchWaitingList();
+    }
+  }, [activeTab]);
+
+  const fetchWaitingList = async () => {
+    setIsLoadingWaitingList(true);
+    try {
+      const { data, error } = await supabase
+        .from('waiting_list')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setWaitingList(data || []);
+    } catch (err) {
+      console.error("Error fetching waiting list:", err);
+    } finally {
+      setIsLoadingWaitingList(false);
+    }
+  };
 
   const handleClearCache = async () => {
     if (!confirm("⚠️ Questa azione svuoterà la cache locale del browser (LocalStorage, SessionStorage) e forzerà il ricaricamento della pagina. Continuare?")) return;
@@ -608,10 +632,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
           const { data, error } = await supabase.from('waiting_list').select('*').order('created_at', { ascending: true });
           if (error) throw error;
           if (!data || data.length === 0) { alert("Nessun iscritto da esportare."); return; }
-          let csvContent = "data:text/csv;charset=utf-8,Posizione,Email,Nome,Data Iscrizione,Fonte\n";
+          let csvContent = "data:text/csv;charset=utf-8,Posizione,Email,Nome,Data Iscrizione,Fonte,Corso ID\n";
           data.forEach((row, index) => {
               const date = new Date(row.created_at).toLocaleDateString();
-              csvContent += `${index + 1},${row.email},"${row.full_name || 'N/A'}",${date},${row.source || 'pre_launch'}\n`;
+              csvContent += `${index + 1},${row.email},"${row.full_name || 'N/A'}",${date},${row.source || 'pre_launch'},${row.course_id || 'N/A'}\n`;
           });
           const encodedUri = encodeURI(csvContent);
           const link = document.createElement("a");
@@ -1045,6 +1069,53 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                                <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                                    <h4 className="font-bold text-sm text-gray-700 flex items-center gap-2">
+                                        <Users className="h-4 w-4 text-brand-600" /> Iscritti Recenti ({waitingList.length})
+                                    </h4>
+                                    <button onClick={fetchWaitingList} className="text-brand-600 hover:text-brand-700 p-1 rounded-full hover:bg-brand-50 transition-colors">
+                                        <RefreshCw className={`h-4 w-4 ${isLoadingWaitingList ? 'animate-spin' : ''}`} />
+                                    </button>
+                                </div>
+                                <div className="max-h-60 overflow-y-auto scrollbar-thin">
+                                    <table className="w-full text-left text-xs">
+                                        <thead className="bg-gray-50 sticky top-0 z-10">
+                                            <tr>
+                                                <th className="px-4 py-2 font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Nome</th>
+                                                <th className="px-4 py-2 font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Email</th>
+                                                <th className="px-4 py-2 font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Corso/Fonte</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {waitingList.map((entry, idx) => (
+                                                <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                                    <td className="px-4 py-2 font-medium text-gray-900">{entry.full_name || 'N/A'}</td>
+                                                    <td className="px-4 py-2 text-gray-600">{entry.email}</td>
+                                                    <td className="px-4 py-2">
+                                                        {entry.course_id ? (
+                                                            <span className="px-2 py-0.5 bg-brand-50 text-brand-700 rounded-full text-[10px] font-bold border border-brand-100">
+                                                                {courses.find(c => c.id === entry.course_id)?.title || 'Corso Eliminato'}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-[10px] font-bold border border-gray-200">
+                                                                {entry.source === 'pdf_guide' ? 'Guida PDF' : 'Pre-Lancio'}
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {waitingList.length === 0 && !isLoadingWaitingList && (
+                                                <tr>
+                                                    <td colSpan={3} className="px-4 py-8 text-center text-gray-400 italic">Nessun iscritto trovato.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                            {renderCapturePageEditor("Editor Pre-Lancio", Rocket, preLaunchConfig, handlePreLaunchChange, handlePreLaunchColorChange)}
                         </div>
                     </div>

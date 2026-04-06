@@ -31,6 +31,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     lessons_content: [],
     status: 'active',
     is_hidden: false,
+    has_waiting_list: true,
     resource_file_url: '',
     resource_file_name: '',
     rating: 5,
@@ -173,6 +174,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             discounted_price: courseToEdit.discounted_price || 0,
             status: courseToEdit.status || 'active',
             is_hidden: courseToEdit.is_hidden || false,
+            has_waiting_list: courseToEdit.has_waiting_list !== false,
             resource_file_url: courseToEdit.resource_file_url || '',
             resource_file_name: courseToEdit.resource_file_name || '',
             rating: courseToEdit.rating || 5,
@@ -188,7 +190,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             id: '', title: '', description: '', price: 0, discounted_price: 0,
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
-            lessons_content: [], status: 'active', is_hidden: false, resource_file_url: '', resource_file_name: '',
+            lessons_content: [], status: 'active', is_hidden: false, has_waiting_list: true, resource_file_url: '', resource_file_name: '',
             rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
             additional_benefits: [''],
             program_title: '',
@@ -215,6 +217,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       discounted_price: formData.discounted_price || null,
       status: formData.status || 'active',
       is_hidden: formData.is_hidden || false,
+      has_waiting_list: formData.has_waiting_list !== false,
       resource_file_url: formData.resource_file_url || null,
       resource_file_name: formData.resource_file_name || null,
       rating: formData.rating || 5,
@@ -491,6 +494,19 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.is_hidden ? 'bg-brand-600' : 'bg-gray-200'}`}
                             >
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_hidden ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Abilita Lista d'Attesa</label>
+                                <p className="text-xs text-gray-500">Mostra il modulo quando il corso è "Pieno".</p>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData({...formData, has_waiting_list: !formData.has_waiting_list})}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.has_waiting_list !== false ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.has_waiting_list !== false ? 'translate-x-6' : 'translate-x-1'}`} />
                             </button>
                         </div>
                     </div>
