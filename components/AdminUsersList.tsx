@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { Course } from '../types';
-import { Loader2, Search, Mail, BookOpen, Shield, User } from 'lucide-react';
+import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download } from 'lucide-react';
 
 interface AdminUsersListProps {
   courses: Course[];
+}
+
+interface WaitingListEntry {
+  id: string;
+  email: string;
+  full_name: string;
+  course_id: string | null;
+  source: string;
+  created_at: string;
 }
 
 interface UserWithCourses {
@@ -20,10 +29,109 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   const [users, setUsers] = useState<UserWithCourses[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeSubTab, setActiveSubTab] = useState<'students' | 'waiting_list'>('students');
+  const [waitingList, setWaitingList] = useState<WaitingListEntry[]>([]);
+  const [isNotifying, setIsNotifying] = useState<string | null>(null);
+  const [isBulkNotifying, setIsBulkNotifying] = useState(false);
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>('all');
 
   useEffect(() => {
-    fetchUsersAndPurchases();
-  }, [courses]);
+    if (activeSubTab === 'students') {
+      fetchUsersAndPurchases();
+    } else {
+      fetchWaitingList();
+    }
+  }, [courses, activeSubTab]);
+
+  const fetchWaitingList = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('waiting_list')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setWaitingList(data || []);
+    } catch (error) {
+      console.error("Errore nel caricamento della lista d'attesa:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleNotifyUser = async (entry: WaitingListEntry) => {
+    if (!confirm(`Vuoi inviare una notifica email a ${entry.email} per il percorso ${entry.course_id ? courses.find(c => c.id === entry.course_id)?.title : 'generale'}?`)) return;
+    
+    setIsNotifying(entry.id);
+    try {
+      await sendNotification(entry);
+      alert('Notifica inviata con successo!');
+    } catch (error: any) {
+      console.error("Errore notifica:", error);
+      alert("Errore nell'invio della notifica: " + error.message);
+    } finally {
+      setIsNotifying(null);
+    }
+  };
+
+  const sendNotification = async (entry: WaitingListEntry) => {
+    const courseTitle = entry.course_id ? courses.find(c => c.id === entry.course_id)?.title : 'un nuovo percorso';
+    const response = await fetch('/api/notify-waiting-list-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: entry.email,
+        name: entry.full_name,
+        courseTitle: courseTitle,
+        courseId: entry.course_id
+      })
+    });
+
+    if (!response.ok) throw new Error('Errore nell\'invio della notifica');
+    return response.json();
+  };
+
+  const handleBulkNotify = async () => {
+    if (filteredWaitingList.length === 0) return;
+    if (!confirm(`Vuoi inviare una notifica email a TUTTI i ${filteredWaitingList.length} iscritti filtrati?`)) return;
+    
+    setIsBulkNotifying(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const entry of filteredWaitingList) {
+      try {
+        await sendNotification(entry);
+        successCount++;
+      } catch (error) {
+        console.error(`Errore notifica per ${entry.email}:`, error);
+        failCount++;
+      }
+    }
+
+    alert(`Operazione completata!\nSuccessi: ${successCount}\nFallimenti: ${failCount}`);
+    setIsBulkNotifying(false);
+  };
+
+  const handleExportWaitingList = () => {
+    if (waitingList.length === 0) return;
+    
+    let csvContent = "data:text/csv;charset=utf-8,Nome,Email,Percorso,Data Iscrizione,Fonte\n";
+    waitingList.forEach((row) => {
+      const courseTitle = row.course_id ? courses.find(c => c.id === row.course_id)?.title || 'N/A' : 'N/A';
+      const date = new Date(row.created_at).toLocaleDateString();
+      csvContent += `"${row.full_name || 'N/A'}",${row.email},"${courseTitle}",${date},${row.source || 'pre_launch'}\n`;
+    });
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `lista_attesa_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const fetchUsersAndPurchases = async () => {
     setIsLoading(true);
@@ -73,6 +181,24 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredWaitingList = waitingList.filter(entry => {
+    const matchesSearch = entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (entry.full_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCourse = selectedCourseFilter === 'all' || entry.course_id === selectedCourseFilter;
+    
+    return matchesSearch && matchesCourse;
+  });
+
+  const getSourceLabel = (source: string) => {
+    switch (source) {
+      case 'pdf_guide': return 'Guida PDF';
+      case 'course_full_waiting_list': return 'Corso Pieno';
+      case 'pre_launch': return 'Pre-Lancio';
+      default: return 'Generale';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -83,106 +209,246 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4">
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Cerca per nome o email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex p-1 bg-gray-100 rounded-xl">
+          <button
+            onClick={() => setActiveSubTab('students')}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              activeSubTab === 'students'
+                ? 'bg-white text-brand-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Studenti Paganti
+          </button>
+          <button
+            onClick={() => setActiveSubTab('waiting_list')}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              activeSubTab === 'waiting_list'
+                ? 'bg-white text-brand-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Lista d'Attesa
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          {activeSubTab === 'waiting_list' && (
+            <>
+              {filteredWaitingList.length > 0 && (
+                <button
+                  onClick={handleBulkNotify}
+                  disabled={isBulkNotifying}
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-brand-700 transition-all disabled:opacity-50"
+                >
+                  {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  Notifica Tutti ({filteredWaitingList.length})
+                </button>
+              )}
+              <select
+                value={selectedCourseFilter}
+                onChange={(e) => setSelectedCourseFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="all">Tutti i percorsi</option>
+                <option value="null">Generale (Pre-Lancio)</option>
+                {courses.map(c => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleExportWaitingList}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-black transition-all"
+              >
+                <Download className="h-4 w-4" /> Esporta CSV
+              </button>
+            </>
+          )}
+          <div className="relative flex-1 md:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cerca per nome o email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all"
+            />
+          </div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
-                <th className="px-6 py-4 font-medium">Utente</th>
-                <th className="px-6 py-4 font-medium">Contatto</th>
-                <th className="px-6 py-4 font-medium">Percorsi Acquistati</th>
-                <th className="px-6 py-4 font-medium text-right">Data Iscrizione</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mr-3">
-                          {user.full_name.charAt(0).toUpperCase()}
+          {activeSubTab === 'students' ? (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">Utente</th>
+                  <th className="px-6 py-4 font-medium">Contatto</th>
+                  <th className="px-6 py-4 font-medium">Percorsi Acquistati</th>
+                  <th className="px-6 py-4 font-medium text-right">Data Iscrizione</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mr-3">
+                            {user.full_name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900 flex items-center gap-2">
+                              {user.full_name}
+                              {user.is_admin && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                  <Shield className="w-3 h-3 mr-1" /> Admin
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-xs text-gray-500 flex items-center mt-1">
+                              <User className="w-3 h-3 mr-1" /> ID: {user.id.substring(0, 8)}...
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 flex items-center gap-2">
-                            {user.full_name}
-                            {user.is_admin && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                                <Shield className="w-3 h-3 mr-1" /> Admin
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center text-gray-600">
+                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={`mailto:${user.email}`} className="hover:text-brand-600 transition-colors">
+                            {user.email}
+                          </a>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {user.purchased_courses.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {user.purchased_courses.map(course => (
+                              <span 
+                                key={course.id} 
+                                className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
+                                title={course.title}
+                              >
+                                <BookOpen className="w-3 h-3 mr-1" />
+                                {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
                               </span>
-                            )}
-                          </p>
-                          <p className="text-xs text-gray-500 flex items-center mt-1">
-                            <User className="w-3 h-3 mr-1" /> ID: {user.id.substring(0, 8)}...
-                          </p>
-                        </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm italic">Nessun percorso</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm text-gray-500">
+                        {new Date(user.created_at).toLocaleDateString('it-IT', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <Search className="h-10 w-10 text-gray-300 mb-3" />
+                        <p className="text-lg font-medium text-gray-900">Nessun utente trovato</p>
+                        <p className="text-sm">Prova a cercare con un termine diverso.</p>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center text-gray-600">
-                        <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                        <a href={`mailto:${user.email}`} className="hover:text-brand-600 transition-colors">
-                          {user.email}
-                        </a>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {user.purchased_courses.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {user.purchased_courses.map(course => (
-                            <span 
-                              key={course.id} 
-                              className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
-                              title={course.title}
-                            >
-                              <BookOpen className="w-3 h-3 mr-1" />
-                              {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-sm italic">Nessun percorso</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString('it-IT', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                    <div className="flex flex-col items-center justify-center">
-                      <Search className="h-10 w-10 text-gray-300 mb-3" />
-                      <p className="text-lg font-medium text-gray-900">Nessun utente trovato</p>
-                      <p className="text-sm">Prova a cercare con un termine diverso.</p>
-                    </div>
-                  </td>
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">Utente</th>
+                  <th className="px-6 py-4 font-medium">Email</th>
+                  <th className="px-6 py-4 font-medium">Percorso Interessato</th>
+                  <th className="px-6 py-4 font-medium">Data Iscrizione</th>
+                  <th className="px-6 py-4 font-medium text-right">Azioni</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredWaitingList.length > 0 ? (
+                  filteredWaitingList.map((entry) => (
+                    <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg mr-3">
+                            {(entry.full_name || 'U').charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{entry.full_name || 'Utente'}</p>
+                            <p className="text-xs text-gray-500 flex items-center mt-1">
+                              <Clock className="w-3 h-3 mr-1" /> {getSourceLabel(entry.source)}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center text-gray-600">
+                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={`mailto:${entry.email}`} className="hover:text-brand-600 transition-colors">
+                            {entry.email}
+                          </a>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {entry.course_id ? (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-100">
+                            <BookOpen className="w-3 h-3 mr-1" />
+                            {courses.find(c => c.id === entry.course_id)?.title || 'Corso Eliminato'}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-sm italic">Generale</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {new Date(entry.created_at).toLocaleDateString('it-IT', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => handleNotifyUser(entry)}
+                          disabled={isNotifying === entry.id}
+                          className="inline-flex items-center px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-bold hover:bg-brand-700 transition-all disabled:opacity-50"
+                        >
+                          {isNotifying === entry.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : (
+                            <Send className="h-3 w-3 mr-1" />
+                          )}
+                          Notifica
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <Search className="h-10 w-10 text-gray-300 mb-3" />
+                        <p className="text-lg font-medium text-gray-900">Nessun iscritto trovato</p>
+                        <p className="text-sm">La lista d'attesa è vuota.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            Totale utenti trovati: <span className="font-semibold text-gray-900">{filteredUsers.length}</span>
+            Totale {activeSubTab === 'students' ? 'utenti' : 'iscritti'} trovati: <span className="font-semibold text-gray-900">{activeSubTab === 'students' ? filteredUsers.length : filteredWaitingList.length}</span>
           </p>
         </div>
       </div>
