@@ -296,7 +296,7 @@ const AppContent: React.FC = () => {
   };
   const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase.from('platform_settings').select('*').eq('id', 1).maybeSingle();
+      const { data, error } = await supabase.from('platform_settings').select('*').eq('id', 1).single();
       if (error) throw error;
       if (data) {
           const newSettings = {
@@ -421,7 +421,7 @@ const AppContent: React.FC = () => {
         <Route path="/guida-pdf-gratuita" element={<PdfGuideLanding />} />
         <Route path="/thank-you-pdf-gratuita" element={<ThankYouPdf />} />
         
-        <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config || {}} />} />
+        <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config} />} />
         <Route path="/courses" element={<CoursesPage courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} />} />
         <Route path="/cart" element={<Cart user={user} />} />
         <Route path="/course/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} />} />
