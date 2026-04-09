@@ -1351,10 +1351,14 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                   {/* Right Video Visual - OTTIMIZZATO */}
                   <div className="lg:col-span-5 h-full min-h-[500px] relative rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
                         <VideoPlayer 
-                            sources={targetSectionVideo.sources}
-                            poster={targetSectionVideo.poster}
+                            sources={[{ src: 'https://res.cloudinary.com/dhj0ztos6/video/upload/v1775734457/MWA_Video_Home_page_2_2_nlzc2p.mov', type: 'video/mp4' }]}
+                            poster="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop"
                             className="absolute inset-0 w-full h-full object-cover"
                             preload="metadata"
+                            autoPlay={true}
+                            loop={true}
+                            muted={true}
+                            playsInline={true}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90"></div>
                         
