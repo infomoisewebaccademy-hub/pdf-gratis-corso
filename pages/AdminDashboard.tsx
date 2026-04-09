@@ -936,7 +936,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       <Sidebar 
         activeItem={activeTab} 
         items={adminMenuItems} 
-        onItemClick={(id) => setActiveTab(id as any)} 
+        onItemClick={(id) => { setActiveTab(id as any); navigate(`/admin/${id}`); }} 
       />
 
       <main className="flex-1 bg-gray-50/50 pb-20 overflow-y-auto">

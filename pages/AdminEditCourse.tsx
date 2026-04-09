@@ -164,11 +164,22 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     }, 0);
   };
 
+  const initialCourseRef = useRef<Partial<Course> | null>(null);
+
+  const handleCancel = () => {
+    if (JSON.stringify(formData) !== JSON.stringify(initialCourseRef.current)) {
+        if (!confirm("Hai delle modifiche non salvate. Sei sicuro di voler annullare?")) {
+            return;
+        }
+    }
+    navigate(-1);
+  };
+
   useEffect(() => {
     if (!isNew && id) {
       const courseToEdit = courses.find(c => c.id === id);
       if (courseToEdit) {
-        setFormData({
+        const data = {
             ...courseToEdit,
             lessons_content: courseToEdit.lessons_content || [],
             discounted_price: courseToEdit.discounted_price || 0,
@@ -183,10 +194,12 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             show_features: courseToEdit.show_features !== false,
             additional_benefits: courseToEdit.additional_benefits || [''],
             program_title: courseToEdit.program_title || '',
-        });
+        };
+        setFormData(data);
+        initialCourseRef.current = data;
       }
     } else {
-        setFormData({
+        const data = {
             id: '', title: '', description: '', price: 0, discounted_price: 0,
             image: 'https://picsum.photos/800/600?random=' + Math.floor(Math.random() * 100),
             level: 'Principiante', features: [''], lessons: 0, duration: '',
@@ -194,7 +207,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
             additional_benefits: [''],
             program_title: '',
-        });
+        };
+        setFormData(data);
+        initialCourseRef.current = data;
     }
   }, [id, courses, isNew]);
 
@@ -318,14 +333,14 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 py-4 border-b border-gray-200">
             <div className="flex items-center">
-                <button type="button" onClick={() => navigate('/admin')} className="mr-4 p-2 rounded-full hover:bg-gray-200 text-gray-500"><ArrowLeft className="h-6 w-6" /></button>
+                <button type="button" onClick={handleCancel} className="mr-4 p-2 rounded-full hover:bg-gray-200 text-gray-500"><ArrowLeft className="h-6 w-6" /></button>
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">{isNew ? 'Crea Nuovo Corso' : 'Modifica Corso'}</h1>
                     <p className="text-gray-500 text-sm">{isNew ? 'Compila i campi per creare un nuovo prodotto.' : `Modifica dettagli per: ${formData.title}`}</p>
                 </div>
             </div>
             <div className="flex gap-3 w-full sm:w-auto">
-                <button type="button" onClick={() => navigate('/admin')} className="flex-1 sm:flex-none px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-100">Annulla</button>
+                <button type="button" onClick={handleCancel} className="flex-1 sm:flex-none px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-100">Annulla</button>
                 <button type="submit" className="flex-1 sm:flex-none px-6 py-3 bg-brand-600 text-white rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 flex items-center justify-center"><Save className="h-5 w-5 mr-2" />{isNew ? 'Pubblica' : 'Salva'}</button>
             </div>
         </div>
