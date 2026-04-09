@@ -449,6 +449,12 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                 <div className="w-full bg-white border border-gray-300 rounded p-2 text-sm">
                                     <label className="text-xs font-bold text-gray-500">Video Lezione (Carica File)</label>
                                     <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, -1)} className="w-full text-xs" />
+                                    {isUploadingVideo === -1 && uploadProgress !== null && (
+                                        <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                            <div className="bg-brand-600 h-2 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                                            <p className="text-[10px] text-gray-500 mt-1">{uploadProgress}% caricato</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div><div className="relative flex justify-center text-xs"><span className="bg-brand-50/50 px-2 text-gray-500">o</span></div></div>
                                 <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson({...newLesson, videoUrl: e.target.value})} />
@@ -475,7 +481,14 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                                     <button type="button" onClick={() => handleVideoRemove(idx)} className="text-red-400 hover:text-red-600 p-1"><X className="h-3 w-3" /></button>
                                                 </div>
                                             ) : isUploadingVideo === idx ? (
-                                                <div className='flex items-center gap-2 text-blue-500'><Loader2 className="h-3 w-3 animate-spin"/> Caricamento...</div>
+                                                <div className='flex flex-col gap-1'>
+                                                    <div className='flex items-center gap-2 text-blue-500'><Loader2 className="h-3 w-3 animate-spin"/> Caricamento...</div>
+                                                    {uploadProgress !== null && (
+                                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                                            <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ) : (
                                                 <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, idx)} className="w-full text-xs" />
                                             )}
