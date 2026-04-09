@@ -348,15 +348,116 @@ interface VideoData {
     poster: string;
 }
 
+const VideoPlayer = ({ 
+    sources, 
+    poster, 
+    className, 
+    autoPlay = true, 
+    loop = true, 
+    muted = true, 
+    playsInline = true,
+    preload = "metadata" as const
+}: { 
+    sources: VideoSource[], 
+    poster?: string, 
+    className?: string,
+    autoPlay?: boolean,
+    loop?: boolean,
+    muted?: boolean,
+    playsInline?: boolean,
+    preload?: "auto" | "metadata" | "none"
+}) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isInView, setIsInView] = useState(false);
+    const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            setIsInView(true);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        if (videoRef.current) {
+            observer.observe(videoRef.current);
+        }
+
+        return () => {
+            if (videoRef.current) {
+                observer.unobserve(videoRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || hasError) return;
+
+        if (isInView) {
+            if (autoPlay) {
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch((error) => {
+                        console.warn("Autoplay failed:", error);
+                    });
+                }
+            }
+        } else {
+            if (!video.paused) {
+                video.pause();
+            }
+        }
+    }, [isInView, autoPlay, hasError]);
+
+    const handleVideoError = () => {
+        setHasError(true);
+        console.error("Video error:", sources);
+    };
+
+    if (hasError && poster) {
+        return <img src={poster} className={className} alt="Video fallback" />;
+    }
+
+    return (
+        <video
+            ref={videoRef}
+            poster={poster}
+            loop={loop}
+            muted={muted}
+            playsInline={playsInline}
+            // @ts-ignore
+            webkit-playsinline={playsInline ? "true" : "false"}
+            preload={preload}
+            className={className}
+            onError={handleVideoError}
+            crossOrigin="anonymous"
+        >
+            {sources.map((source, idx) => (
+                <source key={idx} src={source.src} type={source.type} />
+            ))}
+            Il tuo browser non supporta il tag video.
+        </video>
+    );
+};
+
 const createOptimizedVideo = (videoId: string): VideoData => {
     if (!videoId) return { sources: [], poster: '' };
     
     // Se è già un URL completo, lo restituiamo così com'è
     if (videoId.startsWith('http')) {
-        const type = videoId.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
+        // Rilevamento tipo più robusto per URL con parametri
+        const urlWithoutParams = videoId.split('?')[0];
+        const type = urlWithoutParams.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
         return {
             sources: [{ src: videoId, type }],
-            poster: ''
+            // Usiamo un'immagine di placeholder neutra se non abbiamo un poster
+            poster: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop'
         };
     }
 
@@ -654,16 +755,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
       <div className="relative overflow-hidden">
           {/* Hero Video Background - OTTIMIZZATO per tutti i dispositivi */}
           <div className="absolute inset-0 z-0">
-             <video 
+             <VideoPlayer 
+                sources={heroVideo.sources}
                 poster={heroVideo.poster}
-                autoPlay loop muted playsInline 
                 className="w-full h-full object-cover opacity-20"
-             >
-                {heroVideo.sources.map((source, idx) => (
-                    <source key={idx} src={source.src} type={source.type} />
-                ))}
-                Il tuo browser non supporta il tag video.
-             </video>
+                preload="metadata"
+             />
              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-950"></div>
           </div>
 
@@ -762,16 +859,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
                           {/* Right Video Visual - OTTIMIZZATO */}
                           <div className="relative rounded-3xl overflow-hidden lg:h-[750px] md:h-[600px] h-[450px] w-full shadow-2xl ring-1 ring-white/10 group">
-                               <video 
+                               <VideoPlayer 
+                                  sources={aiEraVideo.sources}
                                   poster={aiEraVideo.poster}
-                                  loading="lazy"
-                                  autoPlay loop muted playsInline 
                                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
-                               >
-                                   {aiEraVideo.sources.map((source, idx) => (
-                                       <source key={idx} src={source.src} type={source.type} />
-                                   ))}
-                               </video>
+                                  preload="metadata"
+                               />
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
                                <div className="absolute bottom-6 left-6 right-6">
@@ -935,16 +1028,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                         <div className="relative rounded-3xl overflow-hidden h-[500px] w-full shadow-2xl ring-1 ring-white/10 group">
                             {/* VIDEO/IMAGE CHECK & OTTIMIZZAZIONE */}
                             {isVideo(config.about_section.image_url) ? (
-                                <video 
+                                <VideoPlayer 
+                                    sources={aboutVideo.sources}
                                     poster={aboutVideo.poster}
-                                    loading="lazy"
-                                    autoPlay loop muted playsInline 
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
-                                >
-                                   {aboutVideo.sources.map((source, idx) => (
-                                       <source key={idx} src={source.src} type={source.type} />
-                                   ))}
-                                </video>
+                                    preload="metadata"
+                                />
                              ) : (
                                 <img 
                                     src={config.about_section.image_url} 
@@ -1117,16 +1206,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                       {/* Right Video area - OTTIMIZZATO */}
                       <div className="lg:col-span-7">
                           <div className="relative h-full min-h-[400px] rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
-                               <video 
+                               <VideoPlayer 
+                                  sources={howItWorksVideo.sources}
                                   poster={howItWorksVideo.poster}
-                                  loading="lazy"
-                                  autoPlay loop muted playsInline 
                                   className="absolute inset-0 w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-700"
-                               >
-                                   {howItWorksVideo.sources.map((source, idx) => (
-                                       <source key={idx} src={source.src} type={source.type} />
-                                   ))}
-                               </video>
+                                  preload="metadata"
+                               />
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
                                <div className="absolute bottom-2 left-3 right-3">
@@ -1265,16 +1350,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
                   {/* Right Video Visual - OTTIMIZZATO */}
                   <div className="lg:col-span-5 h-full min-h-[500px] relative rounded-3xl overflow-hidden ring-1 ring-white/10 shadow-2xl">
-                        <video 
+                        <VideoPlayer 
+                            sources={targetSectionVideo.sources}
                             poster={targetSectionVideo.poster}
-                            loading="lazy"
-                            autoPlay loop muted playsInline 
                             className="absolute inset-0 w-full h-full object-cover"
-                        >
-                           {targetSectionVideo.sources.map((source, idx) => (
-                               <source key={idx} src={source.src} type={source.type} />
-                           ))}
-                        </video>
+                            preload="metadata"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90"></div>
                         
                         <div className="absolute bottom-2 left-3 right-3">
@@ -1461,8 +1542,12 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                                 ></iframe>
                                             </div>
                                         ) : (
-                                            <video src={review.attachmentUrl} autoPlay loop muted playsInline className="w-full max-h-48 object-cover" />
-                                        )
+                                            <VideoPlayer 
+                                                sources={[{ src: review.attachmentUrl, type: review.attachmentUrl.split('?')[0].toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4' }]} 
+                                                className="w-full max-h-48 object-cover"
+                                                preload="metadata"
+                                            />
+                                         )
                                     ) : (
                                         <img src={review.attachmentUrl} alt="Review attachment" className="w-full h-48 object-cover opacity-80 hover:opacity-100 transition-opacity" />
                                     )}
