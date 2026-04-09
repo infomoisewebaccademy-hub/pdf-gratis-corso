@@ -49,6 +49,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState<number | null>(null); // -1 per nuova lezione, altrimenti index
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
     const file = event.target.files?.[0];
@@ -60,12 +61,39 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     }
 
     setIsUploadingVideo(lessonIndex);
+    setUploadProgress(0);
+
     try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
         const filePath = `${courseId}/videos/${fileName}`;
-        const { error } = await supabase.storage.from('course-videos').upload(filePath, file, { upsert: true });
-        if (error) throw error;
+        
+        const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://zplcjlyqmcayprettmqd.supabase.co';
+        const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbGNqbHlxbWNheXByZXR0bXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NzA0MzgsImV4cCI6MjA4MDI0NjQzOH0.OfK1kbwc-3OBrvIIVFnnTeNCgSinVGAJiIy8jfvxjSA';
+
+        await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${supabaseUrl}/storage/v1/object/course-videos/${filePath}`);
+            xhr.setRequestHeader('apikey', supabaseAnonKey);
+            xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
+            
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    setUploadProgress(percentComplete);
+                }
+            };
+            
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject(new Error(xhr.statusText));
+                }
+            };
+            xhr.onerror = () => reject(new Error(xhr.statusText));
+            xhr.send(file);
+        });
 
         if (lessonIndex === -1) { // Nuova lezione
             setNewLesson(prev => ({ ...prev, video_storage_path: filePath }));
@@ -76,14 +104,10 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         }
     } catch (err: any) {
         console.error("Errore upload video:", err);
-        const msg = err.message || '';
-        if (msg.includes('row-level security')) {
-            alert('Errore di permessi (RLS): Esegui lo script SQL per configurare le policy del bucket "course-videos".');
-        } else {
-            alert("Errore upload video: " + err.message);
-        }
+        alert("Errore upload video: " + err.message);
     } finally {
         setIsUploadingVideo(null);
+        setUploadProgress(null);
     }
   };
 
