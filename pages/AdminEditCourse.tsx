@@ -73,9 +73,10 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
 
         await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${supabaseUrl}/storage/v1/object/course-videos/${filePath}`);
+            xhr.open('POST', `${supabaseUrl}/storage/v1/object/course-videos/${filePath}?upsert=true`);
             xhr.setRequestHeader('apikey', supabaseAnonKey);
             xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
+            xhr.setRequestHeader('Content-Type', file.type);
             
             xhr.upload.onprogress = (event) => {
                 if (event.lengthComputable) {
@@ -88,10 +89,10 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                 if (xhr.status >= 200 && xhr.status < 300) {
                     resolve(xhr.response);
                 } else {
-                    reject(new Error(xhr.statusText));
+                    reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
                 }
             };
-            xhr.onerror = () => reject(new Error(xhr.statusText));
+            xhr.onerror = () => reject(new Error('Network error during upload'));
             xhr.send(file);
         });
 
