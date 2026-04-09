@@ -51,66 +51,49 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [isUploadingVideo, setIsUploadingVideo] = useState<number | null>(null); // -1 per nuova lezione, altrimenti index
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
-    const file = event.target.files?.[0];
-    const courseId = isNew ? formData.id : id;
+    const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
+        const file = event.target.files?.[0];
+        const courseId = isNew ? formData.id : id;
 
-    if (!file || !courseId) {
-        if (!courseId) alert("Per favore, imposta prima un 'ID Corso' per poter caricare file.");
-        return;
-    }
-
-    setIsUploadingVideo(lessonIndex);
-    setUploadProgress(0);
-
-    try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-        const filePath = `${courseId}/videos/${fileName}`;
-        
-        const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://zplcjlyqmcayprettmqd.supabase.co';
-        const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwbGNqbHlxbWNheXByZXR0bXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NzA0MzgsImV4cCI6MjA4MDI0NjQzOH0.OfK1kbwc-3OBrvIIVFnnTeNCgSinVGAJiIy8jfvxjSA';
-
-        await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${supabaseUrl}/storage/v1/object/course-videos/${filePath}?upsert=true`);
-            xhr.setRequestHeader('apikey', supabaseAnonKey);
-            xhr.setRequestHeader('Authorization', `Bearer ${supabaseAnonKey}`);
-            xhr.setRequestHeader('Content-Type', file.type);
-            
-            xhr.upload.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    const percentComplete = Math.round((event.loaded / event.total) * 100);
-                    setUploadProgress(percentComplete);
-                }
-            };
-            
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve(xhr.response);
-                } else {
-                    reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
-                }
-            };
-            xhr.onerror = () => reject(new Error('Network error during upload'));
-            xhr.send(file);
-        });
-
-        if (lessonIndex === -1) { // Nuova lezione
-            setNewLesson(prev => ({ ...prev, video_storage_path: filePath }));
-        } else { // Lezione esistente
-            const updatedLessons = [...(formData.lessons_content || [])];
-            updatedLessons[lessonIndex].video_storage_path = filePath;
-            setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
+        if (!file || !courseId) {
+            if (!courseId) alert("Per favore, imposta prima un 'ID Corso' per poter caricare file.");
+            return;
         }
-    } catch (err: any) {
-        console.error("Errore upload video:", err);
-        alert("Errore upload video: " + err.message);
-    } finally {
-        setIsUploadingVideo(null);
-        setUploadProgress(null);
-    }
-  };
+
+        setIsUploadingVideo(lessonIndex);
+        setUploadProgress(0);
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+            const filePath = `${courseId}/videos/${fileName}`;
+            
+            // Usiamo l'SDK di Supabase che gestisce automaticamente autenticazione e headers
+            const { error } = await supabase.storage
+                .from('course-videos')
+                .upload(filePath, file, { 
+                    upsert: true,
+                    cacheControl: '3600'
+                });
+            
+            if (error) throw error;
+
+            if (lessonIndex === -1) { // Nuova lezione
+                setNewLesson(prev => ({ ...prev, video_storage_path: filePath }));
+            } else { // Lezione esistente
+                const updatedLessons = [...(formData.lessons_content || [])];
+                updatedLessons[lessonIndex].video_storage_path = filePath;
+                setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
+            }
+            setUploadProgress(100);
+        } catch (err: any) {
+            console.error("Errore upload video:", err);
+            alert("Errore upload video: " + err.message);
+        } finally {
+            setIsUploadingVideo(null);
+            setUploadProgress(null);
+        }
+    };
 
   const handleVideoRemove = async (lessonIndex: number) => {
     const lesson = formData.lessons_content?.[lessonIndex];
