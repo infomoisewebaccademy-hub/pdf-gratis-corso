@@ -1332,7 +1332,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                         <h3 className="text-xl font-bold mb-6 flex items-center"><Video className="mr-2 text-brand-600"/> Gestione Video Home Page</h3>
                         <div className="space-y-6">
                             <div className="bg-gray-50 p-4 rounded-xl">
-                                <label className="block text-sm font-bold mb-2">Video Hero (ID Cloudinary)</label>
+                                <label className="block text-sm font-bold mb-2">Video Hero (ID Cloudinary o URL)</label>
                                 <input 
                                     type="text" 
                                     value={landingConfig.videos?.hero_video_id || ''} 
@@ -1342,7 +1342,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 />
                             </div>
                             <div className="bg-gray-50 p-4 rounded-xl">
-                                <label className="block text-sm font-bold mb-2">Video Era AI (ID Cloudinary)</label>
+                                <label className="block text-sm font-bold mb-2">Video Era AI (ID Cloudinary o URL)</label>
                                 <input 
                                     type="text" 
                                     value={landingConfig.videos?.ai_era_video_id || ''} 
@@ -1352,7 +1352,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 />
                             </div>
                             <div className="bg-gray-50 p-4 rounded-xl">
-                                <label className="block text-sm font-bold mb-2">Video Come Funziona (ID Cloudinary)</label>
+                                <label className="block text-sm font-bold mb-2">Video Come Funziona (ID Cloudinary o URL)</label>
                                 <input 
                                     type="text" 
                                     value={landingConfig.videos?.how_it_works_video_id || ''} 
@@ -1362,7 +1362,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 />
                             </div>
                             <div className="bg-gray-50 p-4 rounded-xl">
-                                <label className="block text-sm font-bold mb-2">Video Target Section (ID Cloudinary)</label>
+                                <label className="block text-sm font-bold mb-2">Video Target Section (ID Cloudinary o URL)</label>
                                 <input 
                                     type="text" 
                                     value={landingConfig.videos?.target_section_video_id || ''} 
@@ -1382,7 +1382,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 />
                             </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-4 italic">Inserisci l'ID del video caricato su Cloudinary per i primi 4 campi, o l'URL completo per l'ultimo.</p>
+                        <p className="text-xs text-gray-500 mt-4 italic">Inserisci l'ID del video caricato su Cloudinary o l'URL completo (es. Supabase, Dropbox, etc.).</p>
                     </div>
 
                     <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">

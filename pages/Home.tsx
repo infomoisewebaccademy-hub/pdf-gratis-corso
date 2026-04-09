@@ -338,22 +338,37 @@ const FAQ_ITEMS = [
 // --- OTTIMIZZAZIONE VIDEO GLOBALE ---
 const CLOUDINARY_BASE_URL = "https://res.cloudinary.com/dhj0ztos6/video/upload";
 
-const createOptimizedVideo = (videoId: string) => {
-    if (!videoId) return { optimized: '', poster: '' };
+interface VideoSource {
+    src: string;
+    type: string;
+}
+
+interface VideoData {
+    sources: VideoSource[];
+    poster: string;
+}
+
+const createOptimizedVideo = (videoId: string): VideoData => {
+    if (!videoId) return { sources: [], poster: '' };
     
     // Se è già un URL completo, lo restituiamo così com'è
     if (videoId.startsWith('http')) {
+        const type = videoId.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
         return {
-            optimized: videoId.replace(/\.(webm|mp4)$/i, ''),
+            sources: [{ src: videoId, type }],
             poster: ''
         };
     }
 
     // Ottimizzazione aggressiva e responsiva per TUTTI i video Cloudinary.
     const optimizationParams = 'w_auto,dpr_auto,c_limit,q_auto:good';
+    const baseUrl = `${CLOUDINARY_BASE_URL}/${optimizationParams}/${videoId}`;
     
     return {
-        optimized: `${CLOUDINARY_BASE_URL}/${optimizationParams}/${videoId}`,
+        sources: [
+            { src: `${baseUrl}.webm`, type: 'video/webm' },
+            { src: `${baseUrl}.mp4`, type: 'video/mp4' }
+        ],
         poster: `${CLOUDINARY_BASE_URL}/w_auto,dpr_auto,c_limit,f_jpg,q_auto:low/${videoId}.jpg`
     };
 };
@@ -557,9 +572,15 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
 
   const aboutVideo = useMemo(() => {
     const videoUrl = config.videos?.about_video_url || config.about_section.image_url;
-    if(!videoUrl.includes('cloudinary')) return { optimized: videoUrl, poster: '' };
+    if(!videoUrl.includes('cloudinary')) {
+        const type = videoUrl.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
+        return { sources: [{ src: videoUrl, type }], poster: '' };
+    }
     const parts = videoUrl.split('/upload/');
-    if(parts.length < 2) return { optimized: videoUrl, poster: '' };
+    if(parts.length < 2) {
+        const type = videoUrl.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
+        return { sources: [{ src: videoUrl, type }], poster: '' };
+    }
     const videoId = parts[1].replace(/\.\w+$/, '');
     return createOptimizedVideo(videoId);
   }, [config.videos?.about_video_url, config.about_section.image_url]);
@@ -638,8 +659,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                 autoPlay loop muted playsInline 
                 className="w-full h-full object-cover opacity-20"
              >
-                <source src={`${heroVideo.optimized}.webm`} type="video/webm" />
-                <source src={`${heroVideo.optimized}.mp4`} type="video/mp4" />
+                {heroVideo.sources.map((source, idx) => (
+                    <source key={idx} src={source.src} type={source.type} />
+                ))}
                 Il tuo browser non supporta il tag video.
              </video>
              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-950"></div>
@@ -746,8 +768,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                   autoPlay loop muted playsInline 
                                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                                >
-                                  <source src={`${aiEraVideo.optimized}.webm`} type="video/webm" />
-                                  <source src={`${aiEraVideo.optimized}.mp4`} type="video/mp4" />
+                                   {aiEraVideo.sources.map((source, idx) => (
+                                       <source key={idx} src={source.src} type={source.type} />
+                                   ))}
                                </video>
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
@@ -918,8 +941,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                     autoPlay loop muted playsInline 
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                                 >
-                                   <source src={`${aboutVideo.optimized}.webm`} type="video/webm" />
-                                   <source src={`${aboutVideo.optimized}.mp4`} type="video/mp4" />
+                                   {aboutVideo.sources.map((source, idx) => (
+                                       <source key={idx} src={source.src} type={source.type} />
+                                   ))}
                                 </video>
                              ) : (
                                 <img 
@@ -1099,8 +1123,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                   autoPlay loop muted playsInline 
                                   className="absolute inset-0 w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-700"
                                >
-                                   <source src={`${howItWorksVideo.optimized}.webm`} type="video/webm" />
-                                   <source src={`${howItWorksVideo.optimized}.mp4`} type="video/mp4" />
+                                   {howItWorksVideo.sources.map((source, idx) => (
+                                       <source key={idx} src={source.src} type={source.type} />
+                                   ))}
                                </video>
                                {/* Gradient Overlay on Video */}
                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
@@ -1246,8 +1271,9 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                             autoPlay loop muted playsInline 
                             className="absolute inset-0 w-full h-full object-cover"
                         >
-                           <source src={`${targetSectionVideo.optimized}.webm`} type="video/webm" />
-                           <source src={`${targetSectionVideo.optimized}.mp4`} type="video/mp4" />
+                           {targetSectionVideo.sources.map((source, idx) => (
+                               <source key={idx} src={source.src} type={source.type} />
+                           ))}
                         </video>
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90"></div>
                         
