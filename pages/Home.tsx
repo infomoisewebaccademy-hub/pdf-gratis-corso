@@ -669,7 +669,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
   const heroVideo = useMemo(() => createOptimizedVideo(config.videos?.hero_video_id || 'v1765326450/home_2_bbhedx'), [config.videos?.hero_video_id]);
   const aiEraVideo = useMemo(() => createOptimizedVideo(config.videos?.ai_era_video_id || 'v1765328025/home_page_3_tnvnqm'), [config.videos?.ai_era_video_id]);
   const howItWorksVideo = useMemo(() => createOptimizedVideo(config.videos?.how_it_works_video_id || 'v1765456382/come-funziona-MWA_mpdave'), [config.videos?.how_it_works_video_id]);
-  const targetSectionVideo = useMemo(() => createOptimizedVideo(config.videos?.target_section_video_id || 'v1765392297/uomo-affari-consegna-carta_f3tj6t'), [config.videos?.target_section_video_id]);
+  const targetSectionVideo = useMemo(() => createOptimizedVideo(config.videos?.target_section_video_id || ''), [config.videos?.target_section_video_id]);
 
   const aboutVideo = useMemo(() => {
     const videoUrl = config.videos?.about_video_url || config.about_section.image_url;
