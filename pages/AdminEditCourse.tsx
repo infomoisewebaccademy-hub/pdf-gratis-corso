@@ -46,6 +46,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [imgError, setImgError] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '' });
   const [isAddingLesson, setIsAddingLesson] = useState(false);
@@ -225,7 +227,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
 
   useEffect(() => { setImgError(false); }, [formData.image]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || (isNew && !formData.id)) {
         alert("ID Corso e Titolo sono obbligatori."); return;
@@ -233,6 +235,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     if (formData.discounted_price && formData.discounted_price >= formData.price) {
         alert("Il prezzo fedeltà deve essere inferiore al prezzo standard."); return;
     }
+    
+    setIsSaving(true);
     const courseToSave = {
       ...formData,
       id: isNew ? formData.id : id,
@@ -254,8 +258,12 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       additional_benefits: formData.additional_benefits?.filter(b => b.trim() !== '') || [],
       program_title: formData.program_title || null,
     } as Course;
-    onSave(courseToSave);
-    navigate('/admin');
+    
+    await onSave(courseToSave);
+    
+    setIsSaving(false);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,7 +361,10 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             </div>
             <div className="flex gap-3 w-full sm:w-auto">
                 <button type="button" onClick={handleCancel} className="flex-1 sm:flex-none px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-100">Annulla</button>
-                <button type="submit" className="flex-1 sm:flex-none px-6 py-3 bg-brand-600 text-white rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 flex items-center justify-center"><Save className="h-5 w-5 mr-2" />{isNew ? 'Pubblica' : 'Salva'}</button>
+                <button type="submit" disabled={isSaving} className="flex-1 sm:flex-none px-6 py-3 bg-brand-600 text-white rounded-lg font-bold shadow-lg shadow-brand-500/30 hover:bg-brand-700 flex items-center justify-center">
+                    {isSaving ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : showSuccess ? <CheckCircle2 className="h-5 w-5 mr-2 text-green-400" /> : <Save className="h-5 w-5 mr-2" />}
+                    {isSaving ? 'Salvataggio...' : showSuccess ? 'Salvato!' : (isNew ? 'Pubblica' : 'Salva')}
+                </button>
             </div>
         </div>
 

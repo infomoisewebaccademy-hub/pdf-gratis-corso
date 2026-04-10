@@ -219,7 +219,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   source: 'course_full_waiting_list'
               }]);
               
-          if (error) throw error;
+          if (error) {
+              if (error.code === '23505') {
+                  setWaitingListSuccess(true);
+                  return;
+              }
+              throw error;
+          }
           setWaitingListSuccess(true);
       } catch (err: any) {
           console.error("Errore iscrizione lista d'attesa:", err);
