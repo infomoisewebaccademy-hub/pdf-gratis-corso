@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson } from '../types';
 import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../services/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
 
 interface AdminEditCourseProps {
@@ -52,6 +52,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '' });
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadFileProgress, setUploadFileProgress] = useState<number | null>(null);
   const [isUploadingVideo, setIsUploadingVideo] = useState<number | null>(null); // -1 per nuova lezione, altrimenti index
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
@@ -68,19 +69,44 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         setUploadProgress(0);
 
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            
+            if (!token) throw new Error("Non autenticato");
+
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
             const filePath = `${courseId}/videos/${fileName}`;
             
-            // Usiamo l'SDK di Supabase che gestisce automaticamente autenticazione e headers
-            const { error } = await supabase.storage
-                .from('course-videos')
-                .upload(filePath, file, { 
-                    upsert: true,
-                    cacheControl: '3600'
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        setUploadProgress(percentComplete);
+                    }
                 });
-            
-            if (error) throw error;
+
+                xhr.addEventListener("load", () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.response);
+                    } else {
+                        reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.responseText}`));
+                    }
+                });
+
+                xhr.addEventListener("error", () => {
+                    reject(new Error("Upload failed due to a network error."));
+                });
+
+                xhr.open("POST", `${supabaseUrl}/storage/v1/object/course-videos/${filePath}`);
+                xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+                xhr.setRequestHeader("apikey", supabaseAnonKey);
+                xhr.setRequestHeader("x-upsert", "true");
+                xhr.setRequestHeader("Content-Type", file.type || 'application/octet-stream');
+                
+                xhr.send(file);
+            });
 
             if (lessonIndex === -1) { // Nuova lezione
                 setNewLesson(prev => ({ ...prev, video_storage_path: filePath }));
@@ -276,12 +302,46 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     }
     
     setIsUploadingFile(true);
+    setUploadFileProgress(0);
     try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        
+        if (!token) throw new Error("Non autenticato");
+
         // Sanitize filename: remove quotes and other potentially problematic characters
         const sanitizedFileName = file.name.replace(/["']/g, '').replace(/\s+/g, '_');
         const filePath = `${courseId}/${sanitizedFileName}`;
-        const { error } = await supabase.storage.from('course-resources').upload(filePath, file, { upsert: true });
-        if (error) throw error;
+        
+        await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener("progress", (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    setUploadFileProgress(percentComplete);
+                }
+            });
+
+            xhr.addEventListener("load", () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.responseText}`));
+                }
+            });
+
+            xhr.addEventListener("error", () => {
+                reject(new Error("Upload failed due to a network error."));
+            });
+
+            xhr.open("POST", `${supabaseUrl}/storage/v1/object/course-resources/${filePath}`);
+            xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+            xhr.setRequestHeader("apikey", supabaseAnonKey);
+            xhr.setRequestHeader("x-upsert", "true");
+            xhr.setRequestHeader("Content-Type", file.type || 'application/octet-stream');
+            
+            xhr.send(file);
+        });
         
         const { data: { publicUrl } } = supabase.storage.from('course-resources').getPublicUrl(filePath);
         setFormData({ ...formData, resource_file_url: publicUrl, resource_file_name: file.name });
@@ -294,7 +354,10 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             alert("Errore upload: " + err.message); 
         }
     } 
-    finally { setIsUploadingFile(false); }
+    finally { 
+        setIsUploadingFile(false); 
+        setUploadFileProgress(null);
+    }
   };
   
   const handleFileRemove = async () => {
@@ -427,9 +490,15 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><FileText className="h-5 w-5 mr-2 text-brand-600" /> Materiale Didattico</h2>
                     <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-6">
                         {isUploadingFile ? (
-                            <div className="flex flex-col items-center justify-center text-gray-500">
+                            <div className="flex flex-col items-center justify-center text-gray-500 w-full max-w-xs mx-auto">
                                 <Loader2 className="h-8 w-8 animate-spin text-brand-500 mb-2"/>
-                                <span className="text-sm font-bold">Caricamento...</span>
+                                <span className="text-sm font-bold mb-2">Caricamento...</span>
+                                {uploadFileProgress !== null && (
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="bg-brand-600 h-2 rounded-full" style={{ width: `${uploadFileProgress}%` }}></div>
+                                        <p className="text-[10px] text-gray-500 mt-1 text-center">{uploadFileProgress}% caricato</p>
+                                    </div>
+                                )}
                             </div>
                         ) : formData.resource_file_url ? (
                             <div>
