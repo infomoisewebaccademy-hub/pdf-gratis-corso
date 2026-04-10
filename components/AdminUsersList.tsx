@@ -33,6 +33,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   const [waitingList, setWaitingList] = useState<WaitingListEntry[]>([]);
   const [isNotifying, setIsNotifying] = useState<string | null>(null);
   const [isBulkNotifying, setIsBulkNotifying] = useState(false);
+  const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
+  const [notificationStatus, setNotificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>('all');
 
   useEffect(() => {
@@ -93,14 +95,17 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   };
 
   const handleBulkNotify = async () => {
-    if (filteredWaitingList.length === 0) return;
-    if (!confirm(`Vuoi inviare una notifica email a TUTTI i ${filteredWaitingList.length} iscritti filtrati?`)) return;
+    if (selectedEntries.length === 0) return;
+    if (!confirm(`Vuoi inviare una notifica email a TUTTI i ${selectedEntries.length} iscritti selezionati?`)) return;
     
     setIsBulkNotifying(true);
+    setNotificationStatus('idle');
     let successCount = 0;
     let failCount = 0;
 
-    for (const entry of filteredWaitingList) {
+    for (const entryId of selectedEntries) {
+      const entry = waitingList.find(e => e.id === entryId);
+      if (!entry) continue;
       try {
         await sendNotification(entry);
         successCount++;
@@ -110,8 +115,16 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       }
     }
 
-    alert(`Operazione completata!\nSuccessi: ${successCount}\nFallimenti: ${failCount}`);
+    if (successCount > 0) {
+        setNotificationStatus('success');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    } else {
+        setNotificationStatus('error');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    }
+    
     setIsBulkNotifying(false);
+    setSelectedEntries([]);
   };
 
   const handleExportWaitingList = () => {
@@ -237,14 +250,26 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
           {activeSubTab === 'waiting_list' && (
             <>
               {filteredWaitingList.length > 0 && (
-                <button
-                  onClick={handleBulkNotify}
-                  disabled={isBulkNotifying}
-                  className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-brand-700 transition-all disabled:opacity-50"
-                >
-                  {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Notifica Tutti ({filteredWaitingList.length})
-                </button>
+                <div className="flex items-center gap-2">
+                  {notificationStatus === 'success' && (
+                    <span className="text-green-600 text-sm font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300">
+                      <Check className="h-4 w-4" /> Inviate!
+                    </span>
+                  )}
+                  {notificationStatus === 'error' && (
+                    <span className="text-red-600 text-sm font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300">
+                      <XCircle className="h-4 w-4" /> Errore!
+                    </span>
+                  )}
+                  <button
+                    onClick={handleBulkNotify}
+                    disabled={isBulkNotifying || selectedEntries.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-brand-700 transition-all disabled:opacity-50"
+                  >
+                    {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    Notifica Selezionati ({selectedEntries.length})
+                  </button>
+                </div>
               )}
               <select
                 value={selectedCourseFilter}
@@ -366,6 +391,20 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedEntries.length === filteredWaitingList.length && filteredWaitingList.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedEntries(filteredWaitingList.map(e => e.id));
+                        } else {
+                          setSelectedEntries([]);
+                        }
+                      }}
+                      className="h-4 w-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500"
+                    />
+                  </th>
                   <th className="px-6 py-4 font-medium">Utente</th>
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Percorso Interessato</th>
@@ -377,6 +416,20 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 {filteredWaitingList.length > 0 ? (
                   filteredWaitingList.map((entry) => (
                     <tr key={entry.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedEntries.includes(entry.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedEntries([...selectedEntries, entry.id]);
+                            } else {
+                              setSelectedEntries(selectedEntries.filter(id => id !== entry.id));
+                            }
+                          }}
+                          className="h-4 w-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500"
+                        />
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div className="h-10 w-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg mr-3">
