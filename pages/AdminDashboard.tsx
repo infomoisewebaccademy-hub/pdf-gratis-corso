@@ -11,6 +11,7 @@ import { ImagePicker } from '../components/ImagePicker';
 import { AdminAnalyticsDashboard } from '../components/AdminAnalyticsDashboard';
 import { AdminUsersList } from '../components/AdminUsersList';
 import { AdminSupportManager } from '../components/AdminSupportManager';
+import { AdminLiveUsers } from '../components/AdminLiveUsers';
 import { TimeRange } from '../components/AdminAnalyticsDashboard';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
@@ -374,7 +375,7 @@ interface AdminDashboardProps {
   onRefresh: () => Promise<void>;
   currentSettings: PlatformSettings;
   onUpdateSettings: (newSettings: PlatformSettings) => Promise<void>;
-  initialTab?: 'dashboard' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community' | 'support';
+  initialTab?: 'dashboard' | 'live' | 'users' | 'courses' | 'general' | 'landing_manual' | 'landing_ai' | 'launch' | 'pdf_guide' | 'community' | 'support';
 }
 
 const ColorInput: React.FC<{label: string, value: string, name: string, onChange: (name: string, value: string) => void}> = ({label, value, name, onChange}) => (
@@ -935,6 +936,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
 
   const adminMenuItems: SidebarItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
+    { id: 'live', label: 'Utenti Live', icon: Activity },
     { id: 'users', label: 'Utenti', icon: Users },
     { id: 'courses', label: 'Corsi', icon: Book },
     { id: 'launch', label: 'Pre-Lancio', icon: Rocket },
@@ -1034,7 +1036,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_discount_badge boolean DEFAULT true;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_features boolean DEFAULT true;</code>
-                          <code className="text-green-400 select-all block">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS upsell_course_id text;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS upsell_course_id text;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;</code>
+                          <code className="text-green-400 select-all block mb-2">UPDATE public.profiles SET email = auth.users.email FROM auth.users WHERE public.profiles.id = auth.users.id;</code>
                       </div>
               </div>
           )}
@@ -1049,6 +1053,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                   customStartDate={customStartDate} 
                   customEndDate={customEndDate} 
                 />
+            )}
+
+            {activeTab === 'live' && (
+                <AdminLiveUsers />
             )}
 
             {activeTab === 'users' && (

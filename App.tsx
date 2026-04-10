@@ -23,6 +23,8 @@ import { supabase, createCheckoutSession } from './services/supabase';
 import { CartProvider } from './contexts/CartContext';
 import { initMetaPixel, trackPageView, trackCompleteRegistration } from './services/metaPixel';
 
+import { PresenceTracker } from './components/PresenceTracker';
+
 // --- TOKEN INTERCEPTOR ---
 const TokenInterceptor: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
     const [status, setStatus] = useState<'idle' | 'processing'>('idle');
@@ -405,6 +407,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
+      <PresenceTracker user={user} />
       {!hideNavbar && (
         <Navbar 
           user={user} 
@@ -433,6 +436,7 @@ const AppContent: React.FC = () => {
         <Route path="/support" element={user ? <SupportPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         
         <Route path="/admin/dashboard" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="dashboard" /> : <Navigate to="/" />} />
+        <Route path="/admin/live" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="live" /> : <Navigate to="/" />} />
         <Route path="/admin/users" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="users" /> : <Navigate to="/" />} />
         <Route path="/admin/courses" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="courses" /> : <Navigate to="/" />} />
         <Route path="/admin/launch" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="launch" /> : <Navigate to="/" />} />
