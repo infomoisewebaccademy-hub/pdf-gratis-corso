@@ -11,6 +11,7 @@ import { ImagePicker } from '../components/ImagePicker';
 import { AdminAnalyticsDashboard } from '../components/AdminAnalyticsDashboard';
 import { AdminUsersList } from '../components/AdminUsersList';
 import { AdminSupportManager } from '../components/AdminSupportManager';
+import { TimeRange } from '../components/AdminAnalyticsDashboard';
 
 // Fix: Added missing usp_section and cta_section to satisfy LandingPageConfig interface
 const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
@@ -389,6 +390,9 @@ const ColorInput: React.FC<{label: string, value: string, name: string, onChange
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, onDelete, onRefresh, currentSettings, onUpdateSettings, initialTab = 'dashboard' }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [timeRange, setTimeRange] = useState<TimeRange>('today');
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -969,7 +973,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                       {activeTab === 'general' && 'Controlla ogni aspetto della tua Academy.'}
                   </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex items-center gap-3">
+                  {activeTab === 'dashboard' && (
+                    <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
+                        <select 
+                            value={timeRange}
+                            onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+                            className="bg-transparent text-sm font-bold text-gray-700 px-3 py-2 outline-none cursor-pointer"
+                        >
+                            <option value="today">Oggi</option>
+                            <option value="yesterday">Ieri</option>
+                            <option value="7d">Ultimi 7 giorni</option>
+                            <option value="30d">Ultimi 30 giorni</option>
+                            <option value="90d">Ultimi 90 giorni</option>
+                            <option value="all">Sempre</option>
+                            <option value="custom">Personalizzato</option>
+                        </select>
+                        {timeRange === 'custom' && (
+                          <div className="flex items-center gap-2 px-2 border-l border-gray-200">
+                            <input 
+                              type="date" 
+                              value={customStartDate}
+                              onChange={(e) => setCustomStartDate(e.target.value)}
+                              className="text-sm border-none outline-none bg-transparent text-gray-700"
+                            />
+                            <span className="text-gray-400">-</span>
+                            <input 
+                              type="date" 
+                              value={customEndDate}
+                              onChange={(e) => setCustomEndDate(e.target.value)}
+                              className="text-sm border-none outline-none bg-transparent text-gray-700"
+                            />
+                          </div>
+                        )}
+                    </div>
+                  )}
                   {activeTab === 'general' && (
                       <button onClick={() => setShowHelp(!showHelp)} className="bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold hover:bg-gray-300 transition-all flex items-center">
                           <Terminal className="h-5 w-5 mr-2" /> SQL Help
@@ -1005,7 +1043,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             
             {activeTab === 'dashboard' && (
-                <AdminAnalyticsDashboard courses={courses} />
+                <AdminAnalyticsDashboard 
+                  courses={courses} 
+                  timeRange={timeRange} 
+                  customStartDate={customStartDate} 
+                  customEndDate={customEndDate} 
+                />
             )}
 
             {activeTab === 'users' && (

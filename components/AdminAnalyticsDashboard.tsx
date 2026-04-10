@@ -11,13 +11,15 @@ import { it } from 'date-fns/locale';
 
 interface AdminAnalyticsDashboardProps {
   courses: Course[];
+  timeRange: TimeRange;
+  customStartDate: string;
+  customEndDate: string;
 }
 
-type TimeRange = '7d' | '30d' | '90d' | 'all';
+export type TimeRange = 'today' | 'yesterday' | '7d' | '30d' | '90d' | 'all' | 'custom';
 
-export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = ({ courses }) => {
+export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = ({ courses, timeRange, customStartDate, customEndDate }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const [isMounted, setIsMounted] = useState(false);
   
   const [rawData, setRawData] = useState<{
@@ -63,21 +65,42 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
   const filteredData = useMemo(() => {
     const now = new Date();
     let startDate: Date | null = null;
+    let endDate: Date | null = null;
 
-    if (timeRange === '7d') startDate = subDays(now, 7);
-    else if (timeRange === '30d') startDate = subDays(now, 30);
-    else if (timeRange === '90d') startDate = subDays(now, 90);
+    if (timeRange === 'today') {
+      startDate = startOfDay(now);
+    } else if (timeRange === 'yesterday') {
+      startDate = startOfDay(subDays(now, 1));
+      endDate = startOfDay(now);
+    } else if (timeRange === '7d') {
+      startDate = subDays(now, 7);
+    } else if (timeRange === '30d') {
+      startDate = subDays(now, 30);
+    } else if (timeRange === '90d') {
+      startDate = subDays(now, 90);
+    } else if (timeRange === 'custom' && customStartDate && customEndDate) {
+      startDate = parseISO(customStartDate);
+      endDate = new Date(parseISO(customEndDate).setHours(23, 59, 59, 999));
+    }
 
-    const filteredPurchases = startDate 
-      ? rawData.purchases.filter(p => p.created_at && isAfter(parseISO(p.created_at), startDate!))
-      : rawData.purchases;
+    const filteredPurchases = rawData.purchases.filter(p => {
+      if (!p.created_at) return false;
+      const date = parseISO(p.created_at);
+      if (startDate && !isAfter(date, startDate) && date.getTime() !== startDate.getTime()) return false;
+      if (endDate && isAfter(date, endDate)) return false;
+      return true;
+    });
 
-    const filteredProgress = startDate
-      ? rawData.progress.filter(p => p.updated_at && isAfter(parseISO(p.updated_at), startDate!))
-      : rawData.progress;
+    const filteredProgress = rawData.progress.filter(p => {
+      if (!p.updated_at) return false;
+      const date = parseISO(p.updated_at);
+      if (startDate && !isAfter(date, startDate) && date.getTime() !== startDate.getTime()) return false;
+      if (endDate && isAfter(date, endDate)) return false;
+      return true;
+    });
 
     return { purchases: filteredPurchases, progress: filteredProgress };
-  }, [rawData, timeRange]);
+  }, [rawData, timeRange, customStartDate, customEndDate]);
 
   const stats = useMemo(() => {
     const { purchases, progress } = filteredData;
@@ -204,31 +227,6 @@ export const AdminAnalyticsDashboard: React.FC<AdminAnalyticsDashboardProps> = (
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-gray-500" />
-          <span className="font-medium text-gray-700">Periodo di analisi:</span>
-        </div>
-        <div className="flex bg-gray-100 p-1 rounded-xl">
-          {(['7d', '30d', '90d', 'all'] as TimeRange[]).map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                timeRange === range 
-                  ? 'bg-white text-brand-600 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {range === '7d' ? '7 Giorni' : range === '30d' ? '30 Giorni' : range === '90d' ? '3 Mesi' : 'Sempre'}
-            </button>
-          ))}
-        </div>
-        <button onClick={fetchRawData} className="p-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 ml-auto sm:ml-0">
-          <BarChart3 className="h-5 w-5" />
-        </button>
-      </div>
-
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-gradient-to-br from-white to-blue-50/50 rounded-2xl p-6 border border-blue-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
