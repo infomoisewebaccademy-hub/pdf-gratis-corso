@@ -33,6 +33,8 @@ export interface Course {
   additional_benefits?: string[]; // NUOVO: Punti "Cosa avrai in più"
   program_title?: string; // NUOVO: Titolo personalizzato per la sezione lezioni
   has_waiting_list?: boolean; // NUOVO: Se abilitare la lista d'attesa quando il corso è pieno
+  show_price_on_home?: boolean; // NUOVO: Se mostrare il prezzo nella home page
+  show_if_full_on_home?: boolean; // NUOVO: Se mostrare il corso nella home page quando è pieno
 }
 
 export interface UserProfile {
@@ -132,6 +134,7 @@ export interface StatsSection {
 
 export interface PdfGuideConfig extends PreLaunchConfig {
   guide_pdf_url?: string; 
+  form_image_height?: number; // NUOVO: Altezza immagine nel box iscrizione
   showcase_items?: ShowcaseItem[];
   stats_section?: StatsSection;
   testimonials_section?: {

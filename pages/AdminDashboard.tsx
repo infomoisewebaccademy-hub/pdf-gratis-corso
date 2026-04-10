@@ -738,6 +738,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                               {pdfGuideConfig.guide_pdf_url ? 'Sostituisci' : 'Carica'}
                           </button>
                       </div>
+                      <div className="mt-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Altezza Immagine Form (px)</label>
+                          <input 
+                              type="number" 
+                              value={pdfGuideConfig.form_image_height || ''} 
+                              onChange={e => setPdfGuideConfig(prev => ({...prev, form_image_height: parseInt(e.target.value) || undefined}))} 
+                              className="w-full border p-2 rounded text-sm" 
+                              placeholder="es. 100" 
+                          />
+                      </div>
                   </div>
 
                   <details className="bg-gray-50 border border-gray-200 p-4 rounded-lg">

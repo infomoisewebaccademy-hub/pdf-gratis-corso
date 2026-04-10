@@ -198,7 +198,8 @@ export const PdfGuideLanding: React.FC = () => {
                         <img 
                             src={formImage} 
                             alt="Guida PDF" 
-                            className="h-24 md:h-32 w-auto object-contain rounded-xl shadow-lg shadow-brand-500/10"
+                            style={{ height: config.form_image_height ? `${config.form_image_height}px` : undefined }}
+                            className="w-auto object-contain rounded-xl shadow-lg shadow-brand-500/10"
                             referrerPolicy="no-referrer"
                         />
                     </div>
@@ -236,7 +237,7 @@ export const PdfGuideLanding: React.FC = () => {
             </div>
 
             {/* 1. HERO SECTION */}
-            <header className="relative text-center pt-16 pb-8 md:pt-32 md:pb-24 px-4 overflow-hidden">
+            <header className="relative text-center pt-24 pb-8 md:pt-32 md:pb-24 px-4 overflow-hidden">
                 <div className="max-w-5xl mx-auto relative z-10">
                     <h1 className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[0.95] mb-6 md:mb-8">
                         {config.headline_solid} <br/>

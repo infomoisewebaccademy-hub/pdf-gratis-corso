@@ -643,7 +643,7 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
           }
           return obj;
       };
-      return replaceCorso(courses.filter(c => !c.is_hidden));
+      return replaceCorso(courses.filter(c => !c.is_hidden && (c.status !== 'full' || c.show_if_full_on_home !== false)));
   }, [courses]);
 
   const processedFaqs = useMemo(() => {
@@ -961,6 +961,11 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                             <span className="bg-brand-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-md">
                                                 {course.level}
                                             </span>
+                                            {course.status === 'full' && (
+                                                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-md">
+                                                    Pieno
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     
@@ -993,7 +998,11 @@ export const Home: React.FC<HomeProps> = ({ courses, onCourseSelect, user, landi
                                             <div className="flex items-end justify-between mb-6">
                                                 <div>
                                                     <span className="text-sm text-slate-500 block mb-1">Prezzo</span>
-                                                    <span className="text-4xl font-black text-white tracking-tight">€{course.price}</span>
+                                                    {course.show_price_on_home !== false ? (
+                                                        <span className="text-4xl font-black text-white tracking-tight">€{course.price}</span>
+                                                    ) : (
+                                                        <span className="text-xl font-bold text-slate-400">Prezzo su richiesta</span>
+                                                    )}
                                                 </div>
                                             </div>
 

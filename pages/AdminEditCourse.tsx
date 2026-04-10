@@ -32,6 +32,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     status: 'active',
     is_hidden: false,
     has_waiting_list: true,
+    show_price_on_home: true,
+    show_if_full_on_home: true,
     resource_file_url: '',
     resource_file_name: '',
     rating: 5,
@@ -241,6 +243,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       status: formData.status || 'active',
       is_hidden: formData.is_hidden || false,
       has_waiting_list: formData.has_waiting_list !== false,
+      show_price_on_home: formData.show_price_on_home !== false,
+      show_if_full_on_home: formData.show_if_full_on_home !== false,
       resource_file_url: formData.resource_file_url || null,
       resource_file_name: formData.resource_file_name || null,
       rating: formData.rating || 5,
@@ -530,6 +534,32 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.is_hidden ? 'bg-brand-600' : 'bg-gray-200'}`}
                             >
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_hidden ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Mostra Prezzo in Home</label>
+                                <p className="text-xs text-gray-500">Mostra il prezzo del corso nella home page.</p>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData({...formData, show_price_on_home: !formData.show_price_on_home})}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.show_price_on_home !== false ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.show_price_on_home !== false ? 'translate-x-6' : 'translate-x-1'}`} />
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700">Mostra se Pieno in Home</label>
+                                <p className="text-xs text-gray-500">Mostra il corso nella home page anche se è "Pieno".</p>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => setFormData({...formData, show_if_full_on_home: !formData.show_if_full_on_home})}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formData.show_if_full_on_home !== false ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.show_if_full_on_home !== false ? 'translate-x-6' : 'translate-x-1'}`} />
                             </button>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">

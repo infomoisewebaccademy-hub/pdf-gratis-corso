@@ -252,192 +252,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 space-y-8">
-                
-                {isPurchased && activeLesson ? (
-                    <SecureVideoPlayer lesson={activeLesson} onEnded={() => markLessonAsCompleted(activeLesson.id)} />
-                ) : (
-                    <div className="space-y-6">
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span className="px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-bold uppercase tracking-wider border border-brand-100">{course.level}</span>
-                            {course.rating && <StarRating rating={course.rating} />}
-                            {isFull && <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-red-200">Posti Esauriti</span>}
-                            {isComingSoon && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{course.title}</h1>
-                        <div 
-                            className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl"
-                            dangerouslySetInnerHTML={{ __html: course.description }}
-                        />
-                    </div>
-                )}
-
-                {/* BLOCCO UPSELL (Offerta Speciale) */}
-                {isPurchased && upsellCourse && !user?.purchased_courses.includes(upsellCourse.id) && (() => {
-                    const upsellDiscountAvailable = user && upsellCourse.discounted_price && upsellCourse.discounted_price > 0;
-                    const upsellFinalPrice = upsellDiscountAvailable ? upsellCourse.discounted_price : upsellCourse.price;
-                    
-                    return (
-                        <div className="bg-white border border-brand-200 p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
-                            <div className="flex items-start gap-4 flex-1">
-                                <div className="bg-brand-50 p-3 rounded-full hidden sm:block">
-                                    <Sparkles className="h-6 w-6 text-brand-600" />
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="text-lg font-bold text-gray-900">Passa al livello successivo</h3>
-                                        {upsellDiscountAvailable && (
-                                            <span className="inline-flex items-center px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-[10px] font-bold uppercase tracking-wider">
-                                                Offerta Fedeltà
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-gray-600 text-sm mb-2">
-                                        Scopri <strong>{upsellCourse.title}</strong> per completare la tua formazione.
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-lg font-black text-brand-600">€{upsellFinalPrice}</span>
-                                        <span className="text-gray-400 line-through text-sm">€{upsellCourse.price * (upsellDiscountAvailable ? 1 : 1.5)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={() => navigate(`/course/${upsellCourse.id}`)}
-                                className="w-full sm:w-auto bg-brand-50 text-brand-700 border border-brand-200 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-100 transition-all flex items-center justify-center whitespace-nowrap"
-                            >
-                                Scopri di più <ArrowLeft className="h-4 w-4 rotate-180 ml-2" />
-                            </button>
-                        </div>
-                    );
-                })()}
-                
-                {/* I blocchi di download sono stati spostati nella sidebar */}
-
-                {isPurchased && activeLesson && (
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div className="flex-1">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{activeLesson.title}</h2>
-                            <p className="text-gray-600 whitespace-pre-wrap">{activeLesson.description}</p>
-                        </div>
-                        <button 
-                            onClick={() => markLessonAsCompleted(activeLesson.id)}
-                            disabled={completedLessons.includes(activeLesson.id)}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm ${
-                                completedLessons.includes(activeLesson.id)
-                                ? 'bg-green-50 text-green-600 border border-green-100'
-                                : 'bg-brand-600 text-white hover:bg-brand-700 shadow-brand-500/20'
-                            }`}
-                        >
-                            {completedLessons.includes(activeLesson.id) ? (
-                                <><CheckCircle2 className="h-5 w-5" /> Completata</>
-                            ) : (
-                                <>Segna come completata</>
-                            )}
-                        </button>
-                    </div>
-                )}
-
-                {!activeLesson && (
-                    <div className="flex flex-wrap gap-6 py-6 border-y border-gray-200">
-                        <div className="flex items-center text-gray-700">
-                            <Clock className="h-5 w-5 mr-2 text-gray-400" />
-                            <span className="font-semibold">{course.duration}</span>
-                        </div>
-                        <div className="flex items-center text-gray-700">
-                            <Book className="h-5 w-5 mr-2 text-gray-400" />
-                            <span className="font-semibold">{course.lessons_content?.length || course.lessons} Lezioni</span>
-                        </div>
-                        <div className="flex items-center text-gray-700">
-                            <BarChart className="h-5 w-5 mr-2 text-gray-400" />
-                            <span className="font-semibold">Livello {course.level}</span>
-                        </div>
-                    </div>
-                )}
-
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                    <h2 className="text-2xl font-bold mb-6">{course.program_title || "Programma del Percorso"}</h2>
-                    
-                    {isPdfGuideCourse && (
-                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 flex items-start gap-3">
-                            <div className="bg-amber-100 p-2 rounded-full mt-0.5">
-                                <PlayCircle className="h-5 w-5 text-amber-600" />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-amber-900">Hai a disposizione anche i video!</h4>
-                                <p className="text-sm text-amber-800">Oltre alla guida PDF, puoi seguire le lezioni video qui sotto per approfondire ogni concetto.</p>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="space-y-4">
-                        {(!course.lessons_content || course.lessons_content.length === 0) ? (
-                            <div className="text-center text-gray-400 py-4">{isPdfGuideCourse ? "Usa il pulsante in alto per scaricare la guida PDF." : "Lezioni in arrivo..."}</div>
-                        ) : (
-                            course.lessons_content.map((lesson, idx) => {
-                                const isCompleted = completedLessons.includes(lesson.id);
-                                return (
-                                    <div 
-                                        key={idx} 
-                                        onClick={() => {
-                                            if (isPurchased) {
-                                                setActiveLesson(lesson);
-                                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                                            }
-                                        }}
-                                        className={`border rounded-lg p-4 transition-all cursor-pointer ${
-                                            activeLesson?.id === lesson.id 
-                                            ? 'bg-brand-50 border-brand-200 ring-1 ring-brand-200' 
-                                            : 'border-gray-100 hover:bg-gray-50'
-                                        } ${!isPurchased && 'opacity-70'}`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div className="flex items-center">
-                                                <div className={`p-2 rounded mr-4 font-bold text-sm ${
-                                                    isCompleted ? 'bg-green-100 text-green-700' : 
-                                                    activeLesson?.id === lesson.id ? 'bg-brand-100 text-brand-700' : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                    {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : (idx + 1).toString().padStart(2, '0')}
-                                                </div>
-                                                <div>
-                                                    <h4 className={`font-bold ${activeLesson?.id === lesson.id ? 'text-brand-900' : 'text-gray-900'} ${isCompleted ? 'text-green-800' : ''}`}>
-                                                        {lesson.title}
-                                                    </h4>
-                                                    {lesson.description && <p className="text-xs text-gray-400 line-clamp-1">{lesson.description}</p>}
-                                                </div>
-                                            </div>
-                                            {isPurchased ? (
-                                                <div className="flex items-center gap-3">
-                                                    {isCompleted && <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded border border-green-100">Fatto</span>}
-                                                    <PlayCircle className={`h-5 w-5 ${activeLesson?.id === lesson.id ? 'text-brand-600' : 'text-gray-400'}`} />
-                                                </div>
-                                            ) : (
-                                                <Lock className="h-4 w-4 text-gray-400" />
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
-
-                {!activeLesson && course.show_features !== false && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                        <h2 className="text-2xl font-bold mb-6">Cosa Imparerai</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {course.features.map((feat, i) => (
-                                <div key={i} className="flex items-start">
-                                    <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
-                                    <span className="text-gray-600">{feat}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 lg:order-2">
                 <div className="sticky top-28 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                     {!activeLesson && (
                         <img src={course.image} alt={course.title} className={`w-full h-48 object-cover ${!isPurchasable && !isPurchased ? 'grayscale-[0.5]' : ''}`} />
@@ -633,6 +448,188 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         )}
                     </div>
                 </div>
+            </div>
+            <div className="lg:col-span-2 lg:order-1 space-y-8">
+                
+                {isPurchased && activeLesson ? (
+                    <SecureVideoPlayer lesson={activeLesson} onEnded={() => markLessonAsCompleted(activeLesson.id)} />
+                ) : (
+                    <div className="space-y-6">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-bold uppercase tracking-wider border border-brand-100">{course.level}</span>
+                            {course.rating && <StarRating rating={course.rating} />}
+                            {isFull && <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-red-200">Posti Esauriti</span>}
+                            {isComingSoon && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border border-blue-200">In Arrivo</span>}
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{course.title}</h1>
+                        <div 
+                            className="text-lg text-slate-600 leading-relaxed whitespace-pre-wrap max-w-3xl"
+                            dangerouslySetInnerHTML={{ __html: course.description }}
+                        />
+                    </div>
+                )}
+
+                {/* BLOCCO UPSELL (Offerta Speciale) */}
+                {isPurchased && upsellCourse && !user?.purchased_courses.includes(upsellCourse.id) && (() => {
+                    const upsellDiscountAvailable = user && upsellCourse.discounted_price && upsellCourse.discounted_price > 0;
+                    const upsellFinalPrice = upsellDiscountAvailable ? upsellCourse.discounted_price : upsellCourse.price;
+                    
+                    return (
+                        <div className="bg-white border border-brand-200 p-5 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
+                            <div className="flex items-start gap-4 flex-1">
+                                <div className="bg-brand-50 p-3 rounded-full hidden sm:block">
+                                    <Sparkles className="h-6 w-6 text-brand-600" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-lg font-bold text-gray-900">Passa al livello successivo</h3>
+                                        {upsellDiscountAvailable && (
+                                            <span className="inline-flex items-center px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-[10px] font-bold uppercase tracking-wider">
+                                                Offerta Fedeltà
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-gray-600 text-sm mb-2">
+                                        Scopri <strong>{upsellCourse.title}</strong> per completare la tua formazione.
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg font-black text-brand-600">€{upsellFinalPrice}</span>
+                                        <span className="text-gray-400 line-through text-sm">€{upsellCourse.price * (upsellDiscountAvailable ? 1 : 1.5)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => navigate(`/course/${upsellCourse.id}`)}
+                                className="w-full sm:w-auto bg-brand-50 text-brand-700 border border-brand-200 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-100 transition-all flex items-center justify-center whitespace-nowrap"
+                            >
+                                Scopri di più <ArrowLeft className="h-4 w-4 rotate-180 ml-2" />
+                            </button>
+                        </div>
+                    );
+                })()}
+                
+                {isPurchased && activeLesson && (
+                    <div className="bg-white p-6 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex-1">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{activeLesson.title}</h2>
+                            <p className="text-gray-600 whitespace-pre-wrap">{activeLesson.description}</p>
+                        </div>
+                        <button 
+                            onClick={() => markLessonAsCompleted(activeLesson.id)}
+                            disabled={completedLessons.includes(activeLesson.id)}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm ${
+                                completedLessons.includes(activeLesson.id)
+                                ? 'bg-green-50 text-green-600 border border-green-100'
+                                : 'bg-brand-600 text-white hover:bg-brand-700 shadow-brand-500/20'
+                            }`}
+                        >
+                            {completedLessons.includes(activeLesson.id) ? (
+                                <><CheckCircle2 className="h-5 w-5" /> Completata</>
+                            ) : (
+                                <>Segna come completata</>
+                            )}
+                        </button>
+                    </div>
+                )}
+
+                {!activeLesson && (
+                    <div className="flex flex-wrap gap-6 py-6 border-y border-gray-200">
+                        <div className="flex items-center text-gray-700">
+                            <Clock className="h-5 w-5 mr-2 text-gray-400" />
+                            <span className="font-semibold">{course.duration}</span>
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                            <Book className="h-5 w-5 mr-2 text-gray-400" />
+                            <span className="font-semibold">{course.lessons_content?.length || course.lessons} Lezioni</span>
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                            <BarChart className="h-5 w-5 mr-2 text-gray-400" />
+                            <span className="font-semibold">Livello {course.level}</span>
+                        </div>
+                    </div>
+                )}
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h2 className="text-2xl font-bold mb-6">{course.program_title || "Programma del Percorso"}</h2>
+                    
+                    {isPdfGuideCourse && (
+                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 flex items-start gap-3">
+                            <div className="bg-amber-100 p-2 rounded-full mt-0.5">
+                                <PlayCircle className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-amber-900">Hai a disposizione anche i video!</h4>
+                                <p className="text-sm text-amber-800">Oltre alla guida PDF, puoi seguire le lezioni video qui sotto per approfondire ogni concetto.</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="space-y-4">
+                        {(!course.lessons_content || course.lessons_content.length === 0) ? (
+                            <div className="text-center text-gray-400 py-4">{isPdfGuideCourse ? "Usa il pulsante in alto per scaricare la guida PDF." : "Lezioni in arrivo..."}</div>
+                        ) : (
+                            course.lessons_content.map((lesson, idx) => {
+                                const isCompleted = completedLessons.includes(lesson.id);
+                                return (
+                                    <div 
+                                        key={idx} 
+                                        onClick={() => {
+                                            if (isPurchased) {
+                                                setActiveLesson(lesson);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        className={`border rounded-lg p-4 transition-all cursor-pointer ${
+                                            activeLesson?.id === lesson.id 
+                                            ? 'bg-brand-50 border-brand-200 ring-1 ring-brand-200' 
+                                            : 'border-gray-100 hover:bg-gray-50'
+                                        } ${!isPurchased && 'opacity-70'}`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <div className={`p-2 rounded mr-4 font-bold text-sm ${
+                                                    isCompleted ? 'bg-green-100 text-green-700' : 
+                                                    activeLesson?.id === lesson.id ? 'bg-brand-100 text-brand-700' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                    {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : (idx + 1).toString().padStart(2, '0')}
+                                                </div>
+                                                <div>
+                                                    <h4 className={`font-bold ${activeLesson?.id === lesson.id ? 'text-brand-900' : 'text-gray-900'} ${isCompleted ? 'text-green-800' : ''}`}>
+                                                        {lesson.title}
+                                                    </h4>
+                                                    {lesson.description && <p className="text-xs text-gray-400 line-clamp-1">{lesson.description}</p>}
+                                                </div>
+                                            </div>
+                                            {isPurchased ? (
+                                                <div className="flex items-center gap-3">
+                                                    {isCompleted && <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded border border-green-100">Fatto</span>}
+                                                    <PlayCircle className={`h-5 w-5 ${activeLesson?.id === lesson.id ? 'text-brand-600' : 'text-gray-400'}`} />
+                                                </div>
+                                            ) : (
+                                                <Lock className="h-4 w-4 text-gray-400" />
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
+
+                {!activeLesson && course.show_features !== false && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                        <h2 className="text-2xl font-bold mb-6">Cosa Imparerai</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {course.features.map((feat, i) => (
+                                <div key={i} className="flex items-start">
+                                    <Check className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
+                                    <span className="text-gray-600">{feat}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
       </div>
