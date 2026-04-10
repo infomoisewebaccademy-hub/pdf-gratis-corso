@@ -78,7 +78,7 @@ const AppContent: React.FC = () => {
   
   const [settings, setSettings] = useState<PlatformSettings>({
       id: 1, logo_url: '', logo_height: 64, logo_offset_x: 0, logo_offset_y: 0,
-      pixels: { meta_pixel_id: '1825625164777432' }, font_family: 'Inter',
+      pixels: { meta_pixel_id: '' }, font_family: 'Inter',
       active_mode: 'public', pre_launch_date: '', pre_launch_config: undefined
   });
   
@@ -308,7 +308,7 @@ const AppContent: React.FC = () => {
               logo_offset_y: data.logo_offset_y ?? 0,
               pdf_guide_form_image: data.pdf_guide_form_image,
               // Ensure pixels object exists
-              pixels: data.pixels || { meta_pixel_id: '1825625164777432' },
+              pixels: data.pixels || { meta_pixel_id: '' },
           };
           setSettings(newSettings);
       }

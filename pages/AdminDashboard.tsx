@@ -205,7 +205,7 @@ const DEFAULT_LANDING_CONFIG: LandingPageConfig = {
 };
 
 const DEFAULT_PRE_LAUNCH_CONFIG: PreLaunchConfig = {
-    meta_pixel_id: '1825625164777432',
+    meta_pixel_id: '',
     headline_solid: "ACCESSO ESCLUSIVO",
     headline_gradient: "AL MONDO DELL'AI",
     subheadline: "Il futuro dello sviluppo web è qui, ed è gratuito.",
@@ -247,7 +247,7 @@ const DEFAULT_PRE_LAUNCH_CONFIG: PreLaunchConfig = {
 
 const DEFAULT_PDF_GUIDE_CONFIG: PdfGuideConfig = {
     ...DEFAULT_PRE_LAUNCH_CONFIG,
-    meta_pixel_id: '1825625164777432',
+    meta_pixel_id: '',
     headline_solid: "CREA SITI CON L'AI",
     headline_gradient: "La Guida Gratuita",
     description: "Ricevi subito via email la nostra guida PDF passo-passo e accedi alla nostra piattaforma per un video-tutorial esclusivo. Inizia oggi a trasformare le tue idee in realtà.",
@@ -1197,7 +1197,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     value={localSettings.meta_pixel_id || ''} 
                                     onChange={(e) => setLocalSettings({...localSettings, meta_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
-                                    placeholder="Es: 1825625164777432"
+                                    placeholder="Inserisci ID Pixel"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Pixel principale per la Home Page. <span className="font-mono text-brand-600">(/)</span>
@@ -1210,7 +1210,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     value={localSettings.add_to_cart_pixel_id || ''} 
                                     onChange={(e) => setLocalSettings({...localSettings, add_to_cart_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
-                                    placeholder="Es: 1825625164777432"
+                                    placeholder="Inserisci ID Pixel"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Pixel specifico per l'evento "Add to Cart".
@@ -1223,7 +1223,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     value={localSettings.pdf_thank_you_pixel_id || ''} 
                                     onChange={(e) => setLocalSettings({...localSettings, pdf_thank_you_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
-                                    placeholder="Es: 1825625164777432"
+                                    placeholder="Inserisci ID Pixel"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Pixel per la pagina di ringraziamento della guida PDF. <span className="font-mono text-brand-600">(/thank-you-pdf-gratuita)</span>
@@ -1236,7 +1236,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     value={localSettings.purchase_new_user_pixel_id || ''} 
                                     onChange={(e) => setLocalSettings({...localSettings, purchase_new_user_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
-                                    placeholder="Es: 1825625164777432"
+                                    placeholder="Inserisci ID Pixel"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Pixel per nuovi utenti (prima volta). Mostra messaggio credenziali email. <span className="font-mono text-brand-600">(/payment-success?new_user=1)</span>
@@ -1249,7 +1249,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                     value={localSettings.purchase_returning_user_pixel_id || ''} 
                                     onChange={(e) => setLocalSettings({...localSettings, purchase_returning_user_pixel_id: e.target.value})} 
                                     className="w-full border-gray-300 rounded-xl py-3 px-4 focus:ring-brand-500 shadow-sm font-mono text-sm"
-                                    placeholder="Es: 1825625164777432"
+                                    placeholder="Inserisci ID Pixel"
                                 />
                                 <p className="text-xs text-gray-500 mt-2">
                                     Pixel per utenti già registrati. Mostra messaggio "I miei corsi". <span className="font-mono text-brand-600">(/payment-success?new_user=0)</span>
