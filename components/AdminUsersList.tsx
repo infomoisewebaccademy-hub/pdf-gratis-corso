@@ -22,7 +22,7 @@ interface UserWithCourses {
   full_name: string;
   is_admin: boolean;
   created_at: string;
-  purchased_courses: Course[];
+  purchased_courses: (Course & { progress: number })[];
 }
 
 export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
@@ -164,12 +164,31 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
 
       if (purchasesError) throw purchasesError;
 
-      // 3. Map purchases to users
+      // 3. Fetch all lesson progress
+      const { data: progressData, error: progressError } = await supabase
+        .from('lesson_progress')
+        .select('user_id, course_id, lesson_id, completed')
+        .eq('completed', true);
+
+      if (progressError) throw progressError;
+
+      // 4. Map purchases and progress to users
       const usersWithCourses: UserWithCourses[] = (profilesData || []).map(profile => {
         const userPurchases = purchasesData?.filter(p => p.user_id === profile.id) || [];
+        const userProgress = progressData?.filter(p => p.user_id === profile.id) || [];
+        
         const purchasedCourses = userPurchases
-          .map(p => courses.find(c => c.id === p.course_id))
-          .filter((c): c is Course => c !== undefined);
+          .map(p => {
+            const course = courses.find(c => c.id === p.course_id);
+            if (!course) return null;
+            
+            const completedLessons = userProgress.filter(p => p.course_id === course.id).length;
+            const totalLessons = course.lessons || 0;
+            const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+            
+            return { ...course, progress };
+          })
+          .filter((c): c is (Course & { progress: number }) => c !== null);
 
         return {
           id: profile.id,
@@ -351,14 +370,20 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                         {user.purchased_courses.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {user.purchased_courses.map(course => (
-                              <span 
+                              <div 
                                 key={course.id} 
-                                className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
+                                className="inline-flex flex-col items-start px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100"
                                 title={course.title}
                               >
-                                <BookOpen className="w-3 h-3 mr-1" />
-                                {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
-                              </span>
+                                <div className="flex items-center">
+                                    <BookOpen className="w-3 h-3 mr-1" />
+                                    {course.title.length > 20 ? course.title.substring(0, 20) + '...' : course.title}
+                                </div>
+                                <div className="w-full bg-blue-200 rounded-full h-1 mt-1">
+                                    <div className="bg-blue-600 h-1 rounded-full" style={{ width: `${course.progress}%` }}></div>
+                                </div>
+                                <span className="text-[10px] mt-0.5">{course.progress}% completato</span>
+                              </div>
                             ))}
                           </div>
                         ) : (
