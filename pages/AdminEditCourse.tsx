@@ -5,6 +5,7 @@ import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, V
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
+import { VideoPicker } from '../components/VideoPicker';
 
 interface AdminEditCourseProps {
   courses: Course[];
@@ -55,6 +56,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [uploadFileProgress, setUploadFileProgress] = useState<number | null>(null);
   const [isUploadingVideo, setIsUploadingVideo] = useState<number | null>(null); // -1 per nuova lezione, altrimenti index
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [isVideoPickerOpen, setIsVideoPickerOpen] = useState(false);
+  const [activeLessonIndexForVideo, setActiveLessonIndexForVideo] = useState<number | null>(null);
 
     const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
         const file = event.target.files?.[0];
@@ -122,6 +125,16 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         } finally {
             setIsUploadingVideo(null);
             setUploadProgress(null);
+        }
+    };
+
+    const handleVideoSelect = (path: string) => {
+        if (activeLessonIndexForVideo === -1) {
+            setNewLesson(prev => ({ ...prev, video_storage_path: path }));
+        } else if (activeLessonIndexForVideo !== null) {
+            const updatedLessons = [...(formData.lessons_content || [])];
+            updatedLessons[activeLessonIndexForVideo].video_storage_path = path;
+            setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
         }
     };
 
@@ -539,8 +552,28 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                             <div className="space-y-3">
                                 <input type="text" placeholder="Titolo Lezione" className="w-full border border-gray-300 rounded p-2 text-sm" value={newLesson.title} onChange={e => setNewLesson({...newLesson, title: e.target.value})} />
                                 <div className="w-full bg-white border border-gray-300 rounded p-2 text-sm">
-                                    <label className="text-xs font-bold text-gray-500">Video Lezione (Carica File)</label>
-                                    <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, -1)} className="w-full text-xs" />
+                                    <label className="text-xs font-bold text-gray-500 mb-2 block">Video Lezione</label>
+                                    <div className="flex items-center gap-2">
+                                        <label className="flex-1 cursor-pointer bg-brand-50 text-brand-700 px-3 py-2 rounded font-bold hover:bg-brand-100 text-center text-xs">
+                                            Carica File
+                                            <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, -1)} className="hidden" />
+                                        </label>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => {
+                                                setActiveLessonIndexForVideo(-1);
+                                                setIsVideoPickerOpen(true);
+                                            }}
+                                            className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded font-bold hover:bg-gray-200 text-xs"
+                                        >
+                                            Scegli dalla Libreria
+                                        </button>
+                                    </div>
+                                    {newLesson.video_storage_path && (
+                                        <div className="mt-2 text-xs text-green-600 font-mono truncate">
+                                            Selezionato: {newLesson.video_storage_path.split('/').pop()}
+                                        </div>
+                                    )}
                                     {isUploadingVideo === -1 && uploadProgress !== null && (
                                         <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                                             <div className="bg-brand-600 h-2 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
@@ -582,7 +615,22 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                                     )}
                                                 </div>
                                             ) : (
-                                                <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, idx)} className="w-full text-xs" />
+                                                <div className="flex items-center gap-2">
+                                                    <label className="flex-1 cursor-pointer bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 text-center text-[10px] font-bold">
+                                                        Carica File
+                                                        <input type="file" accept="video/*" onChange={(e) => handleVideoUpload(e, idx)} className="hidden" />
+                                                    </label>
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => {
+                                                            setActiveLessonIndexForVideo(idx);
+                                                            setIsVideoPickerOpen(true);
+                                                        }}
+                                                        className="flex-1 bg-gray-100 text-gray-700 px-2 py-1 rounded hover:bg-gray-200 text-[10px] font-bold"
+                                                    >
+                                                        Libreria
+                                                    </button>
+                                                </div>
                                             )}
                                          </div>
                                     </div>
