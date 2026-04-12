@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { Course } from '../types';
-import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download } from 'lucide-react';
+import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key } from 'lucide-react';
 
 interface AdminUsersListProps {
   courses: Course[];
@@ -34,6 +34,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   const [isNotifying, setIsNotifying] = useState<string | null>(null);
   const [isBulkNotifying, setIsBulkNotifying] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [notificationStatus, setNotificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>('all');
 
@@ -127,6 +128,133 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     setSelectedEntries([]);
   };
 
+  const handleSendCredentials = async (entry: WaitingListEntry) => {
+    if (!confirm(`Vuoi inviare una email con le credenziali di accesso a ${entry.email}?`)) return;
+    
+    setIsNotifying(entry.id);
+    try {
+      const response = await fetch('/api/send-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: entry.email,
+          name: entry.full_name
+        })
+      });
+      if (!response.ok) throw new Error('Errore nell\'invio delle credenziali');
+      alert('Email con credenziali inviata con successo!');
+    } catch (error: any) {
+      console.error("Errore invio credenziali:", error);
+      alert("Errore nell'invio delle credenziali: " + error.message);
+    } finally {
+      setIsNotifying(null);
+    }
+  };
+
+  const handleBulkSendCredentials = async () => {
+    if (selectedEntries.length === 0) return;
+    if (!confirm(`Vuoi inviare una email con le credenziali a TUTTI i ${selectedEntries.length} iscritti selezionati?`)) return;
+    
+    setIsBulkNotifying(true);
+    setNotificationStatus('idle');
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const entryId of selectedEntries) {
+      const entry = waitingList.find(e => e.id === entryId);
+      if (!entry) continue;
+      try {
+        const response = await fetch('/api/send-credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: entry.email,
+            name: entry.full_name
+          })
+        });
+        if (!response.ok) throw new Error('Errore');
+        successCount++;
+      } catch (error) {
+        console.error(`Errore invio credenziali per ${entry.email}:`, error);
+        failCount++;
+      }
+    }
+
+    if (successCount > 0) {
+        setNotificationStatus('success');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    } else {
+        setNotificationStatus('error');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    }
+    
+    setIsBulkNotifying(false);
+    setSelectedEntries([]);
+  };
+
+  const handleBulkSendCredentialsToStudents = async () => {
+    if (selectedUsers.length === 0) return;
+    if (!confirm(`Vuoi inviare una email con le credenziali a TUTTI i ${selectedUsers.length} studenti selezionati?`)) return;
+    
+    setIsBulkNotifying(true);
+    setNotificationStatus('idle');
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const userId of selectedUsers) {
+      const user = users.find(u => u.id === userId);
+      if (!user) continue;
+      try {
+        const response = await fetch('/api/send-credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.full_name
+          })
+        });
+        if (!response.ok) throw new Error('Errore');
+        successCount++;
+      } catch (error) {
+        console.error(`Errore invio credenziali per ${user.email}:`, error);
+        failCount++;
+      }
+    }
+
+    if (successCount > 0) {
+        setNotificationStatus('success');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    } else {
+        setNotificationStatus('error');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+    }
+    
+    setIsBulkNotifying(false);
+    setSelectedUsers([]);
+  };
+
+  const handleSendCredentialsToStudent = async (user: UserWithCourses) => {
+    if (!confirm(`Vuoi inviare una email con le credenziali di accesso a ${user.email}?`)) return;
+    
+    setIsNotifying(user.id);
+    try {
+      const response = await fetch('/api/send-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.full_name
+        })
+      });
+      if (!response.ok) throw new Error('Errore nell\'invio delle credenziali');
+      alert('Email con credenziali inviata con successo!');
+    } catch (error: any) {
+      console.error("Errore invio credenziali:", error);
+      alert("Errore nell'invio delle credenziali: " + error.message);
+    } finally {
+      setIsNotifying(null);
+    }
+  };
   const handleExportWaitingList = () => {
     if (waitingList.length === 0) return;
     
@@ -217,7 +345,16 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     const matchesSearch = entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (entry.full_name || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCourse = selectedCourseFilter === 'all' || entry.course_id === selectedCourseFilter;
+    let matchesCourse = false;
+    if (selectedCourseFilter === 'all') {
+        matchesCourse = true;
+    } else if (selectedCourseFilter === 'pdf_guide') {
+        matchesCourse = entry.source === 'pdf_guide';
+    } else if (selectedCourseFilter === 'null') {
+        matchesCourse = entry.course_id === null;
+    } else {
+        matchesCourse = entry.course_id === selectedCourseFilter;
+    }
     
     return matchesSearch && matchesCourse;
   });
@@ -288,6 +425,14 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                     {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     Notifica Selezionati ({selectedEntries.length})
                   </button>
+                  <button
+                    onClick={handleBulkSendCredentials}
+                    disabled={isBulkNotifying || selectedEntries.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
+                  >
+                    {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />}
+                    Invia Credenziali Selezionati ({selectedEntries.length})
+                  </button>
                 </div>
               )}
               <select
@@ -297,6 +442,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
               >
                 <option value="all">Tutti i percorsi</option>
                 <option value="null">Generale (Pre-Lancio)</option>
+                <option value="pdf_guide">Guida PDF</option>
                 {courses.map(c => (
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
@@ -308,6 +454,28 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 <Download className="h-4 w-4" /> Esporta CSV
               </button>
             </>
+          )}
+          {activeSubTab === 'students' && (
+            <div className="flex items-center gap-2">
+              {notificationStatus === 'success' && (
+                <span className="text-green-600 text-sm font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300">
+                  <Check className="h-4 w-4" /> Inviate!
+                </span>
+              )}
+              {notificationStatus === 'error' && (
+                <span className="text-red-600 text-sm font-bold flex items-center gap-1 animate-in fade-in zoom-in duration-300">
+                  <XCircle className="h-4 w-4" /> Errore!
+                </span>
+              )}
+              <button
+                onClick={handleBulkSendCredentialsToStudents}
+                disabled={isBulkNotifying || selectedUsers.length === 0}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
+              >
+                {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />}
+                Invia Credenziali Selezionati ({selectedUsers.length})
+              </button>
+            </div>
           )}
           <div className="relative flex-1 md:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -328,16 +496,45 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedUsers(filteredUsers.map(u => u.id));
+                        } else {
+                          setSelectedUsers([]);
+                        }
+                      }}
+                      className="h-4 w-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500"
+                    />
+                  </th>
                   <th className="px-6 py-4 font-medium">Utente</th>
                   <th className="px-6 py-4 font-medium">Contatto</th>
                   <th className="px-6 py-4 font-medium">Percorsi Acquistati</th>
                   <th className="px-6 py-4 font-medium text-right">Data Iscrizione</th>
+                  <th className="px-6 py-4 font-medium text-right">Azioni</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedUsers.includes(user.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedUsers([...selectedUsers, user.id]);
+                            } else {
+                              setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                            }
+                          }}
+                          className="h-4 w-4 text-brand-600 rounded border-gray-300 focus:ring-brand-500"
+                        />
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div className="h-10 w-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-lg mr-3">
@@ -397,11 +594,25 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           year: 'numeric'
                         })}
                       </td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => handleSendCredentialsToStudent(user)}
+                          disabled={isNotifying === user.id}
+                          className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
+                        >
+                          {isNotifying === user.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : (
+                            <Key className="h-3 w-3 mr-1" />
+                          )}
+                          Credenziali
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Search className="h-10 w-10 text-gray-300 mb-3" />
                         <p className="text-lg font-medium text-gray-900">Nessun utente trovato</p>
@@ -506,12 +717,24 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           )}
                           Notifica
                         </button>
+                        <button
+                          onClick={() => handleSendCredentials(entry)}
+                          disabled={isNotifying === entry.id}
+                          className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50 ml-2"
+                        >
+                          {isNotifying === entry.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          ) : (
+                            <Key className="h-3 w-3 mr-1" />
+                          )}
+                          Credenziali
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Search className="h-10 w-10 text-gray-300 mb-3" />
                         <p className="text-lg font-medium text-gray-900">Nessun iscritto trovato</p>
