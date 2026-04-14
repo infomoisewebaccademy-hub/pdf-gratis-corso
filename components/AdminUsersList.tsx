@@ -23,6 +23,7 @@ interface UserWithCourses {
   is_admin: boolean;
   created_at: string;
   purchased_courses: (Course & { progress: number })[];
+  notification_count: number;
 }
 
 export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
@@ -247,6 +248,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
         })
       });
       if (!response.ok) throw new Error('Errore nell\'invio delle credenziali');
+      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
       alert('Email con credenziali inviata con successo!');
     } catch (error: any) {
       console.error("Errore invio credenziali:", error);
@@ -324,7 +326,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
           full_name: profile.full_name || 'Utente',
           is_admin: profile.is_admin || false,
           created_at: profile.created_at || new Date().toISOString(),
-          purchased_courses: purchasedCourses
+          purchased_courses: purchasedCourses,
+          notification_count: profile.notification_count || 0
         };
       });
 
@@ -513,6 +516,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                   <th className="px-6 py-4 font-medium">Utente</th>
                   <th className="px-6 py-4 font-medium">Contatto</th>
                   <th className="px-6 py-4 font-medium">Percorsi Acquistati</th>
+                  <th className="px-6 py-4 font-medium text-right">Notifiche</th>
                   <th className="px-6 py-4 font-medium text-right">Data Iscrizione</th>
                   <th className="px-6 py-4 font-medium text-right">Azioni</th>
                 </tr>
@@ -588,6 +592,9 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                         )}
                       </td>
                       <td className="px-6 py-4 text-right text-sm text-gray-500">
+                        {user.notification_count || 0}
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm text-gray-500">
                         {new Date(user.created_at).toLocaleDateString('it-IT', {
                           day: '2-digit',
                           month: 'short',
@@ -612,7 +619,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Search className="h-10 w-10 text-gray-300 mb-3" />
                         <p className="text-lg font-medium text-gray-900">Nessun utente trovato</p>
@@ -645,7 +652,6 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Percorso Interessato</th>
                   <th className="px-6 py-4 font-medium">Data Iscrizione</th>
-                  <th className="px-6 py-4 font-medium text-right">Azioni</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -717,24 +723,12 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           )}
                           Notifica
                         </button>
-                        <button
-                          onClick={() => handleSendCredentials(entry)}
-                          disabled={isNotifying === entry.id}
-                          className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50 ml-2"
-                        >
-                          {isNotifying === entry.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                          ) : (
-                            <Key className="h-3 w-3 mr-1" />
-                          )}
-                          Credenziali
-                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Search className="h-10 w-10 text-gray-300 mb-3" />
                         <p className="text-lg font-medium text-gray-900">Nessun iscritto trovato</p>

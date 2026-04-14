@@ -1,7 +1,9 @@
 import { Resend } from 'resend';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const supabase = createClient(process.env.VITE_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Abilita CORS
@@ -32,19 +34,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const appUrl = process.env.APP_URL || "https://www.mwacademy.eu";
 
   try {
+    // 1. Find user by email
+    const { data: user, error: userError } = await supabase
+      .from('profiles')
+      .select('id, notification_count')
+      .eq('email', email)
+      .single();
+
+    let notificationCount = 0;
+    if (!userError && user) {
+        notificationCount = user.notification_count || 0;
+        // 2. Increment notification_count
+        await supabase
+          .from('profiles')
+          .update({ notification_count: notificationCount + 1 })
+          .eq('id', user.id);
+        notificationCount++;
+    }
+
+    const isReminder = notificationCount > 1;
+
     const { data, error } = await resend.emails.send({
       from: "Moise Web Academy <supporto@mwacademy.eu>",
       to: [email],
-      subject: `Benvenuto in Moise Web Academy - Ecco le tue credenziali`,
+      subject: isReminder 
+        ? `Promemoria: La tua guida PDF ti sta aspettando!`
+        : `Benvenuto in Moise Web Academy - Ecco le tue credenziali`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; background-color: #ffffff;">
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #2563eb; font-size: 28px; margin-bottom: 10px;">Ciao ${name || 'Studente'}!</h1>
-            <p style="color: #4b5563; font-size: 18px;">Benvenuto nella nostra piattaforma.</p>
+            <p style="color: #4b5563; font-size: 18px;">${isReminder ? 'Ti ricordiamo che la tua guida PDF ti sta aspettando!' : 'Benvenuto nella nostra piattaforma.'}</p>
           </div>
           
           <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
-            Abbiamo notato che non hai ancora effettuato il tuo primo accesso dopo aver richiesto la nostra guida PDF gratuita.
+            ${isReminder 
+                ? 'Abbiamo notato che non hai ancora effettuato l\'accesso alla piattaforma. Non perdere l\'occasione di accedere alla tua guida PDF gratuita.'
+                : 'Abbiamo notato che non hai ancora effettuato il tuo primo accesso dopo aver richiesto la nostra guida PDF gratuita.'}
             Ecco il link per accedere alla piattaforma e iniziare il tuo percorso:
           </p>
           
@@ -73,7 +99,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: error.message });
     }
 
-    return res.status(200).json({ success: true, data });
+    return res.status(200).json({ success: true, data, notificationCount });
   } catch (err) {
     console.error("Errore invio email:", err);
     return res.status(500).json({ error: 'Internal server error' });
