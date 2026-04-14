@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../services/supabase';
+import { supabase, supabaseUrl } from '../services/supabase';
 import { Course } from '../types';
 import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key } from 'lucide-react';
 
@@ -134,7 +134,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     
     setIsNotifying(entry.id);
     try {
-      const response = await fetch('/api/send-credentials', {
+      const functionUrl = `${supabaseUrl}/functions/v1/resend-credentials`;
+      const response = await fetch(functionUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -165,7 +166,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       const entry = waitingList.find(e => e.id === entryId);
       if (!entry) continue;
       try {
-        const response = await fetch('/api/send-credentials', {
+        const functionUrl = `${supabaseUrl}/functions/v1/resend-credentials`;
+        const response = await fetch(functionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -206,7 +208,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       const user = users.find(u => u.id === userId);
       if (!user) continue;
       try {
-        const response = await fetch('/api/send-credentials', {
+        const functionUrl = `${supabaseUrl}/functions/v1/resend-credentials`;
+        const response = await fetch(functionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -234,12 +237,14 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     setSelectedUsers([]);
   };
 
+
   const handleSendCredentialsToStudent = async (user: UserWithCourses) => {
     if (!confirm(`Vuoi inviare una email con le credenziali di accesso a ${user.email}?`)) return;
     
     setIsNotifying(user.id);
     try {
-      const response = await fetch('/api/send-credentials', {
+      const functionUrl = `${supabaseUrl}/functions/v1/resend-credentials`;
+      const response = await fetch(functionUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
