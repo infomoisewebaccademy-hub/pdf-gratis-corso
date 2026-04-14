@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseUrl } from '../services/supabase';
+import { supabase } from '../services/supabase';
 import { Course } from '../types';
 import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key } from 'lucide-react';
 
@@ -243,16 +243,15 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     
     setIsNotifying(user.id);
     try {
-      const functionUrl = `${supabaseUrl}/functions/v1/resend-credentials`;
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('resend-credentials', {
+        body: {
           email: user.email,
           name: user.full_name
-        })
+        }
       });
-      if (!response.ok) throw new Error('Errore nell\'invio delle credenziali');
+      
+      if (error) throw error;
+      
       setUsers(prev => prev.map(u => u.id === user.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
       alert('Email con credenziali inviata con successo!');
     } catch (error: any) {
