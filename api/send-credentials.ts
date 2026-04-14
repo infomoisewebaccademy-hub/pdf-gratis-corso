@@ -42,14 +42,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .single();
 
     let notificationCount = 0;
-    if (!userError && user) {
+    if (userError) {
+        console.error("Supabase user query error:", userError);
+    } else if (user) {
         notificationCount = user.notification_count || 0;
         // 2. Increment notification_count
-        await supabase
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({ notification_count: notificationCount + 1 })
           .eq('id', user.id);
-        notificationCount++;
+        
+        if (updateError) {
+            console.error("Supabase update error:", updateError);
+        } else {
+            notificationCount++;
+        }
     }
 
     const isReminder = notificationCount > 1;
@@ -102,6 +109,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ success: true, data, notificationCount });
   } catch (err) {
     console.error("Errore invio email:", err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: err instanceof Error ? err.message : 'Internal server error' });
   }
 }
