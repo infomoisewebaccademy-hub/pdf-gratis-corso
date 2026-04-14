@@ -62,41 +62,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const isReminder = notificationCount > 1;
 
     const { data, error } = await resend.emails.send({
-      from: "Moise Web Academy <supporto@mwacademy.eu>",
+      from: "Moise Web Academy <info@mwacademy.eu>",
       to: [email],
-      subject: isReminder 
-        ? `Promemoria: La tua guida PDF ti sta aspettando!`
-        : `Benvenuto in Moise Web Academy - Ecco le tue credenziali`,
+      subject: 'La tua Guida Gratuita MWA è pronta!',
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 30px; border-radius: 15px; background-color: #ffffff;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #2563eb; font-size: 28px; margin-bottom: 10px;">Ciao ${name || 'Studente'}!</h1>
-            <p style="color: #4b5563; font-size: 18px;">${isReminder ? 'Ti ricordiamo che la tua guida PDF ti sta aspettando!' : 'Benvenuto nella nostra piattaforma.'}</p>
-          </div>
-          
-          <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
-            ${isReminder 
-                ? 'Abbiamo notato che non hai ancora effettuato l\'accesso alla piattaforma. Non perdere l\'occasione di accedere alla tua guida PDF gratuita.'
-                : 'Abbiamo notato che non hai ancora effettuato il tuo primo accesso dopo aver richiesto la nostra guida PDF gratuita.'}
-            Ecco il link per accedere alla piattaforma e iniziare il tuo percorso:
-          </p>
-          
-          <div style="text-align: center; margin: 40px 0;">
-            <a href="${appUrl}/login" 
-               style="display: inline-block; background: #2563eb; color: white; padding: 16px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);">
-              Accedi alla Piattaforma
-            </a>
-          </div>
-          
-          <p style="color: #4b5563; line-height: 1.6; font-size: 16px;">
-            Se non ricordi la tua password, puoi cliccare su "Password dimenticata" nella pagina di login.
-          </p>
-          
-          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
-          
-          <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-            Ricevi questa email perché ti sei iscritto su Moise Web Academy.<br/>
-          </p>
+        <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #2563eb;">Benvenuto in MWA!</h1>
+            <p>Ciao ${name || 'Studente'}, grazie per il tuo interesse. La tua guida PDF gratuita ti aspetta!</p>
+            <p>Abbiamo creato un account per te sulla nostra piattaforma. Ecco le tue credenziali per accedere:</p>
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #e5e7eb;">
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+                <p style="margin: 5px 0; font-size: 18px;"><strong>Password:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd;">(Usa la password che hai impostato o clicca su "Password dimenticata")</code></p>
+            </div>
+            <p>Accedi subito per scaricare la guida e iniziare a creare:</p>
+            <a href="${appUrl}/login" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Accedi e Scarica la Guida</a>
+            <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #888;">Ti consigliamo di cambiare la password dopo il primo accesso.</p>
         </div>
       `,
     });
