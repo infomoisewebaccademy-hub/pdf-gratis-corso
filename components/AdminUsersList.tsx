@@ -250,7 +250,10 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+          console.error("Errore Edge Function:", error);
+          throw error;
+      }
       
       setUsers(prev => prev.map(u => u.id === user.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
       alert('Email con credenziali inviata con successo!');
