@@ -93,6 +93,7 @@ Deno.serve(async (req: Request) => {
     let isLoyalCustomer = false;
     if (isValidUser) {
         try {
+            // Controlliamo se l'utente ha già acquistato qualcosa in passato
             const { count } = await supabaseAdmin
                 .from('purchases')
                 .select('*', { count: 'exact', head: true })
@@ -108,13 +109,10 @@ Deno.serve(async (req: Request) => {
     let totalAmountCents = 0;
 
     const line_items = courses.map((course: any) => {
-        let finalPrice = course.price;
-        let pricingTier = 'Standard';
-
-        if (isLoyalCustomer && course.discounted_price && course.discounted_price > 0 && course.discounted_price < course.price) {
-            finalPrice = course.discounted_price;
-            pricingTier = 'Loyalty';
-        }
+        // Logica corretta: usa il prezzo scontato solo se l'utente è fedele E il prezzo scontato è valido
+        const isEligibleForLoyalty = isLoyalCustomer && course.discounted_price && course.discounted_price > 0 && course.discounted_price < course.price;
+        const finalPrice = isEligibleForLoyalty ? course.discounted_price : course.price;
+        const pricingTier = isEligibleForLoyalty ? 'Loyalty' : 'Standard';
         
         // Calcolo totale per Pixel Tracking
         totalAmountCents += Math.round(finalPrice * 100);
