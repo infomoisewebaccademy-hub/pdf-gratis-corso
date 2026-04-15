@@ -248,10 +248,20 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
 
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [userToNotify, setUserToNotify] = useState<UserWithCourses | null>(null);
+  const [notificationHistory, setNotificationHistory] = useState<any[]>([]);
 
-  const openNotificationModal = (user: UserWithCourses) => {
+  const openNotificationModal = async (user: UserWithCourses) => {
     setUserToNotify(user);
     setIsNotificationModalOpen(true);
+    
+    // Carica cronologia
+    const { data, error } = await supabase
+      .from('notification_history')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('sent_at', { ascending: false });
+      
+    if (!error) setNotificationHistory(data || []);
   };
 
   const handleSendNotification = async (type: 'pdf-reminder') => {
@@ -270,17 +280,16 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       
       if (error) throw error;
       
-      // 2. Aggiorna il database per contare la notifica specifica
-      const fieldToUpdate = type === 'pdf-reminder' ? 'pdf_reminder_count' : 'notification_count';
-      
-      const { error: dbError } = await supabase
-        .from('profiles')
-        .update({ [fieldToUpdate]: (userToNotify[fieldToUpdate as keyof UserWithCourses] as number || 0) + 1 })
-        .eq('id', userToNotify.id);
+      // 2. Inserisci nella cronologia
+      const { error: historyError } = await supabase
+        .from('notification_history')
+        .insert({ 
+          user_id: userToNotify.id, 
+          notification_type: type 
+        });
 
-      if (dbError) throw dbError;
+      if (historyError) throw historyError;
       
-      setUsers(prev => prev.map(u => u.id === userToNotify.id ? { ...u, [fieldToUpdate]: (u[fieldToUpdate as keyof UserWithCourses] as number || 0) + 1 } : u));
       showToast(`Notifica "${type}" inviata con successo!`, 'success');
     } catch (error: any) {
       console.error("Errore invio notifica:", error);
@@ -786,19 +795,42 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
         )}
         {isNotificationModalOpen && userToNotify && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-              <h3 className="text-lg font-bold mb-4">Seleziona Notifica per {userToNotify.full_name}</h3>
-              <button
-                onClick={() => handleSendNotification('pdf-reminder')}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg"
-              >
-                Promemoria Guida PDF
-              </button>
+            <div className="bg-white p-6 rounded-lg shadow-xl w-[500px] max-h-[80vh] overflow-y-auto">
+              <h3 className="text-lg font-bold mb-4">Notifiche per {userToNotify.full_name}</h3>
+              
+              <div className="mb-6">
+                <h4 className="font-semibold mb-2">Invia nuova notifica</h4>
+                <button
+                  onClick={() => handleSendNotification('pdf-reminder')}
+                  className="w-full text-left px-4 py-2 bg-brand-50 hover:bg-brand-100 rounded-lg text-brand-700 font-medium"
+                >
+                  Invia Promemoria Guida PDF
+                </button>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Cronologia invii</h4>
+                {notificationHistory.length > 0 ? (
+                  <ul className="space-y-2">
+                    {notificationHistory.map((h) => (
+                      <li key={h.id} className="text-sm p-2 bg-gray-50 rounded flex justify-between">
+                        <span>{h.notification_type}</span>
+                        <span className="text-gray-500">
+                          {new Date(h.sent_at).toLocaleString('it-IT')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">Nessuna notifica inviata.</p>
+                )}
+              </div>
+
               <button
                 onClick={() => setIsNotificationModalOpen(false)}
-                className="w-full mt-4 text-gray-500 hover:text-gray-700"
+                className="w-full mt-6 text-gray-500 hover:text-gray-700"
               >
-                Annulla
+                Chiudi
               </button>
             </div>
           </div>
