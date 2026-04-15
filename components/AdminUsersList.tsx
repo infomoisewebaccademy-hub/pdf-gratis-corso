@@ -243,7 +243,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     
     setIsNotifying(user.id);
     try {
-      const { data, error } = await supabase.functions.invoke('resend-credentials', {
+      const { data, error } = await supabase.functions.invoke('send-pdf-reminder', {
         body: {
           email: user.email,
           name: user.full_name
