@@ -481,12 +481,15 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                     Notifica Selezionati ({selectedEntries.length})
                   </button>
                   <button
-                    onClick={handleBulkSendCredentials}
+                    onClick={() => {
+                      // Logic to handle bulk notification
+                      alert('Questa funzione sarà implementata per gestire notifiche multiple.');
+                    }}
                     disabled={isBulkNotifying || selectedEntries.length === 0}
                     className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
                   >
-                    {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />}
-                    Invia Credenziali Selezionati ({selectedEntries.length})
+                    {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                    Notifica Mail ({selectedEntries.length})
                   </button>
                 </div>
               )}
@@ -523,12 +526,15 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 </span>
               )}
               <button
-                onClick={handleBulkSendCredentialsToStudents}
+                onClick={() => {
+                  // Logic to handle bulk notification
+                  alert('Questa funzione sarà implementata per gestire notifiche multiple.');
+                }}
                 disabled={isBulkNotifying || selectedUsers.length === 0}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
               >
-                {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />}
-                Invia Credenziali Selezionati ({selectedUsers.length})
+                {isBulkNotifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                Notifica Mail ({selectedUsers.length})
               </button>
             </div>
           )}
