@@ -290,6 +290,16 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
 
       if (historyError) throw historyError;
       
+      // 3. Aggiorna il contatore nella tabella profiles
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ notification_count: (userToNotify.notification_count || 0) + 1 })
+        .eq('id', userToNotify.id);
+        
+      if (updateError) throw updateError;
+      
+      setUsers(prev => prev.map(u => u.id === userToNotify.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
+      
       showToast(`Notifica "${type}" inviata con successo!`, 'success');
     } catch (error: any) {
       console.error("Errore invio notifica:", error);
