@@ -238,6 +238,13 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   };
 
 
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  };
+
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [userToNotify, setUserToNotify] = useState<UserWithCourses | null>(null);
 
@@ -250,27 +257,33 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     if (!userToNotify) return;
     setIsNotificationModalOpen(false);
     
-    if (!confirm(`Vuoi inviare la notifica "${type}" a ${userToNotify.email}?`)) return;
-    
     setIsNotifying(userToNotify.id);
     try {
-      const { data, error } = await supabase.functions.invoke('send-pdf-reminder', {
+      // 1. Invia la notifica
+      const { error } = await supabase.functions.invoke('send-pdf-reminder', {
         body: {
           email: userToNotify.email,
           name: userToNotify.full_name
         }
       });
       
-      if (error) {
-          console.error("Errore Edge Function:", error);
-          throw error;
-      }
+      if (error) throw error;
       
-      setUsers(prev => prev.map(u => u.id === userToNotify.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
-      alert('Notifica inviata con successo!');
+      // 2. Aggiorna il database per contare la notifica specifica
+      const fieldToUpdate = type === 'pdf-reminder' ? 'pdf_reminder_count' : 'notification_count';
+      
+      const { error: dbError } = await supabase
+        .from('users')
+        .update({ [fieldToUpdate]: (userToNotify[fieldToUpdate as keyof UserWithCourses] as number || 0) + 1 })
+        .eq('id', userToNotify.id);
+
+      if (dbError) throw dbError;
+      
+      setUsers(prev => prev.map(u => u.id === userToNotify.id ? { ...u, [fieldToUpdate]: (u[fieldToUpdate as keyof UserWithCourses] as number || 0) + 1 } : u));
+      showToast(`Notifica "${type}" inviata con successo!`, 'success');
     } catch (error: any) {
       console.error("Errore invio notifica:", error);
-      alert("Errore nell'invio della notifica: " + error.message);
+      showToast("Errore nell'invio della notifica: " + error.message, 'error');
     } finally {
       setIsNotifying(null);
       setUserToNotify(null);
@@ -765,6 +778,11 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
             Totale {activeSubTab === 'students' ? 'utenti' : 'iscritti'} trovati: <span className="font-semibold text-gray-900">{activeSubTab === 'students' ? filteredUsers.length : filteredWaitingList.length}</span>
           </p>
         </div>
+        {toast && (
+          <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white z-[60] ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+            {toast.message}
+          </div>
+        )}
         {isNotificationModalOpen && userToNotify && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-xl w-96">
