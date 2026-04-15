@@ -18,7 +18,8 @@ Deno.serve(async (req: Request) => {
 
   // 1. Gestione Preflight CORS (OPTIONS)
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    const headers = new Headers(corsHeaders);
+    return new Response('ok', { headers })
   }
 
   try {
@@ -191,7 +192,12 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { 
+            'Access-Control-Allow-Origin': 'https://www.mwacademy.eu',
+            'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            "Content-Type": "application/json" 
+        },
         status: 400, 
       },
     )
