@@ -45,7 +45,7 @@ Deno.serve(async (req: Request) => {
 
 // --- FUNZIONE EMAIL ---
 async function sendCredentialsEmail(apiKey: string, toEmail: string, name: string) {
-    console.log(`✉️ Tentativo rinvio email a: ${toEmail}`);
+    console.log(`✉️ Tentativo invio promemoria a: ${toEmail}`);
     const sender = 'Moise Web Academy <info@mwacademy.eu>'; 
     const SITE_URL = "https://www.mwacademy.eu";
 
@@ -56,27 +56,26 @@ async function sendCredentialsEmail(apiKey: string, toEmail: string, name: strin
             body: JSON.stringify({
                 from: sender,
                 to: [toEmail], 
-                subject: 'La tua Guida Gratuita MWA è pronta!',
+                subject: 'La tua Guida PDF ti sta aspettando!',
                 html: `
                     <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 600px; margin: 0 auto;">
-                        <h1 style="color: #2563eb;">Benvenuto in MWA!</h1>
-                        <p>Ciao ${name}, grazie per il tuo interesse. La tua guida PDF gratuita ti aspetta!</p>
-                        <p>Abbiamo creato un account per te sulla nostra piattaforma. Ecco le tue credenziali per accedere:</p>
+                        <h1 style="color: #2563eb;">Ciao ${name}, la tua guida è pronta!</h1>
+                        <p>Ti scriviamo per ricordarti che la tua guida PDF gratuita su Moise Web Academy ti sta aspettando.</p>
+                        <p>Abbiamo già inviato una mail con le tue credenziali di accesso al momento della tua iscrizione. Se non l'hai trovata, <strong>ti invitiamo a controllare nella cartella Spam o Promozioni</strong> della tua posta elettronica.</p>
                         <div style="background: #f3f4f6; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                            <p style="margin: 5px 0;"><strong>Email:</strong> ${toEmail}</p>
-                            <p style="margin: 5px 0; font-size: 18px;"><strong>Password:</strong> <code style="background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #ddd;">(Usa la password che hai impostato o clicca su "Password dimenticata")</code></p>
+                            <p style="margin: 0;">Ti ricordiamo che le tue credenziali di accesso sono quelle che hai ricevuto al momento della tua iscrizione.</p>
                         </div>
-                        <p>Accedi subito per scaricare la guida e iniziare a creare:</p>
-                        <a href="${SITE_URL}/login" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Accedi e Scarica Guida PDF</a>
+                        <p>Accedi subito per scaricare la guida e iniziare il tuo percorso:</p>
+                        <a href="${SITE_URL}/login" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Accedi alla Piattaforma</a>
                         <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;" />
-                        <p style="font-size: 12px; color: #888;">Ti consigliamo di cambiare la password dopo il primo accesso.</p>
+                        <p style="font-size: 12px; color: #888;">Ricevi questa email perché hai richiesto la nostra guida PDF gratuita.</p>
                     </div>
                 `
             })
         });
         const responseData = await res.json();
         if (!res.ok) console.error("❌ ERRORE RISPOSTA RESEND:", JSON.stringify(responseData));
-        else console.log("✅ EMAIL RINVIATA! ID:", responseData.id);
+        else console.log("✅ EMAIL DI PROMEMORIA INVIATA! ID:", responseData.id);
     } catch (e) {
         console.error("❌ Errore Network fetch (Resend):", e);
     }
