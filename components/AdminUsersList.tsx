@@ -273,7 +273,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       const fieldToUpdate = type === 'pdf-reminder' ? 'pdf_reminder_count' : 'notification_count';
       
       const { error: dbError } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ [fieldToUpdate]: (userToNotify[fieldToUpdate as keyof UserWithCourses] as number || 0) + 1 })
         .eq('id', userToNotify.id);
 
