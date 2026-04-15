@@ -631,7 +631,6 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                   <th className="px-6 py-4 font-medium">Contatto</th>
                   <th className="px-6 py-4 font-medium">Percorsi Acquistati</th>
                   <th className="px-6 py-4 font-medium text-right">Notifiche</th>
-                  <th className="px-6 py-4 font-medium text-right">Data Iscrizione</th>
                   <th className="px-6 py-4 font-medium text-right">Azioni</th>
                 </tr>
               </thead>
@@ -670,6 +669,13 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                             <p className="text-xs text-gray-500 flex items-center mt-1">
                               <User className="w-3 h-3 mr-1" /> ID: {user.id.substring(0, 8)}...
                             </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Iscritto il: {new Date(user.created_at).toLocaleDateString('it-IT', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -707,13 +713,6 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                       </td>
                       <td className="px-6 py-4 text-right text-sm text-gray-500">
                         {user.notification_count || 0}
-                      </td>
-                      <td className="px-6 py-4 text-right text-sm text-gray-500">
-                        {new Date(user.created_at).toLocaleDateString('it-IT', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex gap-2 justify-end">

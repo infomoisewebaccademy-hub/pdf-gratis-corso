@@ -391,6 +391,7 @@ const ColorInput: React.FC<{label: string, value: string, name: string, onChange
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, onDelete, onRefresh, currentSettings, onUpdateSettings, initialTab = 'dashboard' }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [timeRange, setTimeRange] = useState<TimeRange>('today');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
@@ -953,10 +954,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
         activeItem={activeTab} 
         items={adminMenuItems} 
         onItemClick={(id) => { setActiveTab(id as any); navigate(`/admin/${id}`); }} 
+        user={user}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       <main className="flex-1 bg-gray-50/50 pb-20 overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-6 py-10 lg:px-12">
+        <div className="max-w-[95%] mx-auto px-2 py-4 lg:px-4">
           
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
               <div>

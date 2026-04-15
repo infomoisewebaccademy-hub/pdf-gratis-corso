@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { BookOpen, User, Settings, MessageSquare, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, User, Settings, MessageSquare, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { UserProfile } from '../types';
 import { isPaidStudent } from '../services/authUtils';
 
@@ -19,9 +19,11 @@ interface SidebarProps {
   items?: SidebarItem[];
   onItemClick?: (id: string) => void;
   user: UserProfile | null;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unreadCount = 0, items, onItemClick, user }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unreadCount = 0, items, onItemClick, user, isCollapsed, onToggleCollapse }) => {
   const isPaid = isPaidStudent(user);
 
   const defaultMenuItems: SidebarItem[] = [
@@ -45,8 +47,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
   };
 
   return (
-    <aside className="flex lg:flex-col w-full lg:w-72 bg-white border-b lg:border-r lg:border-b-0 border-gray-200 lg:h-[calc(100vh-80px)] sticky top-20 self-start overflow-x-auto lg:overflow-y-auto z-30 scrollbar-hide">
-      <div className="p-4 lg:px-6 lg:pt-4 lg:pb-6 flex lg:flex-col gap-2 lg:space-y-2 min-w-max lg:min-w-0">
+    <aside className={`flex lg:flex-col bg-white border-b lg:border-r lg:border-b-0 border-gray-200 lg:h-[calc(100vh-80px)] sticky top-20 self-start overflow-x-auto lg:overflow-y-auto z-30 scrollbar-hide transition-all duration-300 ${isCollapsed ? 'lg:w-20' : 'lg:w-72'}`}>
+      <button 
+        onClick={onToggleCollapse}
+        className="hidden lg:flex items-center justify-center p-2 m-2 rounded-lg hover:bg-gray-100 text-gray-500"
+      >
+        {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+      </button>
+      <div className={`p-4 lg:px-6 lg:pt-4 lg:pb-6 flex lg:flex-col gap-2 lg:space-y-2 min-w-max lg:min-w-0 ${isCollapsed ? 'items-center' : ''}`}>
         <nav className="flex lg:flex-col gap-2 lg:space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -57,18 +65,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
               <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap border border-transparent ${
+                title={isCollapsed ? item.label : undefined}
+                className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap border border-transparent ${
                   isActive 
                     ? 'text-brand-700 shadow-sm border-brand-200 bg-white' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center ${isCollapsed ? 'gap-0' : 'gap-3'}`}>
                   <Icon className={`h-5 w-5 ${isActive ? 'text-brand-600' : 'text-gray-400'}`} />
-                  {item.label}
+                  {!isCollapsed && item.label}
                 </div>
                 
-                {hasNotification && (
+                {hasNotification && !isCollapsed && (
                   <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white ring-2 ring-white animate-bounce">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
@@ -82,14 +91,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onNavigate, unread
       <div className="hidden lg:block mt-auto p-6 border-t border-gray-200">
         <button 
           onClick={() => onNavigate && onNavigate('/support')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+          title={isCollapsed ? "Supporto" : undefined}
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-xl text-sm font-bold transition-all ${
             activeItem === 'support'
               ? 'text-brand-700 shadow-sm border border-brand-200 bg-white'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
           }`}
         >
           <HelpCircle className={`h-5 w-5 ${activeItem === 'support' ? 'text-brand-600' : 'text-gray-400'}`} />
-          Supporto
+          {!isCollapsed && "Supporto"}
         </button>
       </div>
     </aside>
