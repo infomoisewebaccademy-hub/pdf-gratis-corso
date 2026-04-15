@@ -24,6 +24,7 @@ interface UserWithCourses {
   created_at: string;
   purchased_courses: (Course & { progress: number })[];
   notification_count: number;
+  pdf_reminder_count: number;
 }
 
 export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
