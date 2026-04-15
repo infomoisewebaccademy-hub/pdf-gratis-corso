@@ -209,6 +209,18 @@ export const PdfGuideLanding: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">{config.offer_title}</h3>
                 <p className="text-slate-400 mb-6">{config.offer_text}</p>
+                
+                {/* Video Lessons CTA */}
+                <div className="bg-brand-600/10 border border-brand-500/20 rounded-xl p-4 mb-6 flex items-start gap-3">
+                    <div className="bg-brand-500/20 p-2 rounded-lg">
+                        <Youtube className="h-6 w-6 text-brand-400" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-white text-sm">Video Lezioni Incluse!</h4>
+                        <p className="text-xs text-slate-400">Oltre alla guida PDF, sbloccherai l'accesso immediato alla nostra area riservata con video tutorial pratici.</p>
+                    </div>
+                </div>
+                
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="relative">
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
