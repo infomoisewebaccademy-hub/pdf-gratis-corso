@@ -238,15 +238,26 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   };
 
 
-  const handleSendCredentialsToStudent = async (user: UserWithCourses) => {
-    if (!confirm(`Vuoi inviare una email con le credenziali di accesso a ${user.email}?`)) return;
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [userToNotify, setUserToNotify] = useState<UserWithCourses | null>(null);
+
+  const openNotificationModal = (user: UserWithCourses) => {
+    setUserToNotify(user);
+    setIsNotificationModalOpen(true);
+  };
+
+  const handleSendNotification = async (type: 'pdf-reminder') => {
+    if (!userToNotify) return;
+    setIsNotificationModalOpen(false);
     
-    setIsNotifying(user.id);
+    if (!confirm(`Vuoi inviare la notifica "${type}" a ${userToNotify.email}?`)) return;
+    
+    setIsNotifying(userToNotify.id);
     try {
       const { data, error } = await supabase.functions.invoke('send-pdf-reminder', {
         body: {
-          email: user.email,
-          name: user.full_name
+          email: userToNotify.email,
+          name: userToNotify.full_name
         }
       });
       
@@ -255,13 +266,14 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
           throw error;
       }
       
-      setUsers(prev => prev.map(u => u.id === user.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
-      alert('Email con credenziali inviata con successo!');
+      setUsers(prev => prev.map(u => u.id === userToNotify.id ? { ...u, notification_count: (u.notification_count || 0) + 1 } : u));
+      alert('Notifica inviata con successo!');
     } catch (error: any) {
-      console.error("Errore invio credenziali:", error);
-      alert("Errore nell'invio delle credenziali: " + error.message);
+      console.error("Errore invio notifica:", error);
+      alert("Errore nell'invio della notifica: " + error.message);
     } finally {
       setIsNotifying(null);
+      setUserToNotify(null);
     }
   };
   const handleExportWaitingList = () => {
@@ -398,7 +410,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Studenti Paganti
+            Utenti
           </button>
           <button
             onClick={() => setActiveSubTab('waiting_list')}
@@ -610,7 +622,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <button
-                          onClick={() => handleSendCredentialsToStudent(user)}
+                          onClick={() => openNotificationModal(user)}
                           disabled={isNotifying === user.id}
                           className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
                         >
@@ -619,7 +631,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           ) : (
                             <Key className="h-3 w-3 mr-1" />
                           )}
-                          Credenziali
+                          Notifica Mail
                         </button>
                       </td>
                     </tr>
@@ -753,6 +765,25 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
             Totale {activeSubTab === 'students' ? 'utenti' : 'iscritti'} trovati: <span className="font-semibold text-gray-900">{activeSubTab === 'students' ? filteredUsers.length : filteredWaitingList.length}</span>
           </p>
         </div>
+        {isNotificationModalOpen && userToNotify && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+              <h3 className="text-lg font-bold mb-4">Seleziona Notifica per {userToNotify.full_name}</h3>
+              <button
+                onClick={() => handleSendNotification('pdf-reminder')}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg"
+              >
+                Promemoria Guida PDF
+              </button>
+              <button
+                onClick={() => setIsNotificationModalOpen(false)}
+                className="w-full mt-4 text-gray-500 hover:text-gray-700"
+              >
+                Annulla
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
