@@ -309,6 +309,66 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
       setUserToNotify(null);
     }
   };
+
+  const [isBulkNotificationModalOpen, setIsBulkNotificationModalOpen] = useState(false);
+
+  const handleBulkSendNotification = async (type: 'pdf-reminder') => {
+    setIsBulkNotificationModalOpen(false);
+    setIsBulkNotifying(true);
+    
+    const usersToNotify = activeSubTab === 'students' 
+      ? users.filter(u => selectedUsers.includes(u.id))
+      : waitingList.filter(e => selectedEntries.includes(e.id));
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const user of usersToNotify) {
+      try {
+        // 1. Invia la notifica
+        const { error } = await supabase.functions.invoke('send-pdf-reminder', {
+          body: {
+            email: user.email,
+            name: user.full_name
+          }
+        });
+        
+        if (error) throw error;
+        
+        // 2. Inserisci nella cronologia
+        const { error: historyError } = await supabase
+          .from('notification_history')
+          .insert({ 
+            user_id: user.id, 
+            notification_type: type 
+          });
+
+        if (historyError) throw historyError;
+        
+        // 3. Se è un utente (studente), aggiorna il contatore
+        if (activeSubTab === 'students') {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ notification_count: ((user as UserWithCourses).notification_count || 0) + 1 })
+            .eq('id', user.id);
+          if (updateError) throw updateError;
+        }
+        
+        successCount++;
+      } catch (e) {
+        console.error(`Errore invio notifica per ${user.email}:`, e);
+        failCount++;
+      }
+    }
+
+    // Aggiorna UI
+    if (activeSubTab === 'students') {
+        fetchUsersAndPurchases();
+    }
+    
+    setIsBulkNotifying(false);
+    showToast(`Inviate ${successCount} notifiche, ${failCount} errori.`, failCount > 0 ? 'error' : 'success');
+  };
   const handleExportWaitingList = () => {
     if (waitingList.length === 0) return;
     
@@ -481,10 +541,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                     Notifica Selezionati ({selectedEntries.length})
                   </button>
                   <button
-                    onClick={() => {
-                      // Logic to handle bulk notification
-                      alert('Questa funzione sarà implementata per gestire notifiche multiple.');
-                    }}
+                    onClick={() => setIsBulkNotificationModalOpen(true)}
                     disabled={isBulkNotifying || selectedEntries.length === 0}
                     className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
                   >
@@ -526,10 +583,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 </span>
               )}
               <button
-                onClick={() => {
-                  // Logic to handle bulk notification
-                  alert('Questa funzione sarà implementata per gestire notifiche multiple.');
-                }}
+                onClick={() => setIsBulkNotificationModalOpen(true)}
                 disabled={isBulkNotifying || selectedUsers.length === 0}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
               >
@@ -668,7 +722,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           {isNotifying === user.id ? (
                             <Loader2 className="h-3 w-3 animate-spin mr-1" />
                           ) : (
-                            <Key className="h-3 w-3 mr-1" />
+                            <Mail className="h-3 w-3 mr-1" />
                           )}
                           Notifica Mail
                         </button>
@@ -807,6 +861,68 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
         {toast && (
           <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white z-[60] ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
             {toast.message}
+          </div>
+        )}
+        {isNotificationModalOpen && userToNotify && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-[500px] max-h-[80vh] overflow-y-auto">
+              <h3 className="text-lg font-bold mb-4">Notifiche per {userToNotify.full_name}</h3>
+              
+              <div className="mb-6">
+                <h4 className="font-semibold mb-2">Invia nuova notifica</h4>
+                <button
+                  onClick={() => handleSendNotification('pdf-reminder')}
+                  className="w-full text-left px-4 py-2 bg-brand-50 hover:bg-brand-100 rounded-lg text-brand-700 font-medium"
+                >
+                  Invia Promemoria Guida PDF
+                </button>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Cronologia invii</h4>
+                {notificationHistory.length > 0 ? (
+                  <ul className="space-y-2">
+                    {notificationHistory.map((h) => (
+                      <li key={h.id} className="text-sm p-2 bg-gray-50 rounded flex justify-between">
+                        <span>{h.notification_type}</span>
+                        <span className="text-gray-500">
+                          {new Date(h.sent_at).toLocaleString('it-IT')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">Nessuna notifica inviata.</p>
+                )}
+              </div>
+
+              <button
+                onClick={() => setIsNotificationModalOpen(false)}
+                className="w-full mt-6 text-gray-500 hover:text-gray-700"
+              >
+                Chiudi
+              </button>
+            </div>
+          </div>
+        )}
+        {isBulkNotificationModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl w-[400px]">
+              <h3 className="text-lg font-bold mb-4">Invia Notifica Massiva</h3>
+              <p className="mb-4 text-sm text-gray-600">Seleziona il tipo di notifica da inviare agli utenti selezionati.</p>
+              <button
+                onClick={() => handleBulkSendNotification('pdf-reminder')}
+                className="w-full text-left px-4 py-2 bg-brand-50 hover:bg-brand-100 rounded-lg text-brand-700 font-medium"
+              >
+                Promemoria Guida PDF
+              </button>
+              <button
+                onClick={() => setIsBulkNotificationModalOpen(false)}
+                className="w-full mt-4 text-gray-500 hover:text-gray-700"
+              >
+                Annulla
+              </button>
+            </div>
           </div>
         )}
         {isNotificationModalOpen && userToNotify && (
