@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { Course } from '../types';
-import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key } from 'lucide-react';
+import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key, Check, XCircle, X, Edit2, Trash2, Plus, Trash, ArrowLeft } from 'lucide-react';
+import { UserDetailModal } from './UserDetailModal';
 
 interface AdminUsersListProps {
   courses: Course[];
@@ -16,7 +17,7 @@ interface WaitingListEntry {
   created_at: string;
 }
 
-interface UserWithCourses {
+export interface UserWithCourses {
   id: string;
   email: string;
   full_name: string;
@@ -311,6 +312,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   };
 
   const [isBulkNotificationModalOpen, setIsBulkNotificationModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserWithCourses | null>(null);
 
   const handleBulkSendNotification = async (type: 'pdf-reminder') => {
     setIsBulkNotificationModalOpen(false);
@@ -714,18 +716,26 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                         })}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => openNotificationModal(user)}
-                          disabled={isNotifying === user.id}
-                          className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
-                        >
-                          {isNotifying === user.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                          ) : (
-                            <Mail className="h-3 w-3 mr-1" />
-                          )}
-                          Notifica Mail
-                        </button>
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-200 transition-all"
+                          >
+                            Dettagli
+                          </button>
+                          <button
+                            onClick={() => openNotificationModal(user)}
+                            disabled={isNotifying === user.id}
+                            className="inline-flex items-center px-3 py-1.5 bg-slate-600 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-all disabled:opacity-50"
+                          >
+                            {isNotifying === user.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                            ) : (
+                              <Mail className="h-3 w-3 mr-1" />
+                            )}
+                            Notifica Mail
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -966,6 +976,9 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
               </button>
             </div>
           </div>
+        )}
+        {selectedUser && (
+          <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} />
         )}
       </div>
     </div>
