@@ -26,6 +26,7 @@ export interface UserWithCourses {
   purchased_courses: (Course & { progress: number })[];
   notification_count: number;
   pdf_reminder_count: number;
+  last_sign_in_at?: string;
 }
 
 export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
@@ -682,8 +683,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                       <td className="px-6 py-4">
                         <div className="flex items-center text-gray-600">
                           <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                          <a href={`mailto:${user.email}`} className="hover:text-brand-600 transition-colors">
-                            {user.email}
+                          <a href={`mailto:${user.email}`} className={`hover:text-brand-600 transition-colors ${!user.last_sign_in_at ? 'text-gray-400' : ''}`}>
+                            {user.last_sign_in_at ? user.email : 'N/D'}
                           </a>
                         </div>
                       </td>
