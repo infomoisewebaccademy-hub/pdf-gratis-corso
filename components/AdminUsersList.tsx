@@ -666,6 +666,9 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                                   <Shield className="w-3 h-3 mr-1" /> Admin
                                 </span>
                               )}
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${user.last_sign_in_at ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+                                {user.last_sign_in_at ? '🟢 Attivo' : '⚪ Mai Acceduto'}
+                              </span>
                             </p>
                             <p className="text-xs text-gray-500 flex items-center mt-1">
                               <User className="w-3 h-3 mr-1" /> ID: {user.id.substring(0, 8)}...
