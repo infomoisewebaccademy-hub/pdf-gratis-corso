@@ -442,7 +442,8 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
           is_admin: profile.is_admin || false,
           created_at: profile.created_at || new Date().toISOString(),
           purchased_courses: purchasedCourses,
-          notification_count: profile.notification_count || 0
+          notification_count: profile.notification_count || 0,
+          last_sign_in_at: profile.last_sign_in_at
         };
       });
 
