@@ -41,6 +41,7 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [notificationStatus, setNotificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>('all');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'never_signed_in'>('all');
 
   useEffect(() => {
     if (activeSubTab === 'students') {
@@ -455,10 +456,13 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          user.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = selectedStatusFilter === 'all' || 
+                          (selectedStatusFilter === 'active' ? !!user.last_sign_in_at : !user.last_sign_in_at);
+    return matchesSearch && matchesStatus;
+  });
 
   const filteredWaitingList = waitingList.filter(entry => {
     const matchesSearch = entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -522,6 +526,15 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
+              <select
+                value={selectedStatusFilter}
+                onChange={(e) => setSelectedStatusFilter(e.target.value as 'all' | 'active' | 'never_signed_in')}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="all">Stato: Tutti</option>
+                <option value="active">🟢 Attivi</option>
+                <option value="never_signed_in">⚪ Mai Acceduto</option>
+              </select>
           {activeSubTab === 'waiting_list' && (
             <>
               {filteredWaitingList.length > 0 && (
