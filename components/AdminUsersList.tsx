@@ -3,6 +3,7 @@ import { supabase } from '../services/supabase';
 import { Course } from '../types';
 import { Loader2, Search, Mail, BookOpen, Shield, User, Clock, Send, RefreshCw, Download, Key, Check, XCircle, X, Edit2, Trash2, Plus, Trash, ArrowLeft } from 'lucide-react';
 import { UserDetailModal } from './UserDetailModal';
+import { format, subDays, isSameDay, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
 
 interface AdminUsersListProps {
   courses: Course[];
@@ -42,6 +43,9 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
   const [notificationStatus, setNotificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState<string>('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<'all' | 'active' | 'never_signed_in'>('all');
+  const [selectedDateRange, setSelectedDateRange] = useState<'all' | 'today' | 'yesterday' | '7d' | '14d' | 'month' | 'last_month' | 'custom'>('all');
+  const [customStartDate, setCustomStartDate] = useState<string>('');
+  const [customEndDate, setCustomEndDate] = useState<string>('');
 
   useEffect(() => {
     if (activeSubTab === 'students') {
@@ -461,7 +465,26 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                           user.full_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatusFilter === 'all' || 
                           (selectedStatusFilter === 'active' ? !!user.last_sign_in_at : !user.last_sign_in_at);
-    return matchesSearch && matchesStatus;
+    
+    // Filtro Temporale
+    let matchesDate = true;
+    const createdAt = parseISO(user.created_at);
+    const now = new Date();
+    
+    switch(selectedDateRange) {
+        case 'today': matchesDate = isSameDay(createdAt, now); break;
+        case 'yesterday': matchesDate = isSameDay(createdAt, subDays(now, 1)); break;
+        case '7d': matchesDate = isWithinInterval(createdAt, { start: subDays(now, 7), end: endOfDay(now) }); break;
+        case '14d': matchesDate = isWithinInterval(createdAt, { start: subDays(now, 14), end: endOfDay(now) }); break;
+        case 'month': matchesDate = isWithinInterval(createdAt, { start: startOfMonth(now), end: endOfDay(now) }); break;
+        case 'last_month': matchesDate = isWithinInterval(createdAt, { start: startOfMonth(subMonths(now, 1)), end: endOfMonth(subMonths(now, 1)) }); break;
+        case 'custom': 
+            if (customStartDate && customEndDate) 
+                matchesDate = isWithinInterval(createdAt, { start: startOfDay(parseISO(customStartDate)), end: endOfDay(parseISO(customEndDate)) });
+            break;
+    }
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   const filteredWaitingList = waitingList.filter(entry => {
@@ -535,6 +558,26 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
                 <option value="active">🟢 Attivi</option>
                 <option value="never_signed_in">⚪ Mai Acceduto</option>
               </select>
+              <select
+                value={selectedDateRange}
+                onChange={(e) => setSelectedDateRange(e.target.value as any)}
+                className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="all">Tutto il tempo</option>
+                <option value="today">Oggi</option>
+                <option value="yesterday">Ieri</option>
+                <option value="7d">Ultimi 7 gg</option>
+                <option value="14d">Ultimi 14 gg</option>
+                <option value="month">Questo mese</option>
+                <option value="last_month">Mese precedente</option>
+                <option value="custom">Personalizzato</option>
+              </select>
+              {selectedDateRange === 'custom' && (
+                  <div className="flex items-center gap-1">
+                      <input type="date" onChange={(e) => setCustomStartDate(e.target.value)} className="px-2 py-2 border border-gray-200 rounded-lg text-sm" />
+                      <input type="date" onChange={(e) => setCustomEndDate(e.target.value)} className="px-2 py-2 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+              )}
           {activeSubTab === 'waiting_list' && (
             <>
               {filteredWaitingList.length > 0 && (
