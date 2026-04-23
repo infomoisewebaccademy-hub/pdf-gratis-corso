@@ -423,14 +423,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         
                         <div className="space-y-4 pt-6 mt-6 border-t border-gray-100">
                              <div className="flex justify-between text-sm">
-                                 <span className="text-gray-600 flex items-center"><Clock className="h-4 w-4 mr-2 text-brand-500" /> Durata</span>
-                                 <span className="font-bold text-gray-900">{course.duration}</span>
-                             </div>
-                             <div className="flex justify-between text-sm">
-                                 <span className="text-gray-600 flex items-center"><Book className="h-4 w-4 mr-2 text-brand-500" /> Lezioni</span>
-                                 <span className="font-bold text-gray-900">{course.lessons_content?.length || course.lessons}</span>
-                             </div>
-                             <div className="flex justify-between text-sm">
                                  <span className="text-gray-600 flex items-center"><Users className="h-4 w-4 mr-2 text-brand-500" /> Accesso</span>
                                  <span className="font-bold text-gray-900">Illimitato</span>
                              </div>
