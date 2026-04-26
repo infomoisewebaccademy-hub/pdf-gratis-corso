@@ -8,6 +8,11 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
     const editorRef = useRef<HTMLDivElement>(null);
     const quillRef = useRef<Quill | null>(null);
     const isUpdatingRef = useRef(false);
+    const onChangeRef = useRef(onChange);
+
+    useEffect(() => {
+        onChangeRef.current = onChange;
+    }, [onChange]);
 
     useEffect(() => {
         if (editorRef.current && !quillRef.current) {
@@ -28,7 +33,7 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
             quillRef.current.on('text-change', () => {
                 if (!isUpdatingRef.current) {
                    const html = editorRef.current?.querySelector('.ql-editor')?.innerHTML || '';
-                   onChange(html);
+                   onChangeRef.current(html);
                 }
             });
         }
@@ -482,8 +487,11 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     setFormData({ ...formData, lessons_content: updated });
   };
   const updateLesson = (index: number, field: keyof Lesson, value: string) => {
-    const updated = [...(formData.lessons_content || [])]; updated[index] = { ...updated[index], [field]: value };
-    setFormData({ ...formData, lessons_content: updated });
+    setFormData(prev => {
+        const updated = [...(prev.lessons_content || [])];
+        updated[index] = { ...updated[index], [field]: value };
+        return { ...prev, lessons_content: updated };
+    });
   };
 
   return (
@@ -613,7 +621,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                         <div className="bg-brand-50/50 border border-brand-100 rounded-lg p-4 mb-6">
                             <div className="flex justify-between items-center mb-3"><h4 className="font-bold text-sm text-brand-800">Nuova Lezione</h4><button type="button" onClick={() => setIsAddingLesson(false)}><X className="h-4 w-4 text-gray-400 hover:text-gray-600"/></button></div>
                             <div className="space-y-3">
-                                <input type="text" placeholder="Titolo Lezione" className="w-full border border-gray-300 rounded p-2 text-sm" value={newLesson.title} onChange={e => setNewLesson({...newLesson, title: e.target.value})} />
+                                <input type="text" placeholder="Titolo Lezione" className="w-full border border-gray-300 rounded p-2 text-sm" value={newLesson.title} onChange={e => setNewLesson(prev => ({...prev, title: e.target.value}))} />
                                 <div className="w-full bg-white border border-gray-300 rounded p-2 text-sm">
                                     <label className="text-xs font-bold text-gray-500 mb-2 block">Video Lezione</label>
                                     <div className="flex items-center gap-2">
@@ -645,13 +653,13 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                     )}
                                 </div>
                                 <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div><div className="relative flex justify-center text-xs"><span className="bg-brand-50/50 px-2 text-gray-500">o</span></div></div>
-                                <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson({...newLesson, videoUrl: e.target.value})} />
-                                <textarea placeholder="Breve descrizione (Sottotitolo)" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})} />
+                                <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson(prev => ({...prev, videoUrl: e.target.value}))} />
+                                <textarea placeholder="Breve descrizione (Sottotitolo)" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson(prev => ({...prev, description: e.target.value}))} />
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-gray-500">Appunti per gli studenti (Opzionale)</label>
                                     <QuillEditor 
                                         value={newLesson.notes || ''} 
-                                        onChange={notes => setNewLesson({...newLesson, notes})}
+                                        onChange={notes => setNewLesson(prev => ({...prev, notes}))}
                                         placeholder="Scrivi qui gli appunti che gli studenti vedranno in questa lezione..."
                                     />
                                 </div>
