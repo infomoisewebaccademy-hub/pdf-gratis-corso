@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -107,6 +107,7 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [isNotesExpanded, setIsNotesExpanded] = useState(false);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
@@ -631,15 +632,45 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
 
                 {isPurchased && activeLesson && activeLesson.notes && (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mt-6">
-                        <h2 className="text-xl font-bold flex items-center mb-6 text-gray-900">
-                            <FileText className="h-5 w-5 mr-2 text-brand-600" />
-                            Appunti della Lezione
-                        </h2>
-                        <div 
-                            className="prose prose-brand max-w-none text-gray-700 lesson-notes-content"
-                            dangerouslySetInnerHTML={{ __html: activeLesson.notes }}
-                        />
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold flex items-center text-gray-900">
+                                <FileText className="h-5 w-5 mr-2 text-brand-600" />
+                                Appunti della Lezione
+                            </h2>
+                            <button 
+                                onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                                className="text-sm font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1"
+                            >
+                                {isNotesExpanded ? (
+                                    <>Chiudi <ChevronUp className="h-4 w-4" /></>
+                                ) : (
+                                    <>Espandi <ChevronDown className="h-4 w-4" /></>
+                                )}
+                            </button>
+                        </div>
+                        
+                        <div className={`overflow-hidden transition-all duration-300 relative ${!isNotesExpanded ? 'max-height-[200px]' : 'max-height-none'}`}
+                             style={{ maxHeight: isNotesExpanded ? 'none' : '200px' }}>
+                            <div 
+                                className="prose prose-brand max-w-none text-gray-700 lesson-notes-content"
+                                dangerouslySetInnerHTML={{ __html: activeLesson.notes }}
+                            />
+                            {!isNotesExpanded && (
+                                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                            )}
+                        </div>
+
+                        {!isNotesExpanded && (
+                            <button 
+                                onClick={() => setIsNotesExpanded(true)}
+                                className="w-full py-3 mt-2 text-sm font-bold text-gray-500 hover:text-brand-600 border-t border-gray-50 border-dashed"
+                            >
+                                Mostra tutti gli appunti
+                            </button>
+                        )}
+
                         <style>{`
+                            .lesson-notes-content { white-space: pre-wrap; }
                             .lesson-notes-content h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
                             .lesson-notes-content h2 { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem; }
                             .lesson-notes-content h3 { font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; }

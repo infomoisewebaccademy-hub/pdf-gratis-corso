@@ -57,11 +57,14 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
                 .rich-text-editor .ql-container {
                     min-height: 250px;
                 }
+                .rich-text-editor .ql-editor {
+                    white-space: pre-wrap;
+                }
             `}</style>
         </div>
     );
 };
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
@@ -118,6 +121,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isVideoPickerOpen, setIsVideoPickerOpen] = useState(false);
   const [activeLessonIndexForVideo, setActiveLessonIndexForVideo] = useState<number | null>(null);
+  const [expandedNotes, setExpandedNotes] = useState<{[key: number]: boolean}>({});
+  const [isNewLessonNotesExpanded, setIsNewLessonNotesExpanded] = useState(false);
 
     const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
         const file = event.target.files?.[0];
@@ -656,12 +661,27 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                 <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson(prev => ({...prev, videoUrl: e.target.value}))} />
                                 <textarea placeholder="Breve descrizione (Sottotitolo)" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson(prev => ({...prev, description: e.target.value}))} />
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500">Appunti per gli studenti (Opzionale)</label>
-                                    <QuillEditor 
-                                        value={newLesson.notes || ''} 
-                                        onChange={notes => setNewLesson(prev => ({...prev, notes}))}
-                                        placeholder="Scrivi qui gli appunti che gli studenti vedranno in questa lezione..."
-                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setIsNewLessonNotesExpanded(!isNewLessonNotesExpanded)}
+                                        className="flex items-center justify-between w-full text-xs font-bold text-gray-500 bg-gray-50 border border-gray-200 rounded p-2 hover:bg-gray-100"
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <FileText className="h-3 w-3" />
+                                            Appunti per gli studenti (Opzionale)
+                                        </span>
+                                        {isNewLessonNotesExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                    </button>
+                                    
+                                    {isNewLessonNotesExpanded && (
+                                        <div className="mt-2">
+                                            <QuillEditor 
+                                                value={newLesson.notes || ''} 
+                                                onChange={notes => setNewLesson(prev => ({...prev, notes}))}
+                                                placeholder="Scrivi qui gli appunti che gli studenti vedranno in questa lezione..."
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 <button type="button" onClick={addLesson} disabled={!newLesson.title} className="w-full bg-brand-600 text-white py-2 rounded font-bold text-sm hover:bg-brand-700 disabled:opacity-50">Conferma</button>
                             </div>
@@ -713,11 +733,26 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                             )}
                                          </div>
                                          <div className="space-y-1 mt-2">
-                                            <label className="text-[10px] font-bold text-gray-400">Appunti Lezione</label>
-                                            <QuillEditor 
-                                                value={lesson.notes || ''} 
-                                                onChange={notes => updateLesson(idx, 'notes', notes)}
-                                            />
+                                            <button 
+                                                type="button"
+                                                onClick={() => setExpandedNotes(prev => ({...prev, [idx]: !prev[idx]}))}
+                                                className="flex items-center justify-between w-full text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 rounded px-2 py-1 hover:bg-gray-100"
+                                            >
+                                                <span className="flex items-center gap-1">
+                                                    <FileText className="h-3 w-3 text-brand-600" />
+                                                    Appunti Lezione
+                                                </span>
+                                                {expandedNotes[idx] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                            </button>
+
+                                            {expandedNotes[idx] && (
+                                                <div className="mt-1">
+                                                    <QuillEditor 
+                                                        value={lesson.notes || ''} 
+                                                        onChange={notes => updateLesson(idx, 'notes', notes)}
+                                                    />
+                                                </div>
+                                            )}
                                          </div>
                                     </div>
                                     <button type="button" onClick={() => removeLesson(idx)} className="text-gray-400 hover:text-red-500 p-1"><Trash className="h-4 w-4" /></button>
