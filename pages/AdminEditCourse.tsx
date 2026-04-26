@@ -941,6 +941,12 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
         onClose={() => setIsPickerOpen(false)} 
         onSelect={(url) => setFormData({ ...formData, image: url })} 
       />
+
+      <VideoPicker
+        isOpen={isVideoPickerOpen}
+        onClose={() => setIsVideoPickerOpen(false)}
+        onSelect={handleVideoSelect}
+      />
     </div>
   );
 };
