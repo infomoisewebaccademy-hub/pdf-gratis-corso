@@ -48,6 +48,11 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
     return (
         <div className="rich-text-editor border border-gray-200 rounded-lg overflow-hidden bg-white">
             <div ref={editorRef} />
+            <style>{`
+                .rich-text-editor .ql-container {
+                    min-height: 250px;
+                }
+            `}</style>
         </div>
     );
 };
