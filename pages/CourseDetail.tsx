@@ -594,9 +594,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                                 </div>
                                                 <div>
                                                     <h4 className={`font-bold ${activeLesson?.id === lesson.id ? 'text-brand-900' : 'text-gray-900'} ${isCompleted ? 'text-green-800' : ''}`}>
-                                                        {lesson.title}
+                                                        {isPurchased ? lesson.title : `Lezione ${idx + 1}`}
                                                     </h4>
-                                                    {lesson.description && <p className="text-xs text-gray-400 line-clamp-1">{lesson.description}</p>}
+                                                    {isPurchased && lesson.description && <p className="text-xs text-gray-400 line-clamp-1">{lesson.description}</p>}
                                                 </div>
                                             </div>
                                             {isPurchased ? (
