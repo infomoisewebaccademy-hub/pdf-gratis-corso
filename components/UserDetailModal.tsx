@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
-import { X, Mail, BookOpen, Clock, Shield, User, Ticket, Bell } from 'lucide-react';
+import { X, Mail, BookOpen, Clock, Shield, User, Ticket, Bell, Plus, Loader2 } from 'lucide-react';
 import { UserWithCourses } from './AdminUsersList';
 
 interface UserDetailModalProps {
   user: UserWithCourses;
+  availableCourses: Course[];
   onClose: () => void;
+  onUpdate?: () => void;
 }
 
-export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
+export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, availableCourses, onClose, onUpdate }) => {
   const [activeTab, setActiveTab] = useState<'details' | 'courses' | 'notifications' | 'tickets'>('details');
   const [notificationHistory, setNotificationHistory] = useState<any[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +31,30 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose 
     };
     fetchData();
   }, [user.id]);
+
+  const handleAssignCourse = async () => {
+    if (!selectedCourseId) return;
+    setIsAssigning(true);
+    try {
+        const { error } = await supabase
+            .from('purchases')
+            .insert([{ user_id: user.id, course_id: selectedCourseId }]);
+        
+        if (error) throw error;
+        
+        alert('Percorso assegnato con successo!');
+        setSelectedCourseId('');
+        if (onUpdate) onUpdate();
+    } catch (err: any) {
+        console.error("Errore assegnazione corso:", err);
+        alert("Errore nell'assegnazione: " + err.message);
+    } finally {
+        setIsAssigning(false);
+    }
+  };
+
+  // Filtra i corsi che l'utente NON ha ancora
+  const coursesToAssign = availableCourses.filter(c => !user.purchased_courses.some(pc => pc.id === c.id));
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -58,16 +86,52 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose 
             </div>
           )}
           {activeTab === 'courses' && (
-            <div className="space-y-4">
-              {user.purchased_courses.map(course => (
-                <div key={course.id} className="p-4 bg-gray-50 rounded-lg">
-                  <p className="font-bold">{course.title}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="bg-brand-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div>
-                  </div>
-                  <p className="text-xs mt-1">{course.progress}% completato</p>
+            <div className="space-y-6">
+              <div className="bg-brand-50 p-4 rounded-xl border border-brand-100 mb-6">
+                <h4 className="text-brand-800 font-bold mb-3 flex items-center gap-2">
+                  <Plus className="h-4 w-4" /> Assegna Nuovo Percorso
+                </h4>
+                <div className="flex gap-3">
+                  <select 
+                    value={selectedCourseId}
+                    onChange={(e) => setSelectedCourseId(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  >
+                    <option value="">Seleziona un percorso...</option>
+                    {coursesToAssign.map(c => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleAssignCourse}
+                    disabled={!selectedCourseId || isAssigning}
+                    className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-brand-700 transition-all disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {isAssigning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                    Assegna
+                  </button>
                 </div>
-              ))}
+              </div>
+
+              <h4 className="font-bold text-gray-900 border-b border-gray-100 pb-2">Percorsi In Possesso ({user.purchased_courses.length})</h4>
+              <div className="space-y-4">
+                {user.purchased_courses.length > 0 ? (
+                    user.purchased_courses.map(course => (
+                      <div key={course.id} className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                            <p className="font-bold">{course.title}</p>
+                            <span className="text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Acquistato</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div className="bg-brand-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div>
+                        </div>
+                        <p className="text-xs mt-1 text-gray-500">{course.progress}% completato</p>
+                      </div>
+                    ))
+                ) : (
+                    <p className="text-gray-500 italic text-sm text-center py-4">L'utente non ha ancora nessun percorso.</p>
+                )}
+              </div>
             </div>
           )}
           {activeTab === 'notifications' && (

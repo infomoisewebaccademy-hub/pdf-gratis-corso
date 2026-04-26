@@ -1038,7 +1038,15 @@ export const AdminUsersList: React.FC<AdminUsersListProps> = ({ courses }) => {
           </div>
         )}
         {selectedUser && (
-          <UserDetailModal user={selectedUser} onClose={() => setSelectedUser(null)} />
+          <UserDetailModal 
+            user={selectedUser} 
+            availableCourses={courses}
+            onClose={() => setSelectedUser(null)} 
+            onUpdate={() => {
+                fetchUsersAndPurchases();
+                setSelectedUser(null);
+            }}
+          />
         )}
       </div>
     </div>
