@@ -628,6 +628,28 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         </div>
                     </div>
                 )}
+
+                {isPurchased && activeLesson && activeLesson.notes && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mt-6">
+                        <h2 className="text-xl font-bold flex items-center mb-6 text-gray-900">
+                            <FileText className="h-5 w-5 mr-2 text-brand-600" />
+                            Appunti della Lezione
+                        </h2>
+                        <div 
+                            className="prose prose-brand max-w-none text-gray-700 lesson-notes-content"
+                            dangerouslySetInnerHTML={{ __html: activeLesson.notes }}
+                        />
+                        <style>{`
+                            .lesson-notes-content h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
+                            .lesson-notes-content h2 { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem; }
+                            .lesson-notes-content h3 { font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; }
+                            .lesson-notes-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+                            .lesson-notes-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+                            .lesson-notes-content p { margin-bottom: 1rem; }
+                            .lesson-notes-content a { color: #8B5CF6; text-decoration: underline; }
+                        `}</style>
+                    </div>
+                )}
             </div>
         </div>
       </div>

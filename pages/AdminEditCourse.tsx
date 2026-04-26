@@ -1,6 +1,56 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 import { Course, Lesson } from '../types';
+
+const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void; placeholder?: string }> = ({ value, onChange, placeholder }) => {
+    const editorRef = useRef<HTMLDivElement>(null);
+    const quillRef = useRef<Quill | null>(null);
+    const isUpdatingRef = useRef(false);
+
+    useEffect(() => {
+        if (editorRef.current && !quillRef.current) {
+            quillRef.current = new Quill(editorRef.current, {
+                theme: 'snow',
+                placeholder: placeholder || "Scrivi qui...",
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link', 'clean']
+                    ]
+                }
+            });
+
+            quillRef.current.on('text-change', () => {
+                if (!isUpdatingRef.current) {
+                   const html = editorRef.current?.querySelector('.ql-editor')?.innerHTML || '';
+                   onChange(html);
+                }
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        if (quillRef.current && value !== (editorRef.current?.querySelector('.ql-editor')?.innerHTML || '')) {
+            isUpdatingRef.current = true;
+            const editor = editorRef.current?.querySelector('.ql-editor');
+            if (editor) {
+                editor.innerHTML = value;
+            }
+            isUpdatingRef.current = false;
+        }
+    }, [value]);
+
+    return (
+        <div className="rich-text-editor border border-gray-200 rounded-lg overflow-hidden bg-white">
+            <div ref={editorRef} />
+        </div>
+    );
+};
 import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
@@ -50,7 +100,7 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '' });
+  const [newLesson, setNewLesson] = useState<Partial<Lesson>>({ title: '', description: '', videoUrl: '', video_storage_path: '', notes: '' });
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [uploadFileProgress, setUploadFileProgress] = useState<number | null>(null);
@@ -410,9 +460,17 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
 
   const addLesson = () => {
     if (!newLesson.title) return;
-    const lesson: Lesson = { id: `lesson_${Date.now()}`, title: newLesson.title || 'Nuova Lezione', description: newLesson.description || '', videoUrl: newLesson.videoUrl || '', video_storage_path: newLesson.video_storage_path, duration: '10:00' };
+    const lesson: Lesson = { 
+        id: `lesson_${Date.now()}`, 
+        title: newLesson.title || 'Nuova Lezione', 
+        description: newLesson.description || '', 
+        videoUrl: newLesson.videoUrl || '', 
+        video_storage_path: newLesson.video_storage_path, 
+        duration: '10:00',
+        notes: newLesson.notes || ''
+    };
     setFormData({ ...formData, lessons_content: [...(formData.lessons_content || []), lesson] });
-    setNewLesson({ title: '', description: '', videoUrl: '', video_storage_path: '' }); setIsAddingLesson(false);
+    setNewLesson({ title: '', description: '', videoUrl: '', video_storage_path: '', notes: '' }); setIsAddingLesson(false);
   };
   const removeLesson = (index: number) => {
     const updated = [...(formData.lessons_content || [])]; updated.splice(index, 1);
@@ -583,7 +641,15 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                 </div>
                                 <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div><div className="relative flex justify-center text-xs"><span className="bg-brand-50/50 px-2 text-gray-500">o</span></div></div>
                                 <input type="text" placeholder="URL Video Esterno (es. YouTube)" className="w-full border border-gray-300 rounded p-2 text-sm font-mono" value={newLesson.videoUrl} onChange={e => setNewLesson({...newLesson, videoUrl: e.target.value})} />
-                                <textarea placeholder="Breve descrizione" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})} />
+                                <textarea placeholder="Breve descrizione (Sottotitolo)" className="w-full border border-gray-300 rounded p-2 text-sm" rows={2} value={newLesson.description} onChange={e => setNewLesson({...newLesson, description: e.target.value})} />
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500">Appunti per gli studenti (Opzionale)</label>
+                                    <QuillEditor 
+                                        value={newLesson.notes || ''} 
+                                        onChange={notes => setNewLesson({...newLesson, notes})}
+                                        placeholder="Scrivi qui gli appunti che gli studenti vedranno in questa lezione..."
+                                    />
+                                </div>
                                 <button type="button" onClick={addLesson} disabled={!newLesson.title} className="w-full bg-brand-600 text-white py-2 rounded font-bold text-sm hover:bg-brand-700 disabled:opacity-50">Conferma</button>
                             </div>
                         </div>
@@ -632,6 +698,13 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                                                     </button>
                                                 </div>
                                             )}
+                                         </div>
+                                         <div className="space-y-1 mt-2">
+                                            <label className="text-[10px] font-bold text-gray-400">Appunti Lezione</label>
+                                            <QuillEditor 
+                                                value={lesson.notes || ''} 
+                                                onChange={notes => updateLesson(idx, 'notes', notes)}
+                                            />
                                          </div>
                                     </div>
                                     <button type="button" onClick={() => removeLesson(idx)} className="text-gray-400 hover:text-red-500 p-1"><Trash className="h-4 w-4" /></button>

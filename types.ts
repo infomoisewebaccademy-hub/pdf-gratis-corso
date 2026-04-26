@@ -7,6 +7,7 @@ export interface Lesson {
   video_storage_path?: string;
   duration?: string;
   isFree?: boolean;
+  notes?: string; // Rich text notes from admin
 }
 
 export interface Course {
@@ -311,12 +312,9 @@ export interface PlatformSettings {
   purchase_new_user_pixel_id?: string;
   purchase_returning_user_pixel_id?: string;
   general_thank_you_pixel_id?: string;
-
-  pdf_guide_form_image?: string;
   font_family?: string;
-  
+  pdf_guide_form_image?: string;
   active_mode?: 'public' | 'pre_launch' | 'pdf_guide';
-  
   pre_launch_date?: string;
   pre_launch_config?: PreLaunchConfig;
   landing_page_config?: LandingPageConfig;
@@ -346,4 +344,13 @@ export interface SupportMessage {
   sender_id: string;
   message: string;
   created_at: string;
+}
+
+export interface CourseNote {
+  id: string;
+  user_id: string;
+  course_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
 }
