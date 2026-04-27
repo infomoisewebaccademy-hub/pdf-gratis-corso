@@ -499,6 +499,18 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     });
   };
 
+  const moveLesson = (index: number, direction: 'up' | 'down') => {
+    if (!formData.lessons_content) return;
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === formData.lessons_content.length - 1)) return;
+    
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const lessons = [...formData.lessons_content];
+    const [movedLesson] = lessons.splice(index, 1);
+    lessons.splice(newIndex, 0, movedLesson);
+    
+    setFormData({ ...formData, lessons_content: lessons });
+  };
+
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">
       <form onSubmit={handleSubmit} className="w-full px-4 sm:px-6 lg:px-8">
@@ -692,7 +704,27 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                         {formData.lessons_content?.map((lesson, idx) => (
                             <div key={idx} className="border border-gray-100 rounded-lg p-4 bg-gray-50/30 group hover:bg-white">
                                 <div className="flex items-start gap-3">
-                                    <div className="mt-1 text-gray-300 cursor-move"><GripVertical className="h-5 w-5" /></div>
+                                    <div className="mt-1 flex flex-col items-center gap-1">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => moveLesson(idx, 'up')}
+                                            disabled={idx === 0}
+                                            className="text-gray-400 hover:text-brand-600 disabled:opacity-20"
+                                            title="Sposta Su"
+                                        >
+                                            <ChevronUp className="h-4 w-4" />
+                                        </button>
+                                        <div className="text-gray-300"><GripVertical className="h-5 w-5" /></div>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => moveLesson(idx, 'down')}
+                                            disabled={idx === (formData.lessons_content?.length || 0) - 1}
+                                            className="text-gray-400 hover:text-brand-600 disabled:opacity-20"
+                                            title="Sposta Giù"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                     <div className="flex-1 space-y-2">
                                         <div className="flex items-center gap-2"><span className="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-0.5 rounded">{idx + 1}</span><input type="text" value={lesson.title} onChange={e => updateLesson(idx, 'title', e.target.value)} className="font-bold text-gray-800 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-brand-500 w-full" /></div>
                                          <div className="text-xs text-gray-500 w-full bg-transparent border-b border-transparent hover:border-gray-200 focus-within:border-brand-300 rounded p-1">
