@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -108,6 +108,7 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
@@ -141,6 +142,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
       setUpsellCourse(null);
     }
   }, [course.upsell_course_id]);
+
+  // Gestione annuncio popup
+  useEffect(() => {
+    if (course.announcement_title || course.announcement_content) {
+      setShowAnnouncement(true);
+    }
+  }, [course.id]);
 
   // Carica progresso lezioni se acquistato
   useEffect(() => {
@@ -684,6 +692,42 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
             </div>
         </div>
       </div>
+
+      {/* MODALE ANNUNCIO */}
+      {showAnnouncement && (course.announcement_title || course.announcement_content) && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAnnouncement(false)}></div>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-in fade-in zoom-in duration-300">
+                <div className="bg-brand-600 p-6 text-white flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-white/20 p-2 rounded-lg">
+                            <Bell className="h-6 w-6" />
+                        </div>
+                        <h3 className="text-xl font-bold">Annuncio Importante</h3>
+                    </div>
+                    <button onClick={() => setShowAnnouncement(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <X className="h-6 w-6" />
+                    </button>
+                </div>
+                <div className="p-8">
+                    {course.announcement_title && (
+                        <h4 className="text-2xl font-black text-gray-900 mb-4 leading-tight">{course.announcement_title}</h4>
+                    )}
+                    {course.announcement_content && (
+                        <div className="text-gray-600 text-lg leading-relaxed whitespace-pre-wrap mb-8">
+                            {course.announcement_content}
+                        </div>
+                    )}
+                    <button 
+                        onClick={() => setShowAnnouncement(false)}
+                        className="w-full bg-brand-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20"
+                    >
+                        Ho capito, grazie!
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };

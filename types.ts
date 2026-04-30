@@ -36,6 +36,8 @@ export interface Course {
   has_waiting_list?: boolean; // NUOVO: Se abilitare la lista d'attesa quando il corso è pieno
   show_price_on_home?: boolean; // NUOVO: Se mostrare il prezzo nella home page
   show_if_full_on_home?: boolean; // NUOVO: Se mostrare il corso nella home page quando è pieno
+  announcement_title?: string; // NUOVO: Titolo del popup di annuncio
+  announcement_content?: string; // NUOVO: Contenuto (HTML/Text) del popup di annuncio
 }
 
 export interface UserProfile {

@@ -55,7 +55,7 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
             <div ref={editorRef} />
             <style>{`
                 .rich-text-editor .ql-container {
-                    min-height: 250px;
+                    min-height: 400px;
                 }
                 .rich-text-editor .ql-editor {
                     white-space: pre-wrap;
@@ -64,7 +64,7 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
         </div>
     );
 };
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp, Bell } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
@@ -105,6 +105,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     upsell_course_id: '',
     show_features: true,
     additional_benefits: [''],
+    announcement_title: '',
+    announcement_content: '',
   });
 
   const [imgError, setImgError] = useState(false);
@@ -194,13 +196,18 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     };
 
     const handleVideoSelect = (path: string) => {
+        console.log("Video selected:", path, "for index:", activeLessonIndexForVideo);
         if (activeLessonIndexForVideo === -1) {
             setNewLesson(prev => ({ ...prev, video_storage_path: path }));
         } else if (activeLessonIndexForVideo !== null) {
             const updatedLessons = [...(formData.lessons_content || [])];
-            updatedLessons[activeLessonIndexForVideo].video_storage_path = path;
+            updatedLessons[activeLessonIndexForVideo] = { 
+                ...updatedLessons[activeLessonIndexForVideo], 
+                video_storage_path: path 
+            };
             setFormData(prev => ({ ...prev, lessons_content: updatedLessons }));
         }
+        setIsVideoPickerOpen(false);
     };
 
   const handleVideoRemove = async (lessonIndex: number) => {
@@ -310,6 +317,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             show_features: courseToEdit.show_features !== false,
             additional_benefits: courseToEdit.additional_benefits || [''],
             program_title: courseToEdit.program_title || '',
+            announcement_title: courseToEdit.announcement_title || '',
+            announcement_content: courseToEdit.announcement_content || '',
         };
         setFormData(data);
         initialCourseRef.current = data;
@@ -323,6 +332,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             rating: 5, show_discount_badge: true, upsell_course_id: '', show_features: true,
             additional_benefits: [''],
             program_title: '',
+            announcement_title: '',
+            announcement_content: '',
         };
         setFormData(data);
         initialCourseRef.current = data;
@@ -361,6 +372,8 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       show_features: formData.show_features !== false,
       additional_benefits: formData.additional_benefits?.filter(b => b.trim() !== '') || [],
       program_title: formData.program_title || null,
+      announcement_title: formData.announcement_title || null,
+      announcement_content: formData.announcement_content || null,
     } as Course;
     
     await onSave(courseToSave);
@@ -638,7 +651,16 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                         <div className="bg-brand-50/50 border border-brand-100 rounded-lg p-4 mb-6">
                             <div className="flex justify-between items-center mb-3"><h4 className="font-bold text-sm text-brand-800">Nuova Lezione</h4><button type="button" onClick={() => setIsAddingLesson(false)}><X className="h-4 w-4 text-gray-400 hover:text-gray-600"/></button></div>
                             <div className="space-y-3">
-                                <input type="text" placeholder="Titolo Lezione" className="w-full border border-gray-300 rounded p-2 text-sm" value={newLesson.title} onChange={e => setNewLesson(prev => ({...prev, title: e.target.value}))} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Titolo Lezione" 
+                                    className="w-full border border-gray-300 rounded p-2 text-sm shadow-sm" 
+                                    value={newLesson.title || ''} 
+                                    onChange={e => {
+                                        const val = e.target.value;
+                                        setNewLesson(prev => ({...prev, title: val}));
+                                    }} 
+                                />
                                 <div className="w-full bg-white border border-gray-300 rounded p-2 text-sm">
                                     <label className="text-xs font-bold text-gray-500 mb-2 block">Video Lezione</label>
                                     <div className="flex items-center gap-2">
@@ -796,6 +818,34 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             </div>
 
             <div className="lg:col-span-1 space-y-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><Bell className="h-5 w-5 mr-2 text-brand-600" /> Annuncio Popup</h2>
+                    <p className="text-xs text-gray-500 mb-4">Questo messaggio apparirà come popup automatico quando lo studente entra nel corso.</p>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Titolo Annuncio</label>
+                            <input 
+                                type="text" 
+                                value={formData.announcement_title || ''} 
+                                onChange={e => setFormData({...formData, announcement_title: e.target.value})} 
+                                className="block w-full border border-gray-300 rounded-lg p-2 text-sm" 
+                                placeholder="Es. Importante: Nuove lezioni caricate!" 
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Contenuto (Breve)</label>
+                            <textarea 
+                                rows={4}
+                                value={formData.announcement_content || ''} 
+                                onChange={e => setFormData({...formData, announcement_content: e.target.value})} 
+                                className="block w-full border border-gray-300 rounded-lg p-2 text-sm" 
+                                placeholder="Scrivi qui il messaggio..." 
+                            />
+                            <p className="text-[10px] text-gray-400 mt-1 italic">Lascia vuoti i campi per disattivare il popup.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center"><AlertCircle className="h-5 w-5 mr-2 text-brand-600" /> Disponibilità</h2>
                     <div className="space-y-4">
