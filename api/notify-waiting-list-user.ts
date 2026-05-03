@@ -54,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           </p>
           
           <div style="text-align: center; margin: 40px 0;">
-            <a href="${appUrl}/courses/${courseId || ''}" 
+            <a href="${appUrl}/course/${courseId || ''}" 
                style="display: inline-block; background: #2563eb; color: white; padding: 16px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);">
               Accedi al Percorso Ora
             </a>
