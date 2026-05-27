@@ -14,6 +14,9 @@ export const Login: React.FC<LoginProps> = ({ landingConfig }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +38,31 @@ export const Login: React.FC<LoginProps> = ({ landingConfig }) => {
       // Il listener su App.tsx gestirà il reindirizzamento
     } catch (err: any) {
       setError(err.message || "Si è verificato un errore durante il login.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setResetSuccess(null);
+    
+    try {
+      if (!resetEmail) {
+        throw new Error("Inserisci un indirizzo email valido.");
+      }
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: window.location.origin + '/login',
+      });
+      
+      if (error) throw error;
+      
+      setResetSuccess("Ti abbiamo inviato un'email con il link per reimpostare la password. Controlla anche la cartella Spam o Promozioni se non la ricevi a breve.");
+    } catch (err: any) {
+      setError(err.message || "Si è verificato un errore durante l'invio del link di recupero.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -68,55 +96,126 @@ export const Login: React.FC<LoginProps> = ({ landingConfig }) => {
 
             {/* Login Card */}
             <div className="relative z-10 bg-white/5 backdrop-blur-xl border border-white/20 rounded-[20px] p-10 w-[350px] shadow-[0_0_40px_rgba(2,83,157,0.3)] animate-float-in">
-                <h2 className="text-center text-white mb-6 font-semibold text-2xl tracking-wide">Bentornato</h2>
-                
-                {error && (
-                    <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-2 text-red-200 text-sm">
-                        <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                        <p>{error}</p>
-                    </div>
-                )}
-
-                <form onSubmit={handleLogin}>
-                    <div className="mb-5 relative">
-                        <input 
-                            type="email" 
-                            name="email" 
-                            required 
-                            placeholder="Email" 
-                            disabled={isLoading}
-                            className="w-full p-3 pl-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-sm outline-none transition-all duration-300 focus:border-[#02539D] focus:shadow-[0_0_8px_rgba(2,83,157,0.6)] placeholder-gray-300 disabled:opacity-50"
-                        />
-                    </div>
-                    <div className="mb-5 relative">
-                        <input 
-                            type="password" 
-                            name="password" 
-                            required 
-                            placeholder="Password" 
-                            disabled={isLoading}
-                            className="w-full p-3 pl-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-sm outline-none transition-all duration-300 focus:border-[#02539D] focus:shadow-[0_0_8px_rgba(2,83,157,0.6)] placeholder-gray-300 disabled:opacity-50"
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        disabled={isLoading}
-                        className="w-full p-3 bg-[#02539D] text-white font-semibold rounded-[10px] cursor-pointer transition-all duration-300 hover:bg-[#024482] hover:shadow-[0_0_15px_rgba(2,83,157,0.6)] mb-5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                Accesso in corso...
-                            </>
-                        ) : (
-                            'Accedi'
+                {!isResetMode ? (
+                    <>
+                        <h2 className="text-center text-white mb-6 font-semibold text-2xl tracking-wide">Bentornato</h2>
+                        
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-2 text-red-200 text-sm">
+                                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                                <p>{error}</p>
+                            </div>
                         )}
-                    </button>
-                </form>
 
-                <div className="text-center text-xs text-[#888] mt-6">
-                    Password dimenticata? | <span onClick={() => navigate('/register')} className="text-[#02539D] no-underline cursor-pointer hover:underline ml-1">Registrati</span>
-                </div>
+                        <form onSubmit={handleLogin}>
+                            <div className="mb-5 relative">
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    required 
+                                    placeholder="Email" 
+                                    disabled={isLoading}
+                                    className="w-full p-3 pl-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-sm outline-none transition-all duration-300 focus:border-[#02539D] focus:shadow-[0_0_8px_rgba(2,83,157,0.6)] placeholder-gray-300 disabled:opacity-50"
+                                />
+                            </div>
+                            <div className="mb-5 relative">
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    required 
+                                    placeholder="Password" 
+                                    disabled={isLoading}
+                                    className="w-full p-3 pl-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-sm outline-none transition-all duration-300 focus:border-[#02539D] focus:shadow-[0_0_8px_rgba(2,83,157,0.6)] placeholder-gray-300 disabled:opacity-50"
+                                />
+                            </div>
+                            <button 
+                                type="submit" 
+                                disabled={isLoading}
+                                className="w-full p-3 bg-[#02539D] text-white font-semibold rounded-[10px] cursor-pointer transition-all duration-300 hover:bg-[#024482] hover:shadow-[0_0_15px_rgba(2,83,157,0.6)] mb-5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        Accesso in corso...
+                                    </>
+                                ) : (
+                                    'Accedi'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="text-center text-xs text-[#888] mt-6 flex flex-wrap justify-center gap-1">
+                            <span 
+                                onClick={() => { setIsResetMode(true); setError(null); setResetSuccess(null); }} 
+                                className="text-[#02539D] cursor-pointer hover:underline"
+                            >
+                                Password dimenticata?
+                            </span>
+                            <span>|</span>
+                            <span 
+                                onClick={() => navigate('/register')} 
+                                className="text-[#02539D] no-underline cursor-pointer hover:underline ml-1"
+                            >
+                                Registrati
+                            </span>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="text-center text-white mb-2 font-semibold text-2xl tracking-wide">Recupera Password</h2>
+                        <p className="text-center text-gray-400 text-xs mb-6">Inserisci la tua email per ricevere un link sicuro con cui reimpostare la tua password.</p>
+                        
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg flex items-start gap-2 text-red-200 text-sm">
+                                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {resetSuccess && (
+                            <div className="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 rounded-lg text-emerald-200 text-xs">
+                                <p>{resetSuccess}</p>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleResetPassword}>
+                            <div className="mb-5 relative">
+                                <input 
+                                    type="email" 
+                                    required 
+                                    placeholder="Email" 
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                    disabled={isLoading}
+                                    className="w-full p-3 pl-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-sm outline-none transition-all duration-300 focus:border-[#02539D] focus:shadow-[0_0_8px_rgba(2,83,157,0.6)] placeholder-gray-300 disabled:opacity-50"
+                                />
+                            </div>
+                            <button 
+                                type="submit" 
+                                disabled={isLoading}
+                                className="w-full p-3 bg-[#02539D] text-white font-semibold rounded-[10px] cursor-pointer transition-all duration-300 hover:bg-[#024482] hover:shadow-[0_0_15px_rgba(2,83,157,0.6)] mb-5 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        Invio in corso...
+                                    </>
+                                ) : (
+                                    'Invia Link di Recupero'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="text-center text-xs mt-6">
+                            <span 
+                                onClick={() => { setIsResetMode(false); setError(null); setResetSuccess(null); }} 
+                                className="text-[#02539D] cursor-pointer hover:underline text-xs"
+                            >
+                                Torna al Login
+                            </span>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
 
