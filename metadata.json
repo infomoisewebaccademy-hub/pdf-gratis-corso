@@ -1,5 +1,6 @@
 {
   "name": "MWA 2.0 - MOLLIE + GUIDA PDF GRATIS ",
   "description": "",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

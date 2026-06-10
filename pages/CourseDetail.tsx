@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
 import { supabase } from '../services/supabase';
+import { generateDefaultLandingPage } from '../utils/courseLandingGenerator';
 
 interface CourseDetailProps {
   course: Course;
@@ -14,6 +15,7 @@ interface CourseDetailProps {
   onBack: () => void;
   user: UserProfile | null;
   settings: PlatformSettings;
+  forceLanding?: boolean;
 }
 
 const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
@@ -105,11 +107,12 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
     );
 };
 
-export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings }) => {
+export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings, forceLanding }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const { addToCart, isInCart } = useCart();
   const navigate = useNavigate();
   const [upsellCourse, setUpsellCourse] = useState<Course | null>(null);
@@ -247,6 +250,398 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const isFull = course.status === 'full';
   const isComingSoon = course.status === 'coming_soon';
   const isPurchasable = !isFull && !isComingSoon;
+
+  const renderLucideIcon = (iconName: string, className: string = "h-5 w-5") => {
+    switch (iconName) {
+        case 'Sparkles': return <Sparkles className={className} />;
+        case 'Zap': return <Zap className={className} />;
+        case 'Target': return <Target className={className} />;
+        case 'TrendingUp': return <TrendingUp className={className} />;
+        case 'Award': return <Award className={className} />;
+        case 'Shield': return <ShieldCheck className={className} />;
+        case 'Laptop': return <Laptop className={className} />;
+        case 'Code': return <Code className={className} />;
+        case 'Brain': return <Brain className={className} />;
+        case 'Users': return <Users className={className} />;
+        default: return <Sparkles className={className} />;
+    }
+  };
+
+  const renderCourseLandingFunnel = () => {
+    const lpd = course.landing_page_data || generateDefaultLandingPage(course.title, course.price, course.discounted_price);
+    if (!lpd) return null;
+
+    return (
+      <div className="bg-slate-50 min-h-screen text-slate-800 pb-24">
+        {/* UPPER SNEAK-PEEK PREMIUM BAR */}
+        <div className="bg-slate-900 text-slate-250 text-center py-2.5 px-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+          <Sparkles className="h-3.5 w-3.5 text-brand-400 animate-pulse" />
+          <span>Presentazione Esclusiva dell'Academy • Accesso Riservato Clienti</span>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* BACK ROW */}
+          <button 
+              onClick={onBack} 
+              className="text-slate-500 hover:text-slate-900 font-medium flex items-center mb-10 transition-colors cursor-pointer"
+          >
+              ← Torna ai Percorsi
+          </button>
+
+          {/* HERO PREVIEW BLOCK */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+            <div className="lg:col-span-7 space-y-6">
+              {lpd.hero?.value_proposition && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-100 text-brand-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                  <Zap className="h-3 w-3 fill-current" />
+                  {lpd.hero.value_proposition}
+                </span>
+              )}
+              
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-950 tracking-tight leading-none">
+                {lpd.hero?.title}
+              </h1>
+              
+              <p className="text-lg sm:text-xl text-slate-600 font-normal leading-relaxed">
+                {lpd.hero?.subheadline}
+              </p>
+
+              {/* CORE BULLET POINTS */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                {(lpd.hero?.bullet_points || []).map((point: string, i: number) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
+                    <span className="text-sm font-semibold text-slate-700 leading-snug">{point}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* ACTION AREA CALL TO ACTION */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                {isPurchasable ? (
+                  <>
+                    <button 
+                        onClick={handleBuyNow}
+                        disabled={isBuying}
+                        className="flex-1 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold py-4 px-6 text-center text-lg shadow-lg shadow-brand-500/25 hover:shadow-brand-500/35 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                        {isBuying ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Elaborazione...
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="h-5 w-5 fill-current" />
+                            Inizia Subito
+                          </>
+                        )}
+                    </button>
+
+                    <button 
+                        onClick={() => {
+                            if (inCart) navigate('/cart');
+                            else addToCart(course, settings.add_to_cart_pixel_id);
+                        }}
+                        className={`flex-1 rounded-xl font-bold py-4 px-6 text-center text-lg transition-all border-2 flex items-center justify-center gap-2 cursor-pointer ${
+                            inCart 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' 
+                            : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
+                        }`}
+                    >
+                        <ShoppingCart className="h-5 w-5" />
+                        {inCart ? 'Vai al Carrello' : 'Aggiungi al Carrello'}
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full">
+                    {isComingSoon ? (
+                      <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-center font-bold">
+                        Disponibile a Breve! Resta Sintonizzato.
+                      </div>
+                    ) : (
+                      <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-center font-bold">
+                        Iscrizioni Chiuse - Posti Esauriti!
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* HERO MEDIA */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
+                <img src={course.image} alt={course.title} className="w-full h-64 sm:h-80 object-cover" />
+                <div className="p-6 bg-white border-t border-slate-100 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest text-[9px]">Prezzo Speciale</p>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-3xl font-black text-brand-650">€{finalPrice}</span>
+                      {isDiscountAvailable && (
+                        <span className="text-slate-400 line-through text-sm">€{course.price}</span>
+                      )}
+                    </div>
+                  </div>
+                  {isDiscountAvailable && (
+                    <span className="bg-brand-100 text-brand-700 font-black text-xs px-2.5 py-1 rounded-lg">
+                      Sconto Fedeltà {Math.round(((course.price - course.discounted_price!) / course.price) * 100)}% off
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* PROBLEM & AGITATION PANEL */}
+          {lpd.problem_solution && (
+            <div className="mb-24">
+              <div className="text-center max-w-2xl mx-auto mb-12">
+                <span className="text-red-500 font-bold text-xs uppercase tracking-widest block mb-2 font-mono">Il Cambiamento</span>
+                <h2 className="text-3xl font-extrabold text-slate-950 tracking-tight">Prima & Dopo: Un Metodo che Rivoluziona Tutto</h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                {/* PROBLEM */}
+                <div className="bg-white p-8 rounded-2xl border border-red-100 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="bg-red-50 text-red-600 h-12 w-12 rounded-xl flex items-center justify-center mb-6 border border-red-100">
+                      <AlertCircle className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">{lpd.problem_solution.problem_title}</h3>
+                    <p className="text-slate-650 leading-relaxed text-sm mb-6">{lpd.problem_solution.problem_desc}</p>
+                  </div>
+                  
+                  {lpd.problem_solution.before_vs_after?.before_items && (
+                    <div className="space-y-3 pt-6 border-t border-slate-100">
+                      <h4 className="text-xs font-bold text-red-650 uppercase tracking-widest font-mono">Lo Stato Attuale di Frustrazione:</h4>
+                      {lpd.problem_solution.before_vs_after.before_items.map((item: string, idx: number) => (
+                        <div key={idx} className="flex items-start gap-3 text-slate-500 text-sm">
+                          <span className="text-red-500 font-black mt-0.5">✕</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* SOLUTION */}
+                <div className="bg-white p-8 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-0 opacity-45"></div>
+                  <div className="relative z-10">
+                    <div className="bg-emerald-50 text-emerald-600 h-12 w-12 rounded-xl flex items-center justify-center mb-6 border border-emerald-100">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">{lpd.problem_solution.solution_title}</h3>
+                    <p className="text-slate-655 leading-relaxed text-sm mb-6">{lpd.problem_solution.solution_desc}</p>
+                  </div>
+
+                  {lpd.problem_solution.before_vs_after?.after_items && (
+                    <div className="space-y-3 pt-6 border-t border-slate-100 relative z-10">
+                      <h4 className="text-xs font-bold text-emerald-600 uppercase tracking-widest font-mono">Il Risultato di Successo:</h4>
+                      {lpd.problem_solution.before_vs_after.after_items.map((item: string, idx: number) => (
+                        <div key={idx} className="flex items-start gap-3 text-slate-750 text-sm font-semibold">
+                          <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* BENEFIT GRID */}
+          {lpd.benefits && (
+            <div className="mb-24">
+              <div className="text-center max-w-2xl mx-auto mb-14">
+                <span className="text-brand-650 font-bold text-xs uppercase tracking-widest block mb-2 font-mono">{lpd.benefits.subtitle || "I Nostri Punti di Forza"}</span>
+                <h2 className="text-3xl font-extrabold text-slate-950 tracking-tight">{lpd.benefits.title || "Perché Questo Percorso è Diverso Da Tutti"}</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {(lpd.benefits.items || []).map((item: any, idx: number) => (
+                  <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="bg-brand-50 text-brand-600 h-10 w-10 rounded-xl flex items-center justify-center mb-4 border border-brand-100">
+                      {renderLucideIcon(item.icon, "h-5 w-5")}
+                    </div>
+                    <h4 className="text-base font-bold text-slate-900 mb-1.5">{item.title}</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CURRICULUM ACCORDION (REAL DATA) */}
+          <div className="mb-24 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="max-w-2xl mx-auto text-center mb-10">
+              <span className="text-brand-600 font-bold text-xs uppercase tracking-widest block mb-2 font-mono">Didattica d'Elite</span>
+              <h2 className="text-3xl font-extrabold text-slate-950 tracking-tight">{course.program_title || "Programma Didattico Dettagliato"}</h2>
+              <p className="text-sm text-slate-500 mt-2">Dalla teoria alla pratica reale: ecco l'elenco dei moduli che affronterai.</p>
+            </div>
+
+            <div className="space-y-3 max-w-4xl mx-auto">
+              {!course.lessons_content || course.lessons_content.length === 0 ? (
+                <p className="text-center text-slate-400 py-4">In arrivo...</p>
+              ) : (
+                course.lessons_content.map((lesson, idx) => (
+                  <div key={idx} className="border border-slate-100 rounded-xl p-4 bg-slate-50 opacity-90 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="h-8 w-8 bg-slate-200 text-slate-600 font-bold rounded-lg flex items-center justify-center text-xs">
+                        {(idx + 1).toString().padStart(2, '0')}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">
+                          {lesson.title}
+                        </h4>
+                        {lesson.description && <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{lesson.description}</p>}
+                      </div>
+                    </div>
+                    <Lock className="h-4 w-4 text-slate-400 shrink-0 ml-4 font-normal" />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* TESTIMONIALS */}
+          {lpd.testimonials && lpd.testimonials.length > 0 && (
+            <div className="mb-24">
+              <div className="text-center max-w-2xl mx-auto mb-14">
+                <span className="text-amber-500 font-bold text-xs uppercase tracking-widest block mb-2 font-mono">Successi Reali</span>
+                <h2 className="text-3xl font-extrabold text-slate-950 tracking-tight">Cosa dicono i nostri studenti dell'Academy</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {lpd.testimonials.map((t: any, idx: number) => (
+                  <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between whitespace-pre-wrap relative">
+                    <span className="absolute top-4 right-6 text-7xl font-serif text-slate-100 select-none pointer-events-none">“</span>
+                    <div className="relative z-10">
+                      <StarRating rating={5.0} />
+                      <p className="text-slate-600 text-sm italic leading-relaxed mt-4 mb-6">"{t.text}"</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                      <div className="h-9 w-9 rounded-full bg-brand-50 text-brand-700 font-bold text-sm flex items-center justify-center border border-brand-100">
+                        {t.name?.charAt(0) || 'U'}
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-900">{t.name}</h5>
+                        <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase text-[8px]">{t.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TRAINER BIO */}
+          {lpd.host_bio && (
+            <div className="mb-24 bg-slate-900 text-slate-100 p-8 sm:p-12 rounded-3xl relative overflow-hidden shadow-xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-center relative z-10">
+                <div className="lg:col-span-1 flex justify-center">
+                  <div className="h-28 w-28 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 select-none text-brand-400 font-black text-4xl shadow-inner">
+                    MWA
+                  </div>
+                </div>
+                <div className="lg:col-span-3 space-y-4">
+                  <span className="text-brand-400 font-bold text-xs uppercase tracking-widest font-mono">Insegnante Straordinario</span>
+                  <h3 className="text-2xl sm:text-3xl font-black">{lpd.host_bio.name}</h3>
+                  <p className="text-brand-300 text-sm font-semibold tracking-wide">{lpd.host_bio.headline}</p>
+                  
+                  <div className="space-y-3 pt-2 text-slate-350 text-sm leading-relaxed max-w-2xl">
+                    {(lpd.host_bio.bio_paragraphs || []).map((p: string, idx: number) => (
+                      <p key={idx}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* FAQ SECTION */}
+          {lpd.faq && lpd.faq.length > 0 && (
+            <div className="mb-24 max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <span className="text-indigo-500 font-bold text-xs uppercase tracking-widest block mb-2 font-mono">Domande Frequenti</span>
+                <h2 className="text-3xl font-extrabold text-slate-950 tracking-tight">Dubbi o Domande? Trova Risposta All'istante</h2>
+              </div>
+
+              <div className="space-y-3">
+                {lpd.faq.map((fq: any, idx: number) => {
+                  const isOpen = activeFaq === idx;
+                  return (
+                    <div key={idx} className="bg-white border border-slate-100 rounded-xl overflow-hidden transition-all duration-200">
+                      <button 
+                        onClick={() => setActiveFaq(isOpen ? null : idx)} 
+                        className="w-full p-5 flex justify-between items-center text-left font-bold text-slate-900 hover:bg-slate-50/50 transition-colors cursor-pointer text-sm"
+                      >
+                        <span>{fq.question}</span>
+                        {isOpen ? <ChevronUp className="h-4 w-4 text-slate-500 font-normal" /> : <ChevronDown className="h-4 w-4 text-slate-500 font-normal" />}
+                      </button>
+                      
+                      {isOpen && (
+                        <div className="px-5 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-50 bg-slate-50/30">
+                          {fq.answer}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* FINAL BOTTOM CARD CALL TO ACTION */}
+          <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl border border-slate-800">
+            <div className="absolute inset-0 bg-radial-gradient(ellipse_at_center,_var(--tw-gradient-stops)) from-brand-600/10 via-transparent to-transparent pointer-events-none"></div>
+            <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+              <span className="text-brand-400 font-bold text-xs uppercase tracking-widest font-mono">Sblocca il tuo potenziale oggi</span>
+              <h3 className="text-3xl sm:text-4xl font-extrabold leading-tight">Trasforma le tue competenze in un vero superpotere</h3>
+              <p className="text-slate-405 text-sm leading-relaxed max-w-lg mx-auto">Non rimandare la crescita personale. Entra ora nell'Academy e padroneggia le tecnologie di domani con i massimi esperti del settore.</p>
+              
+              <div className="flex items-center justify-center gap-3 py-2">
+                <span className="text-slate-500 line-through text-lg">€{course.price}</span>
+                <span className="text-4xl font-black text-brand-400">€{finalPrice}</span>
+              </div>
+
+              {isPurchasable ? (
+                <button 
+                    onClick={handleBuyNow}
+                    disabled={isBuying}
+                    className="inline-flex bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold py-4 px-10 text-lg shadow-lg hover:shadow-brand-500/20 transition-all items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+                >
+                    {isBuying ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Elaborazione ordine...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-5 w-5 fill-current" />
+                        Acquista il Percorso d'Elite
+                      </>
+                    )}
+                </button>
+              ) : (
+                <p className="text-amber-500 font-bold bg-amber-500/10 py-3 px-6 rounded-xl border border-amber-500/20 max-w-sm mx-auto text-sm">
+                  Le iscrizioni non sono attualmente disponibili.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (!isPurchased || forceLanding) {
+    return renderCourseLandingFunnel();
+  }
 
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20">

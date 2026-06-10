@@ -5,7 +5,6 @@ import { Course, UserProfile, PlatformSettings, LandingPageConfig, PreLaunchConf
 import { Plus, Edit2, Trash2, Search, DollarSign, BookOpen, Clock, Eye, EyeOff, Lock, Unlock, Loader, Loader2, Settings, Image, LayoutTemplate, Activity, HelpCircle, Terminal, AlignLeft, AlignCenter, MoveHorizontal, Sparkles, Wand2, X, MessageCircle, Megaphone, Target, ListOrdered, Book, Pin, Type, ExternalLink, Rocket, Calendar, Palette, Download, Facebook, Instagram, Linkedin, Youtube, Move, Quote, MoveVertical, AlignVerticalJustifyCenter, Maximize, Check, Columns, ArrowRightLeft, BrainCircuit, GitMerge, UserCheck, XCircle, Video, AlertTriangle, TrendingUp, Users, File, UploadCloud, Copy, RefreshCw, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-import { GoogleGenAI } from "@google/genai";
 import { Sidebar, SidebarItem } from '../components/Sidebar';
 import { ImagePicker } from '../components/ImagePicker';
 import { AdminAnalyticsDashboard } from '../components/AdminAnalyticsDashboard';
@@ -420,12 +419,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [aiPrompt, setAiPrompt] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [waitingList, setWaitingList] = useState<any[]>([]);
   const [isLoadingWaitingList, setIsLoadingWaitingList] = useState(false);
   const [showPdfFormImagePicker, setShowPdfFormImagePicker] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyLink = (courseId: string) => {
+    const url = `${window.location.origin}/landing/${courseId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(courseId);
+    setTimeout(() => {
+        setCopiedId(null);
+    }, 2000);
+  };
 
   useEffect(() => {
     if (activeTab === 'launch') {
@@ -668,21 +675,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
       } finally {
           setIsClearingChat(false);
       }
-  };
-
-  const handleAiGeneration = async () => {
-    if (!aiPrompt) return;
-    setIsAiLoading(true);
-    try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const result = await ai.models.generateContent({ 
-            model: "gemini-3-flash-preview",
-            contents: `Modifica questo JSON CMS: ${JSON.stringify(landingConfig)}. Richiesta utente: "${aiPrompt}". Ritorna SOLO il JSON valido.`
-        });
-        const jsonStr = result.text.replace(/```json/g, '').replace(/```/g, '').trim();
-        setLandingConfig(JSON.parse(jsonStr));
-        alert("✨ Configurazione generata!");
-    } catch (error: any) { alert("Errore AI: " + error.message); } finally { setIsAiLoading(false); }
   };
 
   const FONT_OPTIONS = ['Inter', 'Roboto', 'Poppins', 'Montserrat', 'Lato', 'Open Sans'];
@@ -1041,6 +1033,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS is_hidden boolean DEFAULT false;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS show_features boolean DEFAULT true;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS upsell_course_id text;</code>
+                          <code className="text-green-400 select-all block mb-2">ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS landing_page_data jsonb;</code>
                           <code className="text-green-400 select-all block mb-2">ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;</code>
                           <code className="text-green-400 select-all block mb-2">UPDATE public.profiles SET email = auth.users.email FROM auth.users WHERE public.profiles.id = auth.users.id;</code>
                       </div>
@@ -1083,7 +1076,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ courses, user, o
                                 </div>
                             </div>
                             <div className="p-6 flex-1 flex flex-col">
-                                <h3 className="font-bold text-lg mb-4 line-clamp-1">{course.title}</h3>
+                                <h3 className="font-bold text-lg mb-2 line-clamp-1">{course.title}</h3>
+                                
+                                {/* URL Landing della pagina di vendita */}
+                                <div className="mb-4 bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs">
+                                    <div className="flex justify-between items-center text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-1.5">
+                                        <span>Link Landing Page</span>
+                                        <span className="text-brand-600">Alta Conversione</span>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="font-mono text-slate-600 truncate max-w-[150px] sm:max-w-[180px]">
+                                            /landing/{course.id}
+                                        </div>
+                                        <button 
+                                            onClick={() => handleCopyLink(course.id)}
+                                            className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 py-1 px-2.5 rounded-lg font-semibold flex items-center gap-1 transition-all text-[11px] shadow-sm select-none shrink-0"
+                                        >
+                                            {copiedId === course.id ? (
+                                                <>
+                                                    <Check className="h-3 w-3 text-emerald-600" />
+                                                    Copiato!
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Copy className="h-3 w-3 text-slate-500" />
+                                                    Copia
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="mt-auto flex gap-2">
                                     <button onClick={() => navigate(`/admin/course/${course.id}`)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg font-bold hover:bg-gray-200 flex items-center justify-center text-sm"><Edit2 className="h-4 w-4 mr-2"/> Modifica</button>
                                     <button 

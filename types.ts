@@ -38,6 +38,7 @@ export interface Course {
   show_if_full_on_home?: boolean; // NUOVO: Se mostrare il corso nella home page quando è pieno
   announcement_title?: string; // NUOVO: Titolo del popup di annuncio
   announcement_content?: string; // NUOVO: Contenuto (HTML/Text) del popup di annuncio
+  landing_page_data?: any; // NUOVO: Landing page strutturata per vendere il corso
 }
 
 export interface UserProfile {

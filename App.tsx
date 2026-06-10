@@ -428,6 +428,9 @@ const AppContent: React.FC = () => {
         <Route path="/courses" element={<CoursesPage courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} />} />
         <Route path="/cart" element={<Cart user={user} />} />
         <Route path="/course/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} />} />
+        <Route path="/landing/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
+        <Route path="/p/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
+        <Route path="/funnel/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/dashboard" element={user ? <Dashboard user={user} courses={courses} onRefresh={refreshUserData} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
         <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
@@ -463,11 +466,11 @@ const AppContent: React.FC = () => {
   );
 };
 
-const CourseWrapper: React.FC<{courses: Course[], user: UserProfile | null, onPurchase: (id: string) => void, isPurchasing: boolean, settings: PlatformSettings}> = ({ courses, user, onPurchase, isPurchasing, settings }) => {
+const CourseWrapper: React.FC<{courses: Course[], user: UserProfile | null, onPurchase: (id: string) => void, isPurchasing: boolean, settings: PlatformSettings, forceLanding?: boolean}> = ({ courses, user, onPurchase, isPurchasing, settings, forceLanding = false }) => {
     const navigate = useNavigate(); const { id } = useParams<{ id: string }>(); const course = courses.find(c => c.id === id);
     if (!course) return null;
     const isPurchased = user?.purchased_courses.includes(course.id) || false;
-    return <CourseDetail course={course} onPurchase={() => onPurchase(course.id)} isPurchased={isPurchased} onBack={() => navigate(-1)} user={user} settings={settings} />
+    return <CourseDetail course={course} onPurchase={() => onPurchase(course.id)} isPurchased={isPurchased} onBack={() => navigate(-1)} user={user} settings={settings} forceLanding={forceLanding} />
 };
 
 const App: React.FC = () => {

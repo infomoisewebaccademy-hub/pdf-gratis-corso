@@ -64,11 +64,12 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
         </div>
     );
 };
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp, Bell } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp, Bell, Users, Award } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
 import { VideoPicker } from '../components/VideoPicker';
+import { generateDefaultLandingPage } from '../utils/courseLandingGenerator';
 
 interface AdminEditCourseProps {
   courses: Course[];
@@ -125,6 +126,34 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
   const [activeLessonIndexForVideo, setActiveLessonIndexForVideo] = useState<number | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<{[key: number]: boolean}>({});
   const [isNewLessonNotesExpanded, setIsNewLessonNotesExpanded] = useState(false);
+
+  const [isGeneratingLandingPage, setIsGeneratingLandingPage] = useState(false);
+  const [generationError, setGenerationError] = useState('');
+
+  const generateLandingWithAI = async () => {
+    setIsGeneratingLandingPage(true);
+    setGenerationError('');
+    // Simuliamo un leggero caricamento per dare una sensazione fluida e professionale di calcolo del funnel coerente
+    setTimeout(() => {
+        try {
+            const landingData = generateDefaultLandingPage(
+                formData.title || '',
+                formData.price || 0,
+                formData.discounted_price
+            );
+            setFormData(prev => ({
+                ...prev,
+                landing_page_data: landingData
+            }));
+            alert("✨ Funnel vendite professionale e persuasivo generato con successo! Ora puoi visualizzare e personalizzare ogni sua sezione nei campi sottostanti.");
+        } catch (err: any) {
+            console.error("Errore generazione funnel:", err);
+            setGenerationError(err.message || "Errore sconosciuto di generazione");
+        } finally {
+            setIsGeneratingLandingPage(false);
+        }
+    }, 500);
+  };
 
     const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>, lessonIndex: number) => {
         const file = event.target.files?.[0];
@@ -597,6 +626,475 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
                             />
                         </div>
                     </div>
+                </div>
+
+                {/* VISUAL LANDING PAGE & SALES FUNNEL EDITOR */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                                <Sparkles className="h-5 w-5 mr-2 text-purple-600 animate-pulse" />
+                                Landing Page di Vendita & Funnel Persuasivo
+                            </h2>
+                            <p className="text-gray-500 text-xs mt-1">Inizializza all'istante un funnel di vendita persuasivo con testimonianze d'elite, biografia dell'host e benefici pronti all'uso e modificabili.</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={generateLandingWithAI}
+                            disabled={isGeneratingLandingPage || !formData.title}
+                            className="w-full sm:w-auto text-sm bg-purple-50 text-purple-700 hover:bg-purple-100 px-4 py-2 \
+rounded-lg font-bold flex items-center justify-center gap-2 border border-purple-200 disabled:opacity-50 transition-all cursor-pointer"
+                        >
+                            {isGeneratingLandingPage ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Inizializzazione in corso...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="h-4 w-4" />
+                                    Inizializza Funnel Persuasivo
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {!formData.title && (
+                        <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded border border-amber-100">
+                            Inserisci il titolo del corso in alto prima di avviare la generazione automatica.
+                        </p>
+                    )}
+
+                    {generationError && (
+                        <p className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-100 mt-2">
+                            {generationError}
+                        </p>
+                    )}
+
+                    {formData.landing_page_data ? (
+                        <div className="space-y-6 mt-6 pt-6 border-t border-gray-100">
+                            {/* HERO SECTION EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <Layout className="h-4 w-4 text-brand-600" />
+                                    Sezione Hero
+                                </h3>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Titolo Persuasivo (Headline)</label>
+                                    <input 
+                                        type="text" 
+                                        value={formData.landing_page_data.hero?.title || ''} 
+                                        onChange={e => {
+                                            const updated = { ...formData.landing_page_data };
+                                            if (!updated.hero) updated.hero = {};
+                                            updated.hero.title = e.target.value;
+                                            setFormData({ ...formData, landing_page_data: updated });
+                                        }}
+                                        className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        placeholder="Headline accattivante..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Sottotitolo (Subheadline)</label>
+                                    <textarea 
+                                        rows={2}
+                                        value={formData.landing_page_data.hero?.subheadline || ''} 
+                                        onChange={e => {
+                                            const updated = { ...formData.landing_page_data };
+                                            if (!updated.hero) updated.hero = {};
+                                            updated.hero.subheadline = e.target.value;
+                                            setFormData({ ...formData, landing_page_data: updated });
+                                        }}
+                                        className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        placeholder="Sottotitolo dettagliato..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Valore Promesso (Value Proposition)</label>
+                                    <input 
+                                        type="text" 
+                                        value={formData.landing_page_data.hero?.value_proposition || ''} 
+                                        onChange={e => {
+                                            const updated = { ...formData.landing_page_data };
+                                            if (!updated.hero) updated.hero = {};
+                                            updated.hero.value_proposition = e.target.value;
+                                            setFormData({ ...formData, landing_page_data: updated });
+                                        }}
+                                        className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        placeholder="Superare resistenze mentali o dubbi..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Punti Chiave (Bullet Points)</label>
+                                    {(formData.landing_page_data.hero?.bullet_points || []).map((point: string, idx: number) => (
+                                        <input 
+                                            key={idx}
+                                            type="text" 
+                                            value={point || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.hero) updated.hero = {};
+                                                if (!updated.hero.bullet_points) updated.hero.bullet_points = [];
+                                                updated.hero.bullet_points[idx] = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm mt-1.5 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                            placeholder={`Punto chiave ${idx + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* PROBLEM/SOLUTION EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <AlertCircle className="h-4 w-4 text-red-500" />
+                                    Sezione Problema & Soluzione (Funnel)
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Titolo dell'Agitazione Problema</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.problem_solution?.problem_title || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.problem_solution) updated.problem_solution = {};
+                                                updated.problem_solution.problem_title = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Titolo della Soluzione</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.problem_solution?.solution_title || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.problem_solution) updated.problem_solution = {};
+                                                updated.problem_solution.solution_title = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Descrizione del Problema</label>
+                                        <textarea 
+                                            rows={3}
+                                            value={formData.landing_page_data.problem_solution?.problem_desc || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.problem_solution) updated.problem_solution = {};
+                                                updated.problem_solution.problem_desc = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Descrizione della Soluzione</label>
+                                        <textarea 
+                                            rows={3}
+                                            value={formData.landing_page_data.problem_solution?.solution_desc || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.problem_solution) updated.problem_solution = {};
+                                                updated.problem_solution.solution_desc = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="p-3 bg-white rounded-lg border border-gray-100 flex flex-col md:flex-row gap-4">
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-red-650 mb-1">Lista Prima dello Studente (Problemi)</label>
+                                        {((formData.landing_page_data.problem_solution?.before_vs_after?.before_items) || []).map((b: string, x: number) => (
+                                            <input 
+                                                key={x}
+                                                type="text" 
+                                                value={b || ''} 
+                                                onChange={e => {
+                                                    const updated = { ...formData.landing_page_data };
+                                                    updated.problem_solution.before_vs_after.before_items[x] = e.target.value;
+                                                    setFormData({ ...formData, landing_page_data: updated });
+                                                }}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs mb-1.5"
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-green-700 mb-1">Lista Dopo lo Studente (Risultati)</label>
+                                        {((formData.landing_page_data.problem_solution?.before_vs_after?.after_items) || []).map((a: string, x: number) => (
+                                            <input 
+                                                key={x}
+                                                type="text" 
+                                                value={a || ''} 
+                                                onChange={e => {
+                                                    const updated = { ...formData.landing_page_data };
+                                                    updated.problem_solution.before_vs_after.after_items[x] = e.target.value;
+                                                    setFormData({ ...formData, landing_page_data: updated });
+                                                }}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs mb-1.5"
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* CORE BENEFITS EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <Sparkles className="h-4 w-4 text-brand-600" />
+                                    Sezione Benefici Principali
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Titolo Sezione Benefici</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.benefits?.title || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.benefits) updated.benefits = {};
+                                                updated.benefits.title = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Sottotitolo Sezione Benefici</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.benefits?.subtitle || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.benefits) updated.benefits = {};
+                                                updated.benefits.subtitle = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {(formData.landing_page_data.benefits?.items || []).map((item: any, idx: number) => (
+                                        <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500">Titolo</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={item.title || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.benefits.items[idx].title = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs font-bold"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500">Icona Lucide</label>
+                                                    <select 
+                                                        value={item.icon || 'Sparkles'} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.benefits.items[idx].icon = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-1 flex items-center justify-center text-xs"
+                                                    >
+                                                        {["Sparkles", "Zap", "Target", "TrendingUp", "Award", "Shield", "Laptop", "Code", "Brain", "Users"].map(ic => (
+                                                            <option key={ic} value={ic}>{ic}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-gray-500">Descrizione</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={item.desc || ''} 
+                                                    onChange={e => {
+                                                        const updated = { ...formData.landing_page_data };
+                                                        updated.benefits.items[idx].desc = e.target.value;
+                                                        setFormData({ ...formData, landing_page_data: updated });
+                                                    }}
+                                                    className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* TESTIMONIALS EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <Users className="h-4 w-4 text-amber-500" />
+                                    Testimonianze generate (Persuasive)
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {(formData.landing_page_data.testimonials || []).map((t: any, idx: number) => (
+                                        <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500">Nome Studente</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={t.name || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.testimonials[idx].name = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-1 text-xs font-bold"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500">Professione / Ruolo</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={t.role || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.testimonials[idx].role = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-1 text-xs"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-gray-500">Testo Testimonianza</label>
+                                                <textarea 
+                                                    rows={3}
+                                                    value={t.text || ''} 
+                                                    onChange={e => {
+                                                        const updated = { ...formData.landing_page_data };
+                                                        updated.testimonials[idx].text = e.target.value;
+                                                        setFormData({ ...formData, landing_page_data: updated });
+                                                    }}
+                                                    className="w-full bg-gray-50 border border-gray-200 rounded p-1 text-xs"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* HOST BIO EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <Award className="h-4 w-4 text-emerald-600" />
+                                    Bio Docente / Fondatore MWA
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Docente / Fondatore</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.host_bio?.name || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.host_bio) updated.host_bio = {};
+                                                updated.host_bio.name = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-600 mb-1">Headline Profilo</label>
+                                        <input 
+                                            type="text" 
+                                            value={formData.landing_page_data.host_bio?.headline || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.host_bio) updated.host_bio = {};
+                                                updated.host_bio.headline = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Contenuto Biografia (Paragrafi)</label>
+                                    {(formData.landing_page_data.host_bio?.bio_paragraphs || []).map((p: string, idx: number) => (
+                                        <textarea 
+                                            key={idx}
+                                            rows={2}
+                                            value={p || ''} 
+                                            onChange={e => {
+                                                const updated = { ...formData.landing_page_data };
+                                                if (!updated.host_bio.bio_paragraphs) updated.host_bio.bio_paragraphs = [];
+                                                updated.host_bio.bio_paragraphs[idx] = e.target.value;
+                                                setFormData({ ...formData, landing_page_data: updated });
+                                            }}
+                                            className="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm mt-2 focus:outline-none"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* FAQ EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-200 pb-2">
+                                    <Book className="h-4 w-4 text-indigo-500" />
+                                    Domande Frequenti (FAQ)
+                                </h3>
+                                {(formData.landing_page_data.faq || []).map((fq: any, idx: number) => (
+                                    <div key={idx} className="bg-white p-3 rounded-lg border border-gray-200 space-y-2">
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-gray-500">Domanda</label>
+                                            <input 
+                                                type="text" 
+                                                value={fq.question || ''} 
+                                                onChange={e => {
+                                                    const updated = { ...formData.landing_page_data };
+                                                    updated.faq[idx].question = e.target.value;
+                                                    setFormData({ ...formData, landing_page_data: updated });
+                                                }}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-gray-500">Risposta</label>
+                                            <textarea 
+                                                rows={2}
+                                                value={fq.answer || ''} 
+                                                onChange={e => {
+                                                    const updated = { ...formData.landing_page_data };
+                                                    updated.faq[idx].answer = e.target.value;
+                                                    setFormData({ ...formData, landing_page_data: updated });
+                                                }}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <p className="text-xs text-green-700 bg-green-50 p-2.5 rounded-lg border border-green-100 font-medium">
+                                Sopra trovi i campi generati dall'AI. Puoi editarli liberamente. Quando pronto, premi "Salva" o "Pubblica" in alto a destra per registrare le modifiche al database del corso.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-center">
+                            <Sparkles className="h-10 w-10 text-gray-300 mb-2" />
+                            <p className="text-sm text-gray-500 font-medium">Nessun funnel generato per questo corso.</p>
+                            <p className="text-xs text-gray-400 max-w-sm mt-1">Sblocca un funnel ottimizzato con testimonianze realistiche generando all'istante la struttura di vendita con l'AI.</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* NUOVA SEZIONE MATERIALE DIDATTICO */}
