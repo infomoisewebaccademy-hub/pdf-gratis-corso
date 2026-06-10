@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -589,6 +589,263 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               </div>
             </div>
           )}
+
+          {/* SEZIONE SPECIALE: IL POTENZIALE RIVOLUZIONARIO DEL WEB DESIGN CON IA IN ITALIA */}
+          <div className="my-28 bg-gradient-to-b from-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-14 relative overflow-hidden border border-slate-800 shadow-2xl">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.12),transparent_50%)] pointer-events-none" />
+            <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 max-w-5xl mx-auto">
+              {/* Header */}
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-500/10 text-brand-400 rounded-full text-xs font-bold uppercase tracking-widest border border-brand-500/20 mb-4">
+                  <Sparkles className="h-3.5 w-3.5 text-brand-400 animate-pulse" />
+                  La Nuova Era dello Sviluppo Web
+                </span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                  La Rivoluzione della Creazione Web con l'IA in Italia
+                </h2>
+                <p className="text-sm sm:text-base text-slate-300 mt-4 max-w-2xl mx-auto font-normal leading-relaxed">
+                  Crea siti web straordinari, reattivi e professionali in pochissimi minuti grazie alla potenza della progettazione assistita da Google AI Studio. 
+                  Senza scrivere codice complesso da zero, sbloccherai il mercato digitale italiano.
+                </p>
+              </div>
+
+              {/* Due Grandi Opportunità di Business: PMIs vs Freelance */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                {/* 1. Piccola Impresa Italiana */}
+                <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 p-8 hover:border-brand-500/40 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-brand-400 uppercase tracking-widest bg-brand-950 border border-brand-900/50 px-3 py-1 rounded-full">
+                      Per Titolari di Attività Locali
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-white mt-4 mb-3">
+                      Digitalizza la Tua Impresa Autonomamente
+                    </h3>
+                    <p className="text-slate-300 text-sm leading-relaxed mb-6 font-normal">
+                      Se hai un ristorante, pizzeria, salone di bellezza, centro estetico, officina o sei un professionista, <strong className="text-brand-300">non farti più prosciugare migliaia di euro dalle agenzie web tradizionali</strong> per semplici modifiche o landing page basilari.
+                    </p>
+                    <ul className="space-y-3.5 text-xs text-slate-300 mb-6">
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Veri €1.500+ Risparmiati:</strong> Costruisci il tuo portfolio, menù o listino prezzi in totale autonomia in soli 20 minuti.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Aggiornamenti Istantanei:</strong> Cambia i prezzi dei servizi, aggiungi pizze a menù, o aggiorna l'orario di apertura istantaneamente con l'IA.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Prenotazioni senza Commissioni:</strong> Attiva un sistema integrato no-code per far riservare tavoli o appuntamenti via WhatsApp.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="border-t border-slate-800/80 pt-5 text-slate-450 text-[11px] italic">
+                    Ideale per: Pizzerie, Ristoranti, Saloni, Parrucchieri e Studi Medici Italiani.
+                  </div>
+                </div>
+
+                {/* 2. Freelance / Aspirante Agenzia Web */}
+                <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 p-8 hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none" />
+                  <div>
+                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-950 border border-emerald-900/50 px-3 py-1 rounded-full">
+                      Modello di Business ad Alto Margine
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-white mt-4 mb-3">
+                      Vendi Siti Professionali a €1.000 — €2.000 ciascuno
+                    </h3>
+                    <p className="text-slate-350 text-sm leading-relaxed mb-6 font-normal">
+                      C'è una fame disperata di digitalizzazione in Italia. Impara a padroneggiare Google AI Studio e <strong className="text-emerald-400">crea software e landing page per attività locali in pochissime ore</strong>, rivendendole a tariffe da agenzia d'elite.
+                    </p>
+                    <ul className="space-y-3.5 text-xs text-slate-300 mb-6">
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Processo Produttivo Fulmineo:</strong> Consegna il lavoro al cliente in 2-3 giorni invece di 4 settimane tradizionali.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Senza Costeggiare Abbonamenti:</strong> Sfrutta l'hosting gratuito di Firebase e Google Cloud Run per minimizzare le tue spese operative a zero.</span>
+                      </li>
+                      <li className="flex items-start gap-2.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span><strong>Canone di Aggiornamento Ricorrente:</strong> Offri manutenzione e piccole modifiche all'attività locale per €50 - €100 / mese.</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="border-t border-slate-800/80 pt-5 text-slate-450 text-[11px] italic flex justify-between items-center">
+                    <span>Target Monetizzazione: €3.000 — €6.000 al mese</span>
+                    <span className="text-emerald-400 font-extrabold">Margine 99%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Showcase Militare di Siti IA Italiani Realizzati */}
+              <div className="space-y-8">
+                <div className="text-center max-w-2xl mx-auto">
+                  <h3 className="text-2xl font-extrabold text-white">
+                    Showcase: Alcuni Esempi di Successo Realizzabili con l'IA
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-400 mt-2">
+                    Esempi concreti di interfacce commerciali ad altissima conversione che sbloccherai durante il percorso.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Case 1: Pizzeria */}
+                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-5 hover:border-slate-700/80 transition-all duration-300 group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-widest">
+                          Ristorazione
+                        </span>
+                        <h4 className="text-base font-bold text-white mt-1 group-hover:text-brand-400 transition-colors">
+                          Pizzeria & Cucina "Vesuvio DOC"
+                        </h4>
+                        <p className="text-[11px] text-slate-400">Napoli, Campania</p>
+                      </div>
+                      <div className="text-right text-xs">
+                        <span className="text-emerald-500 font-bold block">Pronto in 20 min</span>
+                        <span className="text-[10px] text-slate-500">Valore stimato: €1.200</span>
+                      </div>
+                    </div>
+                    {/* Visual mockup of the site interface */}
+                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-3 font-sans">
+                      <div className="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                        <span className="text-[11px] font-extrabold text-white tracking-tight">🍕 VESUVIO DOC</span>
+                        <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded">Menu Digitale Attivo</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-slate-300">Margherita Speciale (Mozzarella DOP)</span>
+                          <span className="font-bold text-white">€8,50</span>
+                        </div>
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-slate-300">Diavola con Salame di Castelpoto</span>
+                          <span className="font-bold text-white">€9,50</span>
+                        </div>
+                      </div>
+                      <div className="bg-brand-900/20 border border-brand-800/40 p-2 rounded text-[10px] text-brand-300 flex items-center justify-between">
+                        <span>Richiedi un Tavolo via WhatsApp</span>
+                        <ArrowRight className="h-3 w-3 text-brand-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Case 2: Estetica */}
+                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-5 hover:border-slate-700/80 transition-all duration-300 group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20 uppercase tracking-widest">
+                          Beauty & Wellness
+                        </span>
+                        <h4 className="text-base font-bold text-white mt-1 group-hover:text-brand-400 transition-colors">
+                          Salone "Stile & Armonia"
+                        </h4>
+                        <p className="text-[11px] text-slate-400">Milano, Lombardia</p>
+                      </div>
+                      <div className="text-right text-xs">
+                        <span className="text-emerald-500 font-bold block">Pronto in 25 min</span>
+                        <span className="text-[10px] text-slate-500">Valore stimato: €1.500</span>
+                      </div>
+                    </div>
+                    {/* Visual mockup of the site interface */}
+                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-3 font-sans">
+                      <div className="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                        <span className="text-[11px] font-extrabold text-white tracking-tight">✨ STILE & ARMONIA</span>
+                        <span className="text-[9px] bg-brand-550/20 text-brand-400 font-bold px-1.5 py-0.5 rounded">Agenda h24</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-slate-950 p-1.5 rounded border border-slate-800">
+                          <span className="text-[9px] text-slate-400 block">Piega & Taglio</span>
+                          <span className="text-[10px] font-bold text-white">€35</span>
+                        </div>
+                        <div className="bg-slate-950 p-1.5 rounded border border-slate-800">
+                          <span className="text-[9px] text-slate-400 block">Colore Organico</span>
+                          <span className="text-[10px] font-bold text-white">€55</span>
+                        </div>
+                        <div className="bg-slate-950 p-1.5 rounded border border-slate-800">
+                          <span className="text-[9px] text-slate-400 block">Trattamento Keratina</span>
+                          <span className="text-[10px] font-bold text-white">€80</span>
+                        </div>
+                      </div>
+                      <div className="bg-emerald-900/20 border border-emerald-800/45 p-2 rounded text-[10px] text-emerald-300 flex items-center justify-between">
+                        <span>Nessun orario di attesa: prenota online</span>
+                        <Check className="h-3 w-3 text-emerald-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Case 3: Studio Professionale */}
+                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-5 hover:border-slate-700/80 transition-all duration-300 group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20 uppercase tracking-widest">
+                          Studio Medico / Professionisti
+                        </span>
+                        <h4 className="text-base font-bold text-white mt-1 group-hover:text-brand-400 transition-colors">
+                          Studio Odontoiatrico "Sorrisi d'Italia"
+                        </h4>
+                        <p className="text-[11px] text-slate-400">Roma, Lazio</p>
+                      </div>
+                      <div className="text-right text-xs">
+                        <span className="text-emerald-500 font-bold block">Pronto in 30 min</span>
+                        <span className="text-[10px] text-slate-500">Valore stimato: €1.800</span>
+                      </div>
+                    </div>
+                    {/* Visual mockup of the site interface */}
+                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-2.5 font-sans">
+                      <div className="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                        <span className="text-[11px] font-semibold text-white">🦷 STUDIO DENTISTICO</span>
+                        <span className="text-[9px] text-slate-400">Convenzionato</span>
+                      </div>
+                      <p className="text-[9.5px] text-slate-300 leading-normal">
+                        Prevenzione, protesi e ortodonzia invisible con tecnologie diagnostiche tridimensionali avanzate ad altissima precisione.
+                      </p>
+                      <div className="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between items-center text-[9px]">
+                        <span className="text-slate-400">📍 Via del Corso 15, Roma</span>
+                        <span className="text-indigo-400 cursor-pointer">Apri Mappa</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Case 4: E-Commerce Locale */}
+                  <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-5 hover:border-slate-700/80 transition-all duration-300 group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 uppercase tracking-widest">
+                          E-Commerce Locale
+                        </span>
+                        <h4 className="text-base font-bold text-white mt-1 group-hover:text-brand-400 transition-colors">
+                          "Le Delizie di Sicilia" - Eccellenze Artigianali
+                        </h4>
+                        <p className="text-[11px] text-slate-400">Palermo, Sicilia</p>
+                      </div>
+                      <div className="text-right text-xs">
+                        <span className="text-emerald-500 font-bold block">Pronto in 35 min</span>
+                        <span className="text-[10px] text-slate-500">Valore stimato: €2.200</span>
+                      </div>
+                    </div>
+                    {/* Visual mockup of the site interface */}
+                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-3 font-sans">
+                      <div className="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                        <span className="text-[11px] font-extrabold text-white tracking-tight">🍊 LE DELIZIE DI SICILIA</span>
+                        <span className="text-[9px] bg-red-500/20 text-red-400 font-bold px-1.5 py-0.5 rounded">Best Seller</span>
+                      </div>
+                      <div className="flex gap-2.5 items-center">
+                        <div className="h-8 w-10 bg-slate-950 rounded flex items-center justify-center font-bold text-[10px] border border-slate-850">🍯</div>
+                        <div className="flex-1 text-[10px]">
+                          <span className="text-white block font-semibold">Pesto di Pistacchio di Bronte DOP (190g)</span>
+                          <span className="text-slate-400">€7,90 <span className="line-through text-[8.5px]">€9,80</span></span>
+                        </div>
+                        <button className="bg-teal-600 text-white p-1 rounded hover:bg-teal-700 text-[10px] px-2">Aggiungi</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* FINAL BOTTOM CARD CALL TO ACTION */}
           <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl border border-slate-800">
