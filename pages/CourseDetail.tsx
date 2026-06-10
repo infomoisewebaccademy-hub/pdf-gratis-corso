@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2 } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
 import { supabase } from '../services/supabase';
 import { generateDefaultLandingPage } from '../utils/courseLandingGenerator';
+import { Footer } from '../components/Footer';
 
 interface CourseDetailProps {
   course: Course;
@@ -280,13 +281,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* BACK ROW */}
-          <button 
-              onClick={onBack} 
-              className="text-slate-500 hover:text-slate-900 font-medium flex items-center mb-10 transition-colors cursor-pointer"
-          >
-              ← Torna ai Percorsi
-          </button>
 
           {/* HERO PREVIEW BLOCK */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
@@ -634,7 +628,147 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               )}
             </div>
           </div>
+
+          {/* TIMELINE PROCESSO D'ELITE CON ANIMAZIONI 3D */}
+          <div className="my-24">
+            <div className="text-center max-w-3xl mx-auto mb-16 px-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-100/80 text-brand-850 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
+                <Sparkles className="h-3.5 w-3.5 text-brand-650 animate-pulse" />
+                Dall'Iscrizione all'Onboarding: Flusso Automatizzato
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+                Come Funziona l'Iscrizione ed il Tuo Onboarding
+              </h2>
+              <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-2xl mx-auto">
+                Un processo impeccabile e automatizzato al millisecondo per iniziare a formarti e fare level-up senza barriere.
+              </p>
+            </div>
+
+            {/* Grid of Steps with 3D Perspective */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative [perspective:1200px]">
+              {/* Timeline Connector Line in Background */}
+              <div className="hidden md:block absolute top-[40%] left-[5%] right-[5%] h-1 bg-gradient-to-r from-blue-500 via-indigo-500 via-brand-500 to-emerald-500 opacity-20 -z-0"></div>
+
+              {[
+                {
+                  step: "01",
+                  title: "Pagamento Criptato & Sicuro",
+                  desc: "Completa l'iscrizione inserendo i dettagli della carta. Transazione cifrata SSL / Stripe / PayPal con fattura immediata.",
+                  icon: <CreditCard className="h-6 w-6 text-white" />,
+                  badge: "Stripe & PayPal",
+                  color: "from-blue-600 to-indigo-600",
+                  shadowColor: "rgba(59,130,246,0.3)",
+                  glow: "rgba(59,130,246,0.15)",
+                },
+                {
+                  step: "02",
+                  title: "Credential Delivery",
+                  desc: "Il nostro sistema automatico genera il tuo account temporaneo entro 3 secondi e ti invia i dati d'accessi via email.",
+                  icon: <Mail className="h-6 w-6 text-white" />,
+                  badge: "In circa ~3 secondi",
+                  color: "from-indigo-600 to-brand-600",
+                  shadowColor: "rgba(124,58,237,0.3)",
+                  glow: "rgba(124,58,237,0.15)",
+                },
+                {
+                  step: "03",
+                  title: "Accesso Accademico Vitalizio",
+                  desc: "Accedi da qualsiasi dispositivo alla tua Dashboard d'elite con le credenziali. Tutto il materiale è sbloccato a vita.",
+                  icon: <Key className="h-6 w-6 text-white" />,
+                  badge: "Disponibilità H24",
+                  color: "from-brand-600 to-emerald-600",
+                  shadowColor: "rgba(13,148,136,0.3)",
+                  glow: "rgba(13,148,136,0.15)",
+                },
+                {
+                  step: "04",
+                  title: "Supporto WhatsApp 1-to-1",
+                  desc: "Nel corso trovi l'invito alla community e lo speciale contatto WhatsApp diretto del docente Daniel Moise per feedback reali.",
+                  icon: <Users className="h-6 w-6 text-white" />,
+                  badge: "Linea Diretta Docente",
+                  color: "from-emerald-600 to-amber-600",
+                  shadowColor: "rgba(16,185,129,0.3)",
+                  glow: "rgba(16,185,129,0.15)",
+                },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="group relative bg-white p-6 rounded-2xl border border-slate-100 shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform-gpu cursor-pointer hover:-translate-y-4 hover:rotate-x-6 hover:rotate-y-3 flex flex-col justify-between h-[320px] overflow-hidden"
+                  style={{
+                    transformStyle: "preserve-3d",
+                    boxShadow: `0 10px 30px -5px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.01)`,
+                  }}
+                >
+                  {/* Subtle 3D Depth Card Overlay Backdrop Glow */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(circle at 50% 50%, ${item.glow} 0%, transparent 70%)`
+                    }}
+                  />
+
+                  {/* Big background number for absolute depth feel */}
+                  <span 
+                    className="absolute -right-4 -bottom-4 text-7xl font-black text-slate-100/50 select-none group-hover:text-slate-200/70 group-hover:scale-110 transition-all duration-500 pointer-events-none"
+                    style={{
+                      transform: "translateZ(10px)",
+                    }}
+                  >
+                    {item.step}
+                  </span>
+
+                  <div>
+                    {/* Icon element floating in 3D */}
+                    <div 
+                      className={`h-12 w-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg mb-6 transition-all duration-500 group-hover:scale-110`}
+                      style={{
+                        transform: "translateZ(30px)",
+                        boxShadow: `0 8px 20px ${item.shadowColor}`
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+
+                    <div style={{ transform: "translateZ(20px)" }} className="space-y-2">
+                      <span className="inline-block bg-slate-100 border border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full">
+                        {item.badge}
+                      </span>
+                      <h3 className="text-sm font-extrabold text-slate-950 group-hover:text-brand-700 transition-colors duration-300">
+                        {item.title}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Interactive flow navigation helper */}
+                  <div 
+                    style={{ transform: "translateZ(15px)" }}
+                    className="pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-mono group-hover:text-slate-600 transition-colors duration-300"
+                  >
+                    <span>Fase {item.step}</span>
+                    <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* FOOTER */}
+        <Footer 
+          config={{
+            is_visible: true,
+            logo_height: 40,
+            copyright: `© ${new Date().getFullYear()} Moise Web Academy. Tutti i diritti riservati.`,
+            logo_margin_top: 0,
+            logo_margin_bottom: 0,
+            logo_margin_left: 0,
+            logo_margin_right: 0,
+            ...settings.landing_page_config?.footer,
+          }} 
+        />
       </div>
     );
   };
