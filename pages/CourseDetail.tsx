@@ -8,6 +8,7 @@ import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
 import { supabase } from '../services/supabase';
 import { generateDefaultLandingPage } from '../utils/courseLandingGenerator';
 import { Footer } from '../components/Footer';
+import { Countdown3D } from '../components/Countdown3D';
 
 interface CourseDetailProps {
   course: Course;
@@ -336,6 +337,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   </div>
                 ))}
               </div>
+              
+              {/* DYNAMIC 3D COUNTDOWN TIMER */}
+              {course.show_countdown && course.countdown_end && (
+                <div className="pt-6">
+                  <Countdown3D targetDate={course.countdown_end} />
+                </div>
+              )}
 
               {/* ACTION AREA CALL TO ACTION */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">

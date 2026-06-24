@@ -64,7 +64,7 @@ const QuillEditor: React.FC<{ value: string; onChange: (content: string) => void
         </div>
     );
 };
-import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp, Bell, Users, Award } from 'lucide-react';
+import { Save, ArrowLeft, Trash, Plus, Image as ImageIcon, Layout, DollarSign, Video, GripVertical, X, Book, Sparkles, AlertCircle, Fingerprint, UploadCloud, FileText, ExternalLink, Loader2, CheckCircle2, Star, Bold, Underline, ChevronDown, ChevronUp, Bell, Users, Award, Gift, Clock } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../services/supabase';
 import { ImagePicker } from '../components/ImagePicker';
@@ -108,6 +108,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     additional_benefits: [''],
     announcement_title: '',
     announcement_content: '',
+    gift_course_id: '',
+    show_countdown: false,
+    countdown_end: '',
   });
 
   const [imgError, setImgError] = useState(false);
@@ -348,6 +351,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             program_title: courseToEdit.program_title || '',
             announcement_title: courseToEdit.announcement_title || '',
             announcement_content: courseToEdit.announcement_content || '',
+            gift_course_id: courseToEdit.gift_course_id || '',
+            show_countdown: courseToEdit.show_countdown || false,
+            countdown_end: courseToEdit.countdown_end || '',
         };
         setFormData(data);
         initialCourseRef.current = data;
@@ -363,6 +369,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             program_title: '',
             announcement_title: '',
             announcement_content: '',
+            gift_course_id: '',
+            show_countdown: false,
+            countdown_end: '',
         };
         setFormData(data);
         initialCourseRef.current = data;
@@ -403,6 +412,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       program_title: formData.program_title || null,
       announcement_title: formData.announcement_title || null,
       announcement_content: formData.announcement_content || null,
+      gift_course_id: formData.gift_course_id || null,
+      show_countdown: formData.show_countdown || false,
+      countdown_end: formData.countdown_end || null,
     } as Course;
     
     await onSave(courseToSave);
@@ -1435,6 +1447,51 @@ rounded-lg font-bold flex items-center justify-center gap-2 border border-purple
                                 }
                             </select>
                             <p className="text-[10px] text-gray-400 mt-1">Verrà mostrato come offerta speciale se questo è il percorso gratuito.</p>
+                         </div>
+                         <hr className="border-gray-100" />
+                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><Gift className="h-4 w-4 text-emerald-500" /> Corso in Regalo (Incluso con questo corso)</label>
+                            <select 
+                                value={formData.gift_course_id || ''} 
+                                onChange={e => setFormData({...formData, gift_course_id: e.target.value})} 
+                                className="block w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                                <option value="">Nessun regalo</option>
+                                {courses
+                                    .filter(c => c.id !== id)
+                                    .map(course => (
+                                        <option key={course.id} value={course.id}>{course.title}</option>
+                                    ))
+                                }
+                            </select>
+                            <p className="text-[10px] text-gray-400 mt-1">Chi acquista questo corso sbloccherà automaticamente anche l'accesso gratuito al corso selezionato (es. Guida PDF Gratuita).</p>
+                         </div>
+                         <hr className="border-gray-100" />
+                         <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-3">
+                             <label className="flex items-center space-x-2 cursor-pointer select-none">
+                                 <input 
+                                     type="checkbox" 
+                                     checked={formData.show_countdown || false} 
+                                     onChange={e => setFormData({...formData, show_countdown: e.target.checked})} 
+                                     className="rounded border-amber-300 text-amber-600 focus:ring-amber-500 h-4 w-4 cursor-pointer" 
+                                 />
+                                 <span className="text-sm font-bold text-amber-900 flex items-center gap-1">
+                                     <Clock className="h-4 w-4 text-amber-600 animate-pulse" /> Attiva Countdown sulla Landing Page
+                                 </span>
+                             </label>
+                             <p className="text-xs text-amber-700 leading-relaxed">Abilita un timer tridimensionale 3D ad alto impatto visivo per creare urgenza comunicando l'imminente aumento del prezzo.</p>
+                             
+                             {formData.show_countdown && (
+                                 <div className="mt-2 space-y-1">
+                                     <label className="block text-xs font-bold text-amber-800">Data e Ora di Scadenza</label>
+                                     <input 
+                                         type="datetime-local" 
+                                         value={formData.countdown_end ? formData.countdown_end.substring(0, 16) : ''} 
+                                         onChange={e => setFormData({...formData, countdown_end: e.target.value})} 
+                                         className="block w-full border border-amber-200 rounded-lg p-2.5 bg-white text-sm focus:ring-amber-500 focus:border-amber-500 text-amber-950 font-mono font-bold shadow-inner" 
+                                     />
+                                 </div>
+                             )}
                          </div>
                          <hr className="border-gray-100" />
                          <div>

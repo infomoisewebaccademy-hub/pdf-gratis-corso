@@ -39,6 +39,9 @@ export interface Course {
   announcement_title?: string; // NUOVO: Titolo del popup di annuncio
   announcement_content?: string; // NUOVO: Contenuto (HTML/Text) del popup di annuncio
   landing_page_data?: any; // NUOVO: Landing page strutturata per vendere il corso
+  gift_course_id?: string; // NUOVO: ID del corso regalato all'acquisto
+  show_countdown?: boolean; // NUOVO: Se mostrare il countdown sulla landing page
+  countdown_end?: string; // NUOVO: Data/ora di scadenza del countdown
 }
 
 export interface UserProfile {

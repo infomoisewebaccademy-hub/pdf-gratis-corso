@@ -360,7 +360,25 @@ const AppContent: React.FC = () => {
         const { data: purchases } = await supabase.from('purchases').select('course_id').eq('user_id', session.user.id);
         const purchasedCourseIds = purchases ? purchases.map(p => p.course_id) : [];
 
-        setUser({ id: session.user.id, email: session.user.email!, full_name: profile?.full_name || session.user.email!.split('@')[0], is_admin: profile?.is_admin || false, purchased_courses: purchasedCourseIds });
+        // Risolvi dinamicamente i corsi in regalo
+        const finalPurchasedCourseIds = [...purchasedCourseIds];
+        const { data: dbCourses } = await supabase.from('courses').select('id, gift_course_id');
+        if (dbCourses) {
+            let addedNew = true;
+            while (addedNew) {
+                addedNew = false;
+                for (const c of dbCourses) {
+                    if (finalPurchasedCourseIds.includes(c.id) && c.gift_course_id) {
+                        if (!finalPurchasedCourseIds.includes(c.gift_course_id)) {
+                            finalPurchasedCourseIds.push(c.gift_course_id);
+                            addedNew = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        setUser({ id: session.user.id, email: session.user.email!, full_name: profile?.full_name || session.user.email!.split('@')[0], is_admin: profile?.is_admin || false, purchased_courses: finalPurchasedCourseIds });
     } catch (error) { console.error("Error loading user data:", error); } finally { setLoading(false); }
   }, []);
 
