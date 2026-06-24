@@ -40,10 +40,12 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
 const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ lesson, onEnded }) => {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         let isMounted = true;
         setIsLoading(true);
+        setErrorMsg(null);
 
         // Priorità al video caricato
         if (lesson.video_storage_path) {
@@ -59,9 +61,12 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
                         setVideoUrl(data.signedUrl);
                         setIsLoading(false);
                     }
-                } catch (err) {
+                } catch (err: any) {
                     console.error("Errore nel generare URL sicuro:", err);
-                    if (isMounted) setIsLoading(false);
+                    if (isMounted) {
+                        setErrorMsg(err.message || String(err));
+                        setIsLoading(false);
+                    }
                 }
             };
             getSignedUrl();
@@ -77,14 +82,34 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
     }, [lesson.video_storage_path, lesson.videoUrl]);
 
     return (
-        <div className="bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative group">
+        <div className="bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video relative group flex flex-col justify-center items-center">
             {isLoading ? (
-                <div className="flex items-center justify-center h-full text-white/50"><p>Caricamento video...</p></div>
+                <div className="flex flex-col items-center justify-center h-full text-white/50 space-y-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+                    <p className="text-sm font-medium">Caricamento video sicuro...</p>
+                </div>
+            ) : errorMsg ? (
+                <div className="flex flex-col items-center justify-center p-6 text-center h-full max-w-md mx-auto text-white/80 space-y-4">
+                    <div className="bg-red-500/10 p-3 rounded-full text-red-500">
+                        <AlertCircle className="h-10 w-10" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-lg text-red-400">Errore nel caricamento del video</h3>
+                        <p className="text-sm text-gray-400 mt-2">
+                            {errorMsg.includes('Object not found') 
+                              ? 'Il file video associato a questa lezione non è stato trovato sul server (Object not found).'
+                              : `Impossibile generare l\'URL sicuro del video: ${errorMsg}`}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-3 border-t border-white/10 pt-3">
+                            Se sei l\'amministratore, accedi all\'area di modifica del corso, rimuovi l\'associazione del video attuale e ricaricalo o selezionalo nuovamente dalla libreria multimediale.
+                        </p>
+                    </div>
+                </div>
             ) : videoUrl ? (
                 videoUrl.includes('youtube') || videoUrl.includes('youtu.be') ? (
                     <iframe 
                         src={videoUrl.replace('watch?v=', 'embed/')}
-                        className="w-full h-full" 
+                        className="w-full h-full absolute inset-0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowFullScreen
                     ></iframe>
@@ -94,14 +119,15 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
                         controls 
                         controlsList="nodownload" 
                         onContextMenu={e => e.preventDefault()} 
-                        className="w-full h-full" 
+                        className="w-full h-full absolute inset-0" 
                         onEnded={onEnded}
                         autoPlay
                     />
                 )
             ) : (
-                <div className="flex items-center justify-center h-full text-white/50">
-                    <p>Video non disponibile per questa lezione.</p>
+                <div className="flex flex-col items-center justify-center h-full text-white/50 space-y-2">
+                    <AlertCircle className="h-8 w-8 text-gray-400" />
+                    <p className="text-sm">Video non disponibile per questa lezione.</p>
                 </div>
             )}
         </div>
