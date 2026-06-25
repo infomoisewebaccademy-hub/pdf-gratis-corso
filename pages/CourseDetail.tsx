@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase, ChevronLeft, ChevronRight, Monitor, Smartphone } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -150,6 +150,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   
   // 3D Carousel dragging and sizing states
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [simulatorViewMode, setSimulatorViewMode] = useState<'explorer' | 'carousel'>('explorer');
+  const [explorerDeviceMode, setExplorerDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartX = useRef(0);
@@ -699,8 +701,12 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 overflow: visible;
                 user-select: none;
                 -webkit-user-select: none;
-                mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
-                -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+              }
+              @media (min-width: 1024px) {
+                .scene-3d {
+                  mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+                  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+                }
               }
               .a3d-carousel {
                 position: relative;
@@ -854,12 +860,111 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   ))}
                 </div>
 
+                {/* View Mode Controls */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto bg-slate-900/40 p-4 rounded-2xl border border-slate-800/80 mt-6 mb-2">
+                  {/* Left Column: Explanatory text */}
+                  <div className="text-center md:text-left">
+                    <h4 className="text-sm font-black text-white flex items-center justify-center md:justify-start gap-2">
+                      <Code className="h-4 w-4 text-brand-400" />
+                      Studio di Sviluppo Sinergico
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Scegli la modalità di anteprima per visualizzare al meglio i siti sviluppati con l'IA.
+                    </p>
+                  </div>
+
+                  {/* Mode switcher & Resolution switcher side by side */}
+                  <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
+                    {/* View Switcher: Explorer vs Carousel */}
+                    <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 shadow-inner w-full sm:w-auto">
+                      <button
+                        onClick={() => setSimulatorViewMode('explorer')}
+                        className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          simulatorViewMode === 'explorer'
+                            ? 'bg-brand-600 text-white shadow-md'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                        }`}
+                      >
+                        <Laptop className="h-3.5 w-3.5" />
+                        <span>Espandi Layout</span>
+                      </button>
+                      <button
+                        onClick={() => setSimulatorViewMode('carousel')}
+                        className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          simulatorViewMode === 'carousel'
+                            ? 'bg-brand-600 text-white shadow-md'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                        }`}
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        <span>Carosello 3D</span>
+                      </button>
+                    </div>
+
+                    {/* Device Switcher (only when in explorer mode) */}
+                    {simulatorViewMode === 'explorer' && (
+                      <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 shadow-inner w-full sm:w-auto justify-center">
+                        <button
+                          disabled={windowWidth < 768}
+                          onClick={() => setExplorerDeviceMode('desktop')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                            windowWidth < 768
+                              ? 'opacity-30 cursor-not-allowed text-slate-600'
+                              : explorerDeviceMode === 'desktop'
+                                ? 'bg-slate-800 text-white shadow-md'
+                                : 'text-slate-400 hover:text-white'
+                          }`}
+                          title={windowWidth < 768 ? "Risoluzione Desktop disponibile solo su schermi grandi" : "Visualizza versione Desktop del sito"}
+                        >
+                          <Monitor className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Desktop</span>
+                        </button>
+                        <button
+                          onClick={() => setExplorerDeviceMode('mobile')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                            explorerDeviceMode === 'mobile' || windowWidth < 768
+                              ? 'bg-slate-800 text-white shadow-md'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                          title="Visualizza versione Mobile del sito"
+                        >
+                          <Smartphone className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Mobile</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* 3D CAROUSEL VIEWPORT */}
                 {(() => {
                   const isMobile = windowWidth < 768;
-                  const cardWidth = isMobile ? 280 : 365;
-                  const cardHeight = isMobile ? 420 : 500;
-                  const radius = isMobile ? 180 : 280;
+                  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+                  const isLargeDesktop = windowWidth >= 1280;
+
+                  // 3D Carousel responsive card dimensions
+                  let cardWidth = 365;
+                  let cardHeight = 500;
+                  let radius = 280;
+
+                  if (isMobile) {
+                    cardWidth = Math.min(windowWidth - 48, 340);
+                    cardHeight = 460;
+                    radius = Math.min(windowWidth * 0.45, 150);
+                  } else if (isTablet) {
+                    cardWidth = 350;
+                    cardHeight = 500;
+                    radius = 240;
+                  } else if (isLargeDesktop) {
+                    cardWidth = 460;
+                    cardHeight = 600;
+                    radius = 350;
+                  } else { // Standard desktop (1024px to 1280px)
+                    cardWidth = 400;
+                    cardHeight = 550;
+                    radius = 300;
+                  }
+
                   const N = activeShowcases.length;
                   const angleStep = 360 / N;
                   const currentRotation = -activeMockup * angleStep + (dragOffset * 0.25);
@@ -1382,6 +1487,111 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     dragDirection.current = 'none';
                   };
 
+                  if (simulatorViewMode === 'explorer') {
+                    return (
+                      <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 mt-8">
+                        {/* Simulated Browser/Handset Frame */}
+                        <div 
+                          className={`mx-auto bg-slate-950 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col ${
+                            explorerDeviceMode === 'mobile' || windowWidth < 768
+                              ? 'max-w-[340px] h-[580px] border-[10px] border-slate-800 rounded-[36px] ring-4 ring-slate-900/40 relative' // Phone handset look
+                              : 'w-full h-[640px]' // Wide desktop browser look
+                          }`}
+                          style={{
+                            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85)'
+                          }}
+                        >
+                          {/* Top Speaker Notch for Mobile frame */}
+                          {(explorerDeviceMode === 'mobile' || windowWidth < 768) && (
+                            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-800 rounded-b-xl z-50 flex items-center justify-center">
+                              <div className="w-12 h-1 bg-slate-900 rounded-full" />
+                            </div>
+                          )}
+
+                          {/* Browser/Device Header Bar */}
+                          <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 select-none pt-4 sm:pt-3">
+                            {/* Window Dots (Hidden in mobile portrait frame for a cleaner phone look) */}
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                            </div>
+
+                            {/* URL Address Bar */}
+                            <div className="bg-slate-950 px-2 py-1.5 rounded-lg border border-slate-850 font-mono text-center text-[10px] sm:text-xs text-slate-300 flex-1 max-w-md mx-3 truncate flex items-center justify-center gap-1.5 shadow-inner">
+                              <span className="text-[8px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-900/50 px-1 py-0.2 rounded shrink-0 leading-none scale-90">HTTPS</span>
+                              <span className="truncate text-slate-400">
+                                {activeShowcaseItem.url || `https://www.${activeShowcaseItem.subtitle?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'website'}.it`}
+                              </span>
+                            </div>
+
+                            {/* Live Badge */}
+                            <span className="bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-emerald-500/20 shadow-sm shrink-0 flex items-center gap-1 scale-90 sm:scale-100">
+                              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                              LIVE
+                            </span>
+                          </div>
+
+                          {/* Simulated Site Content Area */}
+                          <div className="bg-white text-slate-800 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y custom-scrollbar select-text text-left">
+                            {activeShowcaseItem.custom_html || activeShowcaseItem.url || activeShowcaseItem.builtinIndex === undefined ? (
+                              <div className="w-full h-full bg-white relative">
+                                {activeShowcaseItem.custom_html ? (
+                                  <iframe
+                                    srcDoc={activeShowcaseItem.custom_html}
+                                    className="w-full h-full border-0 bg-white"
+                                    title={activeShowcaseItem.title}
+                                    sandbox="allow-scripts allow-same-origin"
+                                  />
+                                ) : (
+                                  <iframe
+                                    src={activeShowcaseItem.url}
+                                    className="w-full h-full border-0 bg-white"
+                                    title={activeShowcaseItem.title}
+                                    sandbox="allow-scripts allow-same-origin"
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              renderMockupContent(activeShowcaseItem.builtinIndex)
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Quick Navigation Footer for Explorer View */}
+                        <div className="flex items-center justify-between mt-6 max-w-md mx-auto bg-slate-950 border border-slate-800 px-5 py-3 rounded-2xl shadow-xl">
+                          <button
+                            onClick={() => {
+                              setActiveMockup((prev) => (prev - 1 + N) % N);
+                            }}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-900 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
+                            title="Sito Precedente"
+                          >
+                            <ChevronLeft className="h-5 w-5" />
+                          </button>
+                          <div className="text-center">
+                            <div className="text-xs font-black text-white uppercase tracking-wider">
+                              {activeShowcaseItem.title}
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              Sito {activeMockup + 1} di {N}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setActiveMockup((prev) => (prev + 1) % N);
+                            }}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-900 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
+                            title="Sito Successivo"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Otherwise render original Carousel 3D, optimized
                   return (
                     <div 
                       className="scene-3d select-none my-12"
@@ -1394,14 +1604,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
                     >
-                      {/* Left and Right navigation buttons */}
+                      {/* Left and Right navigation buttons - hidden on mobile so they don't block viewport clicks */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setActiveMockup((prev) => (prev - 1 + N) % N);
                         }}
-                        className="absolute left-2 sm:left-4 z-45 bg-slate-950/80 hover:bg-slate-950 text-white p-3 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none"
+                        className="absolute left-4 sm:left-6 lg:left-8 z-45 bg-slate-950/90 hover:bg-slate-950 text-white p-3.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none hidden lg:flex"
                         title="Sito precedente"
                       >
                         <ChevronLeft className="h-5 w-5" />
@@ -1413,7 +1623,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                           e.stopPropagation();
                           setActiveMockup((prev) => (prev + 1) % N);
                         }}
-                        className="absolute right-2 sm:right-4 z-45 bg-slate-950/80 hover:bg-slate-950 text-white p-3 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none"
+                        className="absolute right-4 sm:right-6 lg:right-8 z-45 bg-slate-950/90 hover:bg-slate-950 text-white p-3.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none hidden lg:flex"
                         title="Sito successivo"
                       >
                         <ChevronRight className="h-5 w-5" />
