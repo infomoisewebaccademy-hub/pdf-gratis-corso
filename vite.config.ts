@@ -26,28 +26,7 @@ export default defineConfig(({ mode }) => {
       build: {
         cssCodeSplit: true,
         chunkSizeWarningLimit: 1200,
-        minify: 'esbuild',
-        rollupOptions: {
-          output: {
-            manualChunks(id) {
-              if (id.includes('node_modules')) {
-                if (id.includes('@supabase') || id.includes('supabase')) {
-                  return 'supabase';
-                }
-                if (id.includes('lucide-react')) {
-                  return 'lucide';
-                }
-                if (id.includes('recharts') || id.includes('d3')) {
-                  return 'recharts';
-                }
-                if (id.includes('react')) {
-                  return 'react-vendor';
-                }
-                return 'vendor';
-              }
-            }
-          }
-        }
+        minify: 'esbuild'
       }
     };
 });
