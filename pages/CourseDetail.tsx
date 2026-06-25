@@ -150,7 +150,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   
   // 3D Carousel dragging and sizing states
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
-  const [simulatorViewMode, setSimulatorViewMode] = useState<'explorer' | 'carousel'>('explorer');
+  const [simulatorViewMode, setSimulatorViewMode] = useState<'explorer' | 'carousel'>('carousel');
   const [explorerDeviceMode, setExplorerDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -330,10 +330,156 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
         ];
     const activeShowcaseItem = activeShowcases[activeMockup] || activeShowcases[0];
 
+    // High-converting pricing logic
+    const displayOldPrice = course.discounted_price && course.discounted_price > 0 ? course.price : Math.round(course.price * 2.5);
+    const displayNewPrice = course.discounted_price && course.discounted_price > 0 ? course.discounted_price : course.price;
+    const discountPercentage = Math.round(((displayOldPrice - displayNewPrice) / displayOldPrice) * 100);
+
+    const showCountdown = (course.show_countdown || course.landing_page_data?.show_countdown) && (course.countdown_end || course.landing_page_data?.countdown_end);
+    const targetDate = course.countdown_end || course.landing_page_data?.countdown_end;
+
+    // Helper to scroll to pricing block smoothly
+    const scrollToPricing = () => {
+      const element = document.getElementById('pricing-block-desktop') || document.getElementById('pricing-block-mobile');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    // High-fidelity Reusable Pricing and CTA Widget
+    const renderPricingAndCTA = (deviceMode: 'desktop' | 'mobile') => {
+      return (
+        <div 
+          id={`pricing-block-${deviceMode}`}
+          className={`bg-slate-950 text-white rounded-3xl border border-brand-500/30 shadow-2xl overflow-hidden p-6 sm:p-8 relative ${
+            deviceMode === 'desktop' ? 'space-y-6' : 'space-y-5 my-6'
+          }`}
+          style={{
+            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.45), 0 0 40px rgba(124, 58, 237, 0.05)'
+          }}
+        >
+          {/* Accent lighting strip */}
+          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-600 via-amber-400 to-emerald-500" />
+
+          {/* Pricing Info Header */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-900 pb-5 pt-1">
+            <div>
+              <span className="text-[10px] uppercase font-extrabold tracking-widest text-amber-400 block font-mono">Offerta Speciale Riservata</span>
+              <div className="flex items-baseline gap-2 mt-1.5">
+                <span className="text-4xl sm:text-5.5xl font-black text-white tracking-tight">€{displayNewPrice}</span>
+                <span className="text-slate-500 line-through text-base sm:text-lg font-semibold">€{displayOldPrice}</span>
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className="bg-brand-600 text-white font-extrabold text-[11px] sm:text-xs px-2.5 py-1 rounded-xl shadow-md shadow-brand-500/20 animate-pulse border border-brand-500/20">
+                -{discountPercentage}% ORA
+              </span>
+              <span className="text-[10px] text-emerald-400 font-extrabold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                Risparmi €{displayOldPrice - displayNewPrice}
+              </span>
+            </div>
+          </div>
+
+          {/* Social Proof Stars */}
+          <div className="flex flex-wrap items-center gap-2 bg-slate-900/60 border border-slate-850 p-2.5 rounded-2xl">
+            <StarRating rating={4.9} />
+            <span className="text-xs font-extrabold text-slate-300">
+              (142 recensioni degli studenti)
+            </span>
+          </div>
+
+          {/* Scarcity Countdown - STRICTLY RIGHT BELOW THE PRICE ON MOBILE! */}
+          {showCountdown && targetDate && (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-[11px] font-bold text-amber-400 uppercase tracking-wider font-mono">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5 animate-pulse" />
+                  IL PREZZO AUMENTA TRA:
+                </span>
+                <span className="text-red-400 animate-pulse font-black">ULTIMI POSTI DISPONIBILI</span>
+              </div>
+              <Countdown3D targetDate={targetDate} />
+            </div>
+          )}
+
+          {/* Action CTA Buttons */}
+          <div className="space-y-3 pt-2">
+            {isPurchasable ? (
+              <>
+                {/* PRIMARY CTA: BUY NOW */}
+                <button
+                  onClick={handleBuyNow}
+                  disabled={isBuying}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-2xl font-black py-4 px-6 text-center text-lg sm:text-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer border-b-4 border-emerald-700 select-none group"
+                >
+                  {isBuying ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Elaborazione Sicura SSL...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                      SBLOCCA L'ACCESSO IMMEDIATO
+                    </>
+                  )}
+                </button>
+
+                {/* SECONDARY CTA: ADD TO CART */}
+                <button
+                  onClick={() => {
+                    if (inCart) navigate('/cart');
+                    else addToCart(course, settings.add_to_cart_pixel_id);
+                  }}
+                  className={`w-full rounded-2xl font-bold py-3.5 px-6 text-center text-sm transition-all border flex items-center justify-center gap-2 cursor-pointer select-none ${
+                    inCart
+                      ? 'bg-emerald-950 text-emerald-400 border-emerald-800 hover:bg-emerald-900/40 shadow-sm'
+                      : 'bg-slate-900 text-slate-200 border-slate-850 hover:bg-slate-800/80'
+                  }`}
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  {inCart ? 'Vai al Carrello per completare' : 'Aggiungi al Carrello'}
+                </button>
+              </>
+            ) : (
+              <div className="w-full">
+                {isComingSoon ? (
+                  <div className="bg-blue-950/80 border border-blue-900 text-blue-400 p-4 rounded-2xl text-center font-bold text-sm">
+                    Disponibile a Breve! Resta Sintonizzato.
+                  </div>
+                ) : (
+                  <div className="bg-red-950/80 border border-red-900 text-red-400 p-4 rounded-2xl text-center font-bold text-sm">
+                    Iscrizioni Chiuse - Posti Esauriti!
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Secure checkout assurances & badges */}
+          <div className="border-t border-slate-900 pt-4.5 space-y-2.5">
+            <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <span className="leading-snug">GARANZIA 14 GIORNI SODDISFATTO O RIMBORSATO AL 100%</span>
+            </div>
+            <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
+              <Lock className="h-4 w-4 text-slate-500 shrink-0 mt-0.5" />
+              <span className="leading-snug">TRANSAZIONE SICURA SSL CON CRITTOGRAFIA DI GRADO MILITARE</span>
+            </div>
+            <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
+              <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+              <span className="leading-snug">MATERIALE RILASCIATO IMMEDIATAMENTE NELLA TUA AREA PERSONALE</span>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="bg-slate-50 min-h-screen text-slate-800 pb-24">
         {/* UPPER SNEAK-PEEK PREMIUM BAR */}
-        <div className="bg-slate-900 text-slate-250 text-center py-2.5 px-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+        <div className="bg-slate-900 text-slate-200 text-center py-2.5 px-4 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm">
           <Sparkles className="h-3.5 w-3.5 text-brand-400 animate-pulse" />
           <span>Presentazione Esclusiva dell'Academy • Accesso Riservato Clienti</span>
         </div>
@@ -341,7 +487,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
           {/* HERO PREVIEW BLOCK */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20">
+            {/* LEFT COLUMN: HERO INFORMATION */}
             <div className="lg:col-span-7 space-y-6">
               {lpd.hero?.value_proposition && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-100 text-brand-800 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -358,97 +505,76 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 {lpd.hero?.subheadline}
               </p>
 
-              {/* CORE BULLET POINTS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                {(lpd.hero?.bullet_points || []).map((point: string, i: number) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
-                    <span className="text-sm font-semibold text-slate-700 leading-snug">{point}</span>
+              {/* MOBILE ONLY: HERO MEDIA CARD, PRICING, COUNTDOWN, CTA (E-commerce Style) */}
+              <div className="block lg:hidden space-y-6">
+                <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-white">
+                  <img src={course.image} alt={course.title} className="w-full h-56 sm:h-72 object-cover" />
+                  <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-slate-700">
+                    SITO INTERATTIVO IA
                   </div>
-                ))}
-              </div>
-              
-              {/* DYNAMIC 3D COUNTDOWN TIMER */}
-              {(course.show_countdown || course.landing_page_data?.show_countdown) && (course.countdown_end || course.landing_page_data?.countdown_end) && (
-                <div className="pt-6">
-                  <Countdown3D targetDate={course.countdown_end || course.landing_page_data?.countdown_end} />
                 </div>
-              )}
 
-              {/* ACTION AREA CALL TO ACTION */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-                {isPurchasable ? (
-                  <>
-                    <button 
-                        onClick={handleBuyNow}
-                        disabled={isBuying}
-                        className="flex-1 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold py-4 px-6 text-center text-lg shadow-lg shadow-brand-500/25 hover:shadow-brand-500/35 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                        {isBuying ? (
-                          <>
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                            Elaborazione...
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="h-5 w-5 fill-current" />
-                            Inizia Subito
-                          </>
-                        )}
-                    </button>
+                {/* Pricing + Countdown (Right below price) + CTA Buttons */}
+                {renderPricingAndCTA('mobile')}
+              </div>
 
-                    <button 
-                        onClick={() => {
-                            if (inCart) navigate('/cart');
-                            else addToCart(course, settings.add_to_cart_pixel_id);
-                        }}
-                        className={`flex-1 rounded-xl font-bold py-4 px-6 text-center text-lg transition-all border-2 flex items-center justify-center gap-2 cursor-pointer ${
-                            inCart 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100' 
-                            : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
-                        }`}
-                    >
-                        <ShoppingCart className="h-5 w-5" />
-                        {inCart ? 'Vai al Carrello' : 'Aggiungi al Carrello'}
-                    </button>
-                  </>
-                ) : (
-                  <div className="w-full">
-                    {isComingSoon ? (
-                      <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl text-center font-bold">
-                        Disponibile a Breve! Resta Sintonizzato.
+              {/* CORE BULLET POINTS */}
+              <div className="bg-white lg:bg-transparent p-6 lg:p-0 rounded-2xl border border-slate-100 lg:border-0 shadow-sm lg:shadow-none">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 font-mono mb-4 lg:hidden">
+                  COSA ACQUISTI OGGI:
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {(lpd.hero?.bullet_points || []).map((point: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="bg-emerald-50 text-emerald-600 p-1 rounded-lg border border-emerald-100 shrink-0 mt-0.5">
+                        <Check className="h-4 w-4 stroke-[3]" />
                       </div>
-                    ) : (
-                      <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-center font-bold">
-                        Iscrizioni Chiuse - Posti Esauriti!
-                      </div>
-                    )}
-                  </div>
-                )}
+                      <span className="text-sm font-semibold text-slate-700 leading-snug">{point}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Elegant Call to Action below hero bullet points */}
+              <div className="pt-4 pb-2">
+                <button
+                  onClick={scrollToPricing}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-brand-600 to-indigo-650 hover:from-brand-700 hover:to-indigo-750 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/20 hover:shadow-brand-500/30 transform hover:-translate-y-0.5 transition-all cursor-pointer border-b-4 border-indigo-900 group select-none"
+                >
+                  <Zap className="h-4.5 w-4.5 text-white fill-current group-hover:scale-110 transition-transform" />
+                  SBLOCCA IL TUO ACCESSO IMMEDIATO
+                </button>
+                <p className="text-[10px] text-slate-400 font-mono mt-2 pl-1">⚡ Accesso istantaneo e illimitato H24 • Garanzia 100%</p>
+              </div>
+
+              {/* Extra social proof anchors for trust under bullet points */}
+              <div className="hidden lg:flex items-center gap-6 pt-2 border-t border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-brand-600" />
+                  <span className="text-xs font-bold text-slate-500">Certificazione Finale</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-brand-600" />
+                  <span className="text-xs font-bold text-slate-500">Accesso alla Community VIP</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-brand-600" />
+                  <span className="text-xs font-bold text-slate-500">Soddisfatto o Rimborsato</span>
+                </div>
               </div>
             </div>
 
-            {/* HERO MEDIA */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
+            {/* DESKTOP ONLY: HERO MEDIA AND FLOATING E-COMMERCE CARD */}
+            <div className="hidden lg:col-span-5 lg:block sticky top-6 space-y-6">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                 <img src={course.image} alt={course.title} className="w-full h-64 sm:h-80 object-cover" />
-                <div className="p-6 bg-white border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest text-[9px]">Prezzo Speciale</p>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-3xl font-black text-brand-650">€{finalPrice}</span>
-                      {isDiscountAvailable && (
-                        <span className="text-slate-400 line-through text-sm">€{course.price}</span>
-                      )}
-                    </div>
-                  </div>
-                  {isDiscountAvailable && (
-                    <span className="bg-brand-100 text-brand-700 font-black text-xs px-2.5 py-1 rounded-lg">
-                      Sconto Fedeltà {Math.round(((course.price - course.discounted_price!) / course.price) * 100)}% off
-                    </span>
-                  )}
+                <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-slate-700">
+                  STUDIO DI SVILUPPO IA
                 </div>
               </div>
+
+              {/* Pricing, Countdown, CTA Sidebar */}
+              {renderPricingAndCTA('desktop')}
             </div>
           </div>
 
@@ -617,6 +743,16 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       <p key={idx}>{p}</p>
                     ))}
                   </div>
+
+                  <div className="pt-4">
+                    <button
+                      onClick={scrollToPricing}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-indigo-500 hover:from-brand-600 hover:to-indigo-600 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all cursor-pointer group"
+                    >
+                      <Sparkles className="h-4 w-4 text-white group-hover:animate-pulse" />
+                      INIZIA ORA CON DANIEL
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -651,6 +787,17 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     </div>
                   );
                 })}
+              </div>
+
+              <div className="mt-8 text-center bg-slate-100/50 p-6 rounded-2xl border border-slate-200/60 max-w-2xl mx-auto">
+                <p className="text-sm text-slate-800 font-bold mb-3">Hai ancora dei dubbi o vuoi iniziare subito?</p>
+                <button
+                  onClick={scrollToPricing}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-950 hover:bg-slate-900 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all cursor-pointer select-none"
+                >
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                  Sì, sblocca il mio accesso sicuro con Garanzia di 14 giorni
+                </button>
               </div>
             </div>
           )}
@@ -831,6 +978,18 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 </div>
               </div>
 
+              {/* Opportunity CTA Banner */}
+              <div className="text-center mt-12 mb-4 max-w-xl mx-auto relative z-10">
+                <button
+                  onClick={scrollToPricing}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/10 hover:shadow-brand-500/20 transform hover:-translate-y-0.5 transition-all cursor-pointer border-b-4 border-slate-950 group select-none"
+                >
+                  <Zap className="h-5 w-5 text-white animate-pulse group-hover:scale-110 transition-transform" />
+                  PRENDI LA TUA QUOTA DI MERCATO ORA
+                </button>
+                <p className="text-[10px] text-slate-450 font-mono mt-2">⚠️ SOLO POCHI POSTI ANCORA DISPONIBILI CON SCONTO ATTIVO</p>
+              </div>
+
               {/* LIVE WEBSITES SIMULATOR BLOCK */}
               <div className="space-y-8 mt-16 overflow-hidden py-10">
                 <div className="text-center max-w-2xl mx-auto px-4">
@@ -842,99 +1001,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   </p>
                 </div>
 
-                {/* Tab selector */}
-                <div className="flex overflow-x-auto md:flex-wrap items-center md:justify-center gap-2 max-w-4xl mx-auto bg-slate-950 p-2 rounded-2xl border border-slate-800 shadow-xl no-scrollbar scroll-smooth snap-x snap-mandatory">
-                  {activeShowcases.map((tab: any, idx: number) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveMockup(idx)}
-                      className={`flex-none md:flex-1 min-w-[140px] md:min-w-[130px] py-2 px-3 rounded-xl transition-all duration-300 text-center snap-center ${
-                        activeMockup === idx
-                          ? "bg-brand-600 text-white font-extrabold shadow-md transform scale-102 border border-brand-500"
-                          : "bg-slate-900/60 hover:bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-850"
-                      }`}
-                    >
-                      <div className="text-xs truncate max-w-[155px] mx-auto">{tab.title || tab.label}</div>
-                      <div className="text-[9px] opacity-70 font-mono tracking-tight font-normal truncate max-w-[155px] mx-auto">{tab.subtitle}</div>
-                    </button>
-                  ))}
-                </div>
 
-                {/* View Mode Controls */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto bg-slate-900/40 p-4 rounded-2xl border border-slate-800/80 mt-6 mb-2">
-                  {/* Left Column: Explanatory text */}
-                  <div className="text-center md:text-left">
-                    <h4 className="text-sm font-black text-white flex items-center justify-center md:justify-start gap-2">
-                      <Code className="h-4 w-4 text-brand-400" />
-                      Studio di Sviluppo Sinergico
-                    </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
-                      Scegli la modalità di anteprima per visualizzare al meglio i siti sviluppati con l'IA.
-                    </p>
-                  </div>
-
-                  {/* Mode switcher & Resolution switcher side by side */}
-                  <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
-                    {/* View Switcher: Explorer vs Carousel */}
-                    <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 shadow-inner w-full sm:w-auto">
-                      <button
-                        onClick={() => setSimulatorViewMode('explorer')}
-                        className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                          simulatorViewMode === 'explorer'
-                            ? 'bg-brand-600 text-white shadow-md'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
-                        }`}
-                      >
-                        <Laptop className="h-3.5 w-3.5" />
-                        <span>Espandi Layout</span>
-                      </button>
-                      <button
-                        onClick={() => setSimulatorViewMode('carousel')}
-                        className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                          simulatorViewMode === 'carousel'
-                            ? 'bg-brand-600 text-white shadow-md'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
-                        }`}
-                      >
-                        <Sparkles className="h-3.5 w-3.5" />
-                        <span>Carosello 3D</span>
-                      </button>
-                    </div>
-
-                    {/* Device Switcher (only when in explorer mode) */}
-                    {simulatorViewMode === 'explorer' && (
-                      <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-850 shadow-inner w-full sm:w-auto justify-center">
-                        <button
-                          disabled={windowWidth < 768}
-                          onClick={() => setExplorerDeviceMode('desktop')}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                            windowWidth < 768
-                              ? 'opacity-30 cursor-not-allowed text-slate-600'
-                              : explorerDeviceMode === 'desktop'
-                                ? 'bg-slate-800 text-white shadow-md'
-                                : 'text-slate-400 hover:text-white'
-                          }`}
-                          title={windowWidth < 768 ? "Risoluzione Desktop disponibile solo su schermi grandi" : "Visualizza versione Desktop del sito"}
-                        >
-                          <Monitor className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">Desktop</span>
-                        </button>
-                        <button
-                          onClick={() => setExplorerDeviceMode('mobile')}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                            explorerDeviceMode === 'mobile' || windowWidth < 768
-                              ? 'bg-slate-800 text-white shadow-md'
-                              : 'text-slate-400 hover:text-white'
-                          }`}
-                          title="Visualizza versione Mobile del sito"
-                        >
-                          <Smartphone className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">Mobile</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 {/* 3D CAROUSEL VIEWPORT */}
                 {(() => {
@@ -1521,7 +1588,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             <div className="bg-slate-950 px-2 py-1.5 rounded-lg border border-slate-850 font-mono text-center text-[10px] sm:text-xs text-slate-300 flex-1 max-w-md mx-3 truncate flex items-center justify-center gap-1.5 shadow-inner">
                               <span className="text-[8px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-900/50 px-1 py-0.2 rounded shrink-0 leading-none scale-90">HTTPS</span>
                               <span className="truncate text-slate-400">
-                                {activeShowcaseItem.url || `https://www.${activeShowcaseItem.subtitle?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'website'}.it`}
+                                {`https://www.demo-ia.it/preview-${activeMockup + 1}`}
                               </span>
                             </div>
 
@@ -1570,11 +1637,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             <ChevronLeft className="h-5 w-5" />
                           </button>
                           <div className="text-center">
-                            <div className="text-xs font-black text-white uppercase tracking-wider">
-                              {activeShowcaseItem.title}
-                            </div>
-                            <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                              Sito {activeMockup + 1} di {N}
+                            <div className="text-xs font-black text-white uppercase tracking-widest font-mono">
+                              SITO {activeMockup + 1} DI {N}
                             </div>
                           </div>
                           <button
@@ -1604,30 +1668,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
                     >
-                      {/* Left and Right navigation buttons - hidden on mobile so they don't block viewport clicks */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMockup((prev) => (prev - 1 + N) % N);
-                        }}
-                        className="absolute left-4 sm:left-6 lg:left-8 z-45 bg-slate-950/90 hover:bg-slate-950 text-white p-3.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none hidden lg:flex"
-                        title="Sito precedente"
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </button>
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMockup((prev) => (prev + 1) % N);
-                        }}
-                        className="absolute right-4 sm:right-6 lg:right-8 z-45 bg-slate-950/90 hover:bg-slate-950 text-white p-3.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md hover:scale-110 flex items-center justify-center focus:outline-none hidden lg:flex"
-                        title="Sito successivo"
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </button>
 
                       {/* 3D CAROUSEL CONTAINER */}
                       <div 
@@ -1673,7 +1714,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                 <div className="bg-slate-950 px-2 py-1 rounded-md border border-slate-850/60 font-mono text-center text-[10px] text-slate-400 w-full max-w-[150px] sm:max-w-[180px] mx-2 truncate select-all flex items-center justify-center gap-1 shadow-inner">
                                   <span className="text-emerald-500 text-[8px] uppercase font-bold tracking-widest px-1 py-0.2 bg-emerald-950 rounded border border-emerald-900/50 scale-90 shrink-0">SSL</span>
                                   <span className="truncate">
-                                    {tab.url || `https://www.${tab.subtitle?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'website'}.it`}
+                                    {`https://www.demo-ia.it/preview-${idx + 1}`}
                                   </span>
                                 </div>
                                 <div className="text-[8px] text-slate-500 font-bold shrink-0 uppercase tracking-wider bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
