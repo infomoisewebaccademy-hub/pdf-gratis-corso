@@ -1,29 +1,31 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
-import { Home } from './pages/Home';
-import { CoursesPage } from './pages/CoursesPage';
-import { CourseDetail } from './pages/CourseDetail';
-import { Dashboard } from './pages/Dashboard';
-import { CommunityChat } from './pages/CommunityChat';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { AdminEditCourse } from './pages/AdminEditCourse';
-import { Cart } from './pages/Cart';
-import { Login } from './pages/Login';
-import { UpdatePassword } from './pages/UpdatePassword';
-import { PaymentSuccess } from './pages/PaymentSuccess';
-import { ComingSoon } from './pages/ComingSoon'; 
-import { PdfGuideLanding } from './pages/PdfGuideLanding'; // NUOVO
-import { ThankYouPdf } from './pages/ThankYouPdf';
-import { ProfilePage } from './pages/ProfilePage';
-import { SettingsPage } from './pages/SettingsPage';
-import { SupportPage } from './pages/SupportPage';
 import { UserProfile, Course, PlatformSettings } from './types';
 import { supabase, createCheckoutSession } from './services/supabase';
 import { CartProvider } from './contexts/CartContext';
 import { initMetaPixel, trackPageView, trackCompleteRegistration } from './services/metaPixel';
 
 import { PresenceTracker } from './components/PresenceTracker';
+
+// Lazy load pages for maximum performance and faster mobile loading times
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const CoursesPage = lazy(() => import('./pages/CoursesPage').then(m => ({ default: m.CoursesPage })));
+const CourseDetail = lazy(() => import('./pages/CourseDetail').then(m => ({ default: m.CourseDetail })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const CommunityChat = lazy(() => import('./pages/CommunityChat').then(m => ({ default: m.CommunityChat })));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AdminEditCourse = lazy(() => import('./pages/AdminEditCourse').then(m => ({ default: m.AdminEditCourse })));
+const Cart = lazy(() => import('./pages/Cart').then(m => ({ default: m.Cart })));
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const UpdatePassword = lazy(() => import('./pages/UpdatePassword').then(m => ({ default: m.UpdatePassword })));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess').then(m => ({ default: m.PaymentSuccess })));
+const ComingSoon = lazy(() => import('./pages/ComingSoon').then(m => ({ default: m.ComingSoon }))); 
+const PdfGuideLanding = lazy(() => import('./pages/PdfGuideLanding').then(m => ({ default: m.PdfGuideLanding })));
+const ThankYouPdf = lazy(() => import('./pages/ThankYouPdf').then(m => ({ default: m.ThankYouPdf })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const SupportPage = lazy(() => import('./pages/SupportPage').then(m => ({ default: m.SupportPage })));
 
 // --- TOKEN INTERCEPTOR ---
 const TokenInterceptor: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
@@ -362,15 +364,16 @@ const AppContent: React.FC = () => {
 
         // Risolvi dinamicamente i corsi in regalo
         const finalPurchasedCourseIds = [...purchasedCourseIds];
-        const { data: dbCourses } = await supabase.from('courses').select('id, gift_course_id');
+        const { data: dbCourses } = await supabase.from('courses').select('id, landing_page_data');
         if (dbCourses) {
             let addedNew = true;
             while (addedNew) {
                 addedNew = false;
                 for (const c of dbCourses) {
-                    if (finalPurchasedCourseIds.includes(c.id) && c.gift_course_id) {
-                        if (!finalPurchasedCourseIds.includes(c.gift_course_id)) {
-                            finalPurchasedCourseIds.push(c.gift_course_id);
+                    const giftId = (c.landing_page_data as any)?.gift_course_id;
+                    if (finalPurchasedCourseIds.includes(c.id) && giftId) {
+                        if (!finalPurchasedCourseIds.includes(giftId)) {
+                            finalPurchasedCourseIds.push(giftId);
                             addedNew = true;
                         }
                     }
@@ -437,49 +440,61 @@ const AppContent: React.FC = () => {
           logoOffsetY={settings.logo_offset_y || 0}
         />
       )}
-      <Routes>
-        <Route path="/coming-soon" element={<ComingSoon launchDate={settings.pre_launch_date} config={settings.pre_launch_config} />} />
-        <Route path="/guida-pdf-gratuita" element={<PdfGuideLanding />} />
-        <Route path="/thank-you-pdf-gratuita" element={<ThankYouPdf />} />
-        
-        <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config} />} />
-        <Route path="/courses" element={<CoursesPage courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} />} />
-        <Route path="/cart" element={<Cart user={user} />} />
-        <Route path="/course/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} />} />
-        <Route path="/landing/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
-        <Route path="/p/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
-        <Route path="/funnel/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/dashboard" element={user ? <Dashboard user={user} courses={courses} onRefresh={refreshUserData} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={user ? <ProfilePage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        <Route path="/settings" element={user ? <SettingsPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        <Route path="/support" element={user ? <SupportPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
-        
-        <Route path="/admin/dashboard" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="dashboard" /> : <Navigate to="/" />} />
-        <Route path="/admin/live" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="live" /> : <Navigate to="/" />} />
-        <Route path="/admin/users" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="users" /> : <Navigate to="/" />} />
-        <Route path="/admin/courses" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="courses" /> : <Navigate to="/" />} />
-        <Route path="/admin/launch" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="launch" /> : <Navigate to="/" />} />
-        <Route path="/admin/pdf_guide" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="pdf_guide" /> : <Navigate to="/" />} />
-        <Route path="/admin/landing_manual" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="landing_manual" /> : <Navigate to="/" />} />
-        <Route path="/admin/community" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="community" /> : <Navigate to="/" />} />
-        <Route path="/admin/support" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="support" /> : <Navigate to="/" />} />
-        <Route path="/admin/general" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="general" /> : <Navigate to="/" />} />
-        <Route path="/admin/course/:id" element={user?.is_admin ? <AdminEditCourse courses={courses} onSave={handleSaveCourse} /> : <Navigate to="/" />} />
-        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login landingConfig={settings.landing_page_config} />} />
-        <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="/register" element={user ? <Navigate to="/dashboard" /> : (
-             <div className="min-h-screen pt-32 flex justify-center bg-gray-50 px-4">
-                 <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md h-fit text-center">
-                     <h2 className="text-2xl font-bold mb-4">Crea Account</h2>
-                     <p className="text-gray-500 mb-6">Per registrarti, acquista un percorso.</p>
-                     <button onClick={() => navigate('/')} className="bg-brand-600 text-white px-6 py-2 rounded-lg font-bold">Vedi Percorsi</button>
-                 </div>
-             </div>
-        )} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-4 border-amber-500/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin"></div>
+            </div>
+            <p className="text-xs font-bold text-slate-400 font-mono tracking-widest uppercase animate-pulse">Caricamento...</p>
+          </div>
+        </div>
+      }>
+        <Routes>
+          <Route path="/coming-soon" element={<ComingSoon launchDate={settings.pre_launch_date} config={settings.pre_launch_config} />} />
+          <Route path="/guida-pdf-gratuita" element={<PdfGuideLanding />} />
+          <Route path="/thank-you-pdf-gratuita" element={<ThankYouPdf />} />
+          
+          <Route path="/" element={<Home courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} landingConfig={settings.landing_page_config} />} />
+          <Route path="/courses" element={<CoursesPage courses={courses} onCourseSelect={(id) => navigate(`/course/${id}`)} user={user} />} />
+          <Route path="/cart" element={<Cart user={user} />} />
+          <Route path="/course/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} />} />
+          <Route path="/landing/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
+          <Route path="/p/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
+          <Route path="/funnel/:id" element={<CourseWrapper courses={courses} user={user} onPurchase={handlePurchase} isPurchasing={isPurchasing} settings={settings} forceLanding={true} />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/dashboard" element={user ? <Dashboard user={user} courses={courses} onRefresh={refreshUserData} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+          <Route path="/community" element={user ? <CommunityChat user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+          <Route path="/profile" element={user ? <ProfilePage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+          <Route path="/settings" element={user ? <SettingsPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+          <Route path="/support" element={user ? <SupportPage user={user} unreadChatCount={unreadChatCount} /> : <Navigate to="/login" />} />
+          
+          <Route path="/admin/dashboard" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="dashboard" /> : <Navigate to="/" />} />
+          <Route path="/admin/live" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="live" /> : <Navigate to="/" />} />
+          <Route path="/admin/users" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="users" /> : <Navigate to="/" />} />
+          <Route path="/admin/courses" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="courses" /> : <Navigate to="/" />} />
+          <Route path="/admin/launch" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="launch" /> : <Navigate to="/" />} />
+          <Route path="/admin/pdf_guide" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="pdf_guide" /> : <Navigate to="/" />} />
+          <Route path="/admin/landing_manual" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="landing_manual" /> : <Navigate to="/" />} />
+          <Route path="/admin/community" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="community" /> : <Navigate to="/" />} />
+          <Route path="/admin/support" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="support" /> : <Navigate to="/" />} />
+          <Route path="/admin/general" element={user?.is_admin ? <AdminDashboard user={user} courses={courses} onDelete={handleDeleteCourse} onRefresh={refreshUserData} currentSettings={settings} onUpdateSettings={handleUpdateSettings} initialTab="general" /> : <Navigate to="/" />} />
+          <Route path="/admin/course/:id" element={user?.is_admin ? <AdminEditCourse courses={courses} onSave={handleSaveCourse} /> : <Navigate to="/" />} />
+          <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login landingConfig={settings.landing_page_config} />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/register" element={user ? <Navigate to="/dashboard" /> : (
+               <div className="min-h-screen pt-32 flex justify-center bg-gray-50 px-4">
+                   <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md h-fit text-center">
+                       <h2 className="text-2xl font-bold mb-4">Crea Account</h2>
+                       <p className="text-gray-500 mb-6">Per registrarti, acquista un percorso.</p>
+                       <button onClick={() => navigate('/')} className="bg-brand-600 text-white px-6 py-2 rounded-lg font-bold">Vedi Percorsi</button>
+                   </div>
+               </div>
+          )} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };

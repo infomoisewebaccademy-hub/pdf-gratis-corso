@@ -351,9 +351,9 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
             program_title: courseToEdit.program_title || '',
             announcement_title: courseToEdit.announcement_title || '',
             announcement_content: courseToEdit.announcement_content || '',
-            gift_course_id: courseToEdit.gift_course_id || '',
-            show_countdown: courseToEdit.show_countdown || false,
-            countdown_end: courseToEdit.countdown_end || '',
+            gift_course_id: courseToEdit.gift_course_id || courseToEdit.landing_page_data?.gift_course_id || '',
+            show_countdown: courseToEdit.show_countdown || courseToEdit.landing_page_data?.show_countdown || false,
+            countdown_end: courseToEdit.countdown_end || courseToEdit.landing_page_data?.countdown_end || '',
         };
         setFormData(data);
         initialCourseRef.current = data;
@@ -390,6 +390,15 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
     }
     
     setIsSaving(true);
+    
+    // Embed custom attributes into landing_page_data JSON column to prevent schema cache missing column errors
+    const landingData = {
+      ...(formData.landing_page_data || {}),
+      gift_course_id: formData.gift_course_id || null,
+      show_countdown: formData.show_countdown || false,
+      countdown_end: formData.countdown_end || null,
+    };
+
     const courseToSave = {
       ...formData,
       id: isNew ? formData.id : id,
@@ -412,10 +421,13 @@ export const AdminEditCourse: React.FC<AdminEditCourseProps> = ({ courses, onSav
       program_title: formData.program_title || null,
       announcement_title: formData.announcement_title || null,
       announcement_content: formData.announcement_content || null,
-      gift_course_id: formData.gift_course_id || null,
-      show_countdown: formData.show_countdown || false,
-      countdown_end: formData.countdown_end || null,
-    } as Course;
+      landing_page_data: landingData,
+    } as any;
+    
+    // Remove properties that do not exist as table columns
+    delete courseToSave.gift_course_id;
+    delete courseToSave.show_countdown;
+    delete courseToSave.countdown_end;
     
     await onSave(courseToSave);
     
@@ -1094,6 +1106,139 @@ rounded-lg font-bold flex items-center justify-center gap-2 border border-purple
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+
+                            {/* SHOWCASES EDITOR */}
+                            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                                    <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                                        <Layout className="h-4 w-4 text-brand-600" />
+                                        Showcase dei Siti Web (Demo HTML / Live URL)
+                                    </h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const updated = { ...formData.landing_page_data };
+                                            if (!updated.showcases) updated.showcases = [];
+                                            updated.showcases.push({
+                                                title: "💻 Nuovo Sito Web",
+                                                subtitle: "Esempio realizzato con IA",
+                                                custom_html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-8 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 text-center max-w-sm">
+    <h1 class="text-2xl font-bold mb-2 text-indigo-600">Sito Demo</h1>
+    <p class="text-sm text-gray-500">Puoi incollare qui il tuo codice HTML compilato con l'Intelligenza Artificiale!</p>
+  </div>
+</body>
+</html>`
+                                            });
+                                            setFormData({ ...formData, landing_page_data: updated });
+                                        }}
+                                        className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-brand-600 hover:bg-brand-700 px-2.5 py-1.5 rounded transition-all shadow"
+                                    >
+                                        <Plus className="h-3 w-3" />
+                                        Aggiungi Demo
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    Configura i siti web vetrina che appariranno all'interno del simulatore Macbook sulla Landing Page di questo corso. Puoi inserire direttamente il **codice HTML intero** (con Tailwind CSS per uno stile sbalorditivo) o indicare un **indirizzo URL esterno**.
+                                </p>
+                                
+                                <div className="space-y-4">
+                                    {(formData.landing_page_data.showcases || []).map((sc: any, idx: number) => (
+                                        <div key={idx} className="bg-white p-4 rounded-lg border border-gray-200 space-y-3 relative shadow-sm">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const updated = { ...formData.landing_page_data };
+                                                    updated.showcases.splice(idx, 1);
+                                                    setFormData({ ...formData, landing_page_data: updated });
+                                                }}
+                                                className="absolute top-3 right-3 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors"
+                                                title="Elimina demo"
+                                            >
+                                                <Trash className="h-3.5 w-3.5" />
+                                            </button>
+                                            
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500 mb-1">Titolo Tab (es. 🍕 Ristorante)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={sc.title || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.showcases[idx].title = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500 mb-1">Sottotitolo (es. Fornace Gourmet)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={sc.subtitle || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.showcases[idx].subtitle = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-2">
+                                                <div>
+                                                    <label className="block text-[10px] font-semibold text-gray-500 mb-1">URL Esterno (Alternativo all'HTML)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="https://mio-sito.it (lascia vuoto se usi codice HTML)"
+                                                        value={sc.url || ''} 
+                                                        onChange={e => {
+                                                            const updated = { ...formData.landing_page_data };
+                                                            updated.showcases[idx].url = e.target.value;
+                                                            setFormData({ ...formData, landing_page_data: updated });
+                                                        }}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                                    />
+                                                </div>
+                                                
+                                                {!sc.url && (
+                                                    <div>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <label className="block text-[10px] font-semibold text-gray-500">Codice Sorgente HTML del Sito Vetrinato</label>
+                                                            <span className="text-[9px] text-brand-600 font-mono font-bold">Consigliato: usa Tailwind CSS CDN nell'head</span>
+                                                        </div>
+                                                        <textarea 
+                                                            rows={8}
+                                                            placeholder="<!DOCTYPE html><html>...</html>"
+                                                            value={sc.custom_html || ''} 
+                                                            onChange={e => {
+                                                                const updated = { ...formData.landing_page_data };
+                                                                updated.showcases[idx].custom_html = e.target.value;
+                                                                setFormData({ ...formData, landing_page_data: updated });
+                                                            }}
+                                                            className="w-full bg-gray-900 text-gray-100 border border-gray-700 rounded p-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    
+                                    {(formData.landing_page_data.showcases || []).length === 0 && (
+                                        <div className="text-center py-6 bg-white rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs">
+                                            Nessun showcase personalizzato attivo. Verranno mostrate le demo di default.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             
                             <p className="text-xs text-green-700 bg-green-50 p-2.5 rounded-lg border border-green-100 font-medium">

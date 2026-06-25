@@ -44,6 +44,12 @@ export interface LandingPageData {
     question: string;
     answer: string;
   }>;
+  showcases?: Array<{
+    title: string;
+    subtitle: string;
+    url?: string;
+    custom_html?: string;
+  }>;
 }
 
 export function generateDefaultLandingPage(title: string, price: number, discountedPrice?: number): LandingPageData {
@@ -157,6 +163,243 @@ export function generateDefaultLandingPage(title: string, price: number, discoun
         {
           question: "È prevista una garanzia Soddisfatto o Rimborsato?",
           answer: "Sì, offriamo una garanzia totale di 30 giorni. Se per qualunque motivo ritieni che il percorso non faccia al caso tuo, ti basta scriverci per ricevere un rimborso completo all'istante, senza domande faticose."
+        }
+      ]
+    };
+  }
+
+  // --- 1.5. AIWEB STARTER / CREAZIONE SITI CON IA ---
+  if (normalizedTitle.includes('aiweb') || normalizedTitle.includes('ai web') || normalizedTitle.includes('ai_web')) {
+    return {
+      hero: {
+        title: "Crea e Vendi Siti Web da €1.000 a €2.000 con l'Intelligenza Artificiale",
+        subheadline: "Il primo percorso pratico in Italia che ti insegna a governare l'IA (senza saper programmare) per lanciare la tua agenzia digitale in 10 giorni lavorativi, azzerando i costi operativi.",
+        bullet_points: [
+          "Sviluppa e personalizza siti web d'elite per attività locali in meno di 1 ora con Google AI Studio",
+          "Acquisisci il metodo passo-passo per trovare, negoziare e chiudere clienti a €1.000+ a progetto",
+          "Nessuna spesa fissa: ti mostreremo come ospitare i siti dei tuoi clienti gratis su Firebase & Cloud Run",
+          "Linea diretta su WhatsApp 1-to-1 con il fondatore Daniel Moise per feedback sui tuoi progetti"
+        ],
+        value_proposition: "Lancia la tua attività di Web Design con IA"
+      },
+      problem_solution: {
+        problem_title: "La programmazione tradizionale richiede anni, le agenzie costano troppo?",
+        problem_desc: "Creare un sito professionale oggi richiede competenze complesse (HTML, CSS, JS, database) o agenzie che chiedono cifre esorbitanti. Vorresti poter creare e lanciare landing page e siti web commerciali magnifici ed efficienti in pochissimo tempo, per te o per i tuoi clienti locali, ma ti scontri con barriere tecniche insormontabili.",
+        solution_title: "Il Metodo Rivoluzionario di Sviluppo con IA",
+        solution_desc: "Padroneggia l'uso combinato dell'Intelligenza Artificiale e di piattaforme Cloud. Imparerai a far generare all'IA il codice, ad assemblarlo con cura artigianale e a pubblicarlo a costo di gestione zero, creando un'attività estremamente remunerativa e scalabile in pochissimi giorni.",
+        before_vs_after: {
+          before_title: "PRIMA (Sviluppo Complesso o Costoso)",
+          before_items: [
+            "Mesi passati a imparare la sintassi del codice a memoria",
+            "Migliaia di euro spesi in template precotti o programmatori lenti",
+            "Siti lenti, obsoleti e che non convincono i clienti locali",
+            "Costi operativi e di hosting mensili che erodono tutti i tuoi profitti"
+          ],
+          after_title: "DOPO (Sviluppo Aumentato con IA)",
+          after_items: [
+            "Sito web d'elite pronto per la messa online in meno di 1 ora",
+            "Interfacce professionali realizzate con prompt guidati dall'IA",
+            "Strutture orientate alla vendita per ristoranti, dentisti o saloni locali",
+            "Costo fisso azzerato grazie all'hosting gratuito su Firebase e Google"
+          ]
+        }
+      },
+      benefits: {
+        title: "Perché l'Academy ti renderà Imbattibile",
+        subtitle: "L'unico percorso in Italia 100% pratico incentrato sui risultati commerciali",
+        items: [
+          {
+            title: "Progetti Reali d'Elite",
+            desc: "Nessuna lezione teorica astratta. Impari assemblando reali siti web commerciali di altissimo livello estetico.",
+            icon: "Laptop"
+          },
+          {
+            title: "Prompting Avanzato",
+            desc: "Domina Google AI Studio per generare interfacce perfette ed esenti da bug, copiando i nostri prompt di agenzia.",
+            icon: "Brain"
+          },
+          {
+            title: "Costi di Hosting = Zero",
+            desc: "Ti insegniamo a usare i server gratuiti di Firebase e Google Cloud Run per non pagare canoni fissi mensili.",
+            icon: "Shield"
+          },
+          {
+            title: "Supporto WhatsApp 1-to-1",
+            desc: "Parli direttamente con Daniel Moise. Ricevi revisioni personali, consigli di marketing e risposte immediate.",
+            icon: "Zap"
+          }
+        ]
+      },
+      testimonials: [
+        {
+          name: "Alessandro N.",
+          role: "Web Designer Freelance",
+          text: "Prima del corso impiegavo settimane a consegnare una singola landing page. Ora con l'aiuto dell'IA sforno siti completi e bellissimi in 48 ore. Ho chiuso due contratti da €1.200 ciascuno nell'ultimo mese con attività locali!"
+        },
+        {
+          name: "Emanuela R.",
+          role: "Titolare Centro Benessere",
+          text: "Volevo rinnovare il sito del mio salone ma mi chiedevano oltre €2.500. Grazie all'Academy e alla guida di Daniel ho creato da sola un sito fantastico con IA in meno di un giorno. I clienti mi fanno continuamente i complimenti!"
+        },
+        {
+          name: "Lorenzo D.",
+          role: "Agenzia di Comunicazione",
+          text: "Daniel Moise spiega l'integrazione tra intelligenza artificiale e web design in modo estremamente chiaro e orientato al profitto. Il supporto su WhatsApp per superare i piccoli bug di compilazione è un valore inestimabile."
+        }
+      ],
+      host_bio: {
+        name: "Daniel Moise",
+        headline: "Fondatore Moise Web Academy & Expert Web Creator con IA",
+        bio_paragraphs: [
+          "Daniel Moise è un imprenditore e digital specialist con oltre 8 anni di esperienza nella creazione di sistemi e siti web ad altissima conversione per professionisti e aziende italiane.",
+          "Ha ideato questo percorso specifico per trasferire le competenze esatte per governare l'IA, eliminare ogni complessità di programmazione e avviare un'attività di successo con costi operativi pari a zero."
+        ]
+      },
+      faq: [
+        {
+          question: "Non so scrivere codice, posso farcela davvero?",
+          answer: "Sì! Non devi saper programmare o memorizzare sintassi complesse. Ti insegneremo a far scrivere il codice direttamente all'IA di Google e ad assemblarlo visivamente con clic precisi, partendo da zero assoluto."
+        },
+        {
+          question: "Quali strumenti utilizzeremo?",
+          answer: "Utilizzeremo Google AI Studio, un editor di testo moderno e server cloud gratuiti. Ti mostreremo come accedere a tutte queste potenti risorse senza dover spendere cifre fisse mensili."
+        },
+        {
+          question: "Come posso vendere questi siti a €1.000 o €2.000?",
+          answer: "All'interno del corso è presente un modulo interamente dedicato alle strategie commerciali per presentarti alle attività locali del tuo territorio, mostrare le demo interattive ed acquisire clienti ad alto valore."
+        },
+        {
+          question: "Ricevo supporto in caso di dubbi tecnici?",
+          answer: "Assolutamente sì. Questo è il fiore all'occhiello di MWA. Potrai esporre qualsiasi dubbio o condividere errori di compilazione direttamente con Daniel Moise via WhatsApp per risolverli in pochi minuti."
+        }
+      ],
+      showcases: [
+        {
+          title: "🍕 Ristorante Pizzeria",
+          subtitle: "Fornace Basilico Gourmet",
+          custom_html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#0f0e0c] text-neutral-100 min-h-screen">
+  <div class="bg-amber-600 text-white text-center py-2 px-4 text-[11px] font-extrabold uppercase tracking-wider">
+    🍕 CONSEGNA A DOMICILIO GRATUITA CON CODICE "PIZZA_IA"
+  </div>
+  <header class="border-b border-neutral-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-[#0f0e0c]/90 backdrop-blur z-50">
+    <span class="font-black text-amber-500 text-base tracking-tight">🍕 FORNACE & BASILICO</span>
+    <div class="flex items-center gap-4 text-xs font-bold text-neutral-300">
+      <span class="hover:text-amber-500 transition-colors cursor-pointer">Menu</span>
+      <span class="hover:text-amber-500 transition-colors cursor-pointer">Chi Siamo</span>
+      <span class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg transition-colors cursor-pointer">Prenota</span>
+    </div>
+  </header>
+  <section class="px-6 py-12 text-center bg-gradient-to-b from-neutral-900 to-[#0f0e0c]">
+    <span class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] uppercase font-black px-3 py-1 rounded-full">Lievitazione Naturale 48 ore</span>
+    <h1 class="text-3xl font-extrabold text-white mt-4 tracking-tight">La Vera Pizza Napoletana Gourmet</h1>
+    <p class="text-xs text-neutral-400 mt-2 max-w-md mx-auto leading-relaxed">Farine biologiche macinate a pietra, pomodoro San Marzano DOP e mozzarella di bufala campana fresca ogni mattina.</p>
+    <div class="mt-6 flex justify-center gap-3">
+      <button class="bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Ordina Online</button>
+      <button class="border border-neutral-700 text-neutral-300 text-xs font-bold px-4 py-2 rounded-lg">Vedi Menu</button>
+    </div>
+  </section>
+  <section class="p-6">
+    <h3 class="text-xs font-black text-amber-500 uppercase tracking-widest text-center mb-6">Le Specialità</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+        <h4 class="font-bold text-sm">Margherita D.O.P.</h4>
+        <p class="text-[10px] text-neutral-400 mt-1">Pomodoro San Marzano, Bufala fresca, Basilico, Olio EVO.</p>
+        <span class="text-amber-500 font-extrabold text-xs block mt-2">€8.50</span>
+      </div>
+      <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+        <h4 class="font-bold text-sm">Diavola Fiammeggiante</h4>
+        <p class="text-[10px] text-neutral-400 mt-1">Spiandata Calabra DOP, Peperoncino fresco, Basilico.</p>
+        <span class="text-amber-500 font-extrabold text-xs block mt-2">€10.00</span>
+      </div>
+    </div>
+  </section>
+</body>
+</html>`
+        },
+        {
+          title: "🦷 Studio Dentistico",
+          subtitle: "Sorriso Sano",
+          custom_html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <span class="font-extrabold text-slate-900 text-base tracking-tight text-teal-650 flex items-center gap-1.5">🦷 Studio Sorriso Sano</span>
+    <div class="flex items-center gap-4 text-xs font-bold text-slate-600">
+      <span class="hover:text-teal-600 cursor-pointer">Servizi</span>
+      <span class="hover:text-teal-600 cursor-pointer">Chi Siamo</span>
+      <span class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg cursor-pointer transition-colors">Prenota Visita</span>
+    </div>
+  </header>
+  <section class="px-6 py-12 text-center bg-gradient-to-b from-teal-50 to-white">
+    <span class="bg-teal-100 text-teal-800 text-[10px] uppercase font-black px-3 py-1 rounded-full">Esperti del Sorriso</span>
+    <h1 class="text-3xl font-extrabold text-slate-900 mt-4 tracking-tight leading-tight">La Tua Salute Dentale in Mani Sicure</h1>
+    <p class="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">Trattamenti odontoiatrici all'avanguardia con tecnologie indolori, ideali per adulti e bambini. Riacquista la fiducia nel tuo sorriso.</p>
+    <div class="mt-6">
+      <button class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-teal-600/10 transition-all">Richiedi Check-Up Gratuito</button>
+    </div>
+  </section>
+  <section class="p-6">
+    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest text-center mb-6">I Nostri Trattamenti</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h4 class="font-bold text-sm text-slate-950">Prevenzione & Igiene</h4>
+        <p class="text-[10px] text-slate-500 mt-1">Pulizia professionale profonda per eliminare tartaro e macchie dentali.</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h4 class="font-bold text-sm text-slate-950">Ortodonzia Invisibile</h4>
+        <p class="text-[10px] text-slate-500 mt-1">Allinea i tuoi denti in modo discreto ed efficace con mascherine trasparenti.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>`
+        },
+        {
+          title: "💇 Salone di Bellezza",
+          subtitle: "Aura Aesthetic Spa",
+          custom_html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#faf6f0] text-amber-950 min-h-screen">
+  <header class="bg-white/80 backdrop-blur border-b border-[#f3eae0] px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <span class="font-extrabold text-[#78593a] text-sm tracking-widest uppercase">AURA AESTHETIC</span>
+    <div class="flex items-center gap-4 text-xs font-semibold text-[#8a6a48]">
+      <span class="hover:text-[#78593a] cursor-pointer">Rituali</span>
+      <span class="bg-[#8a6a48] text-white px-3 py-1.5 rounded-full text-[10px] tracking-wider uppercase cursor-pointer">Contattaci</span>
+    </div>
+  </header>
+  <section class="px-6 py-14 text-center">
+    <span class="text-[#8a6a48] text-[10px] uppercase font-bold tracking-widest block mb-2">— Oasi di Relax & Rigenerazione</span>
+    <h1 class="text-3xl font-bold text-[#5c4026] mt-1 tracking-tight leading-none">Prenditi cura del tuo corpo e della tua mente</h1>
+    <p class="text-xs text-[#8a7a6b] mt-3 max-w-sm mx-auto leading-relaxed">Esperienze di benessere su misura per risvegliare la tua bellezza naturale, immerse in un ambiente di pura quiete.</p>
+    <div class="mt-6">
+      <button class="bg-[#8a6a48] text-white text-xs font-semibold tracking-wider uppercase px-5 py-2.5 rounded-full shadow-sm hover:bg-[#78593a] transition-colors">Riserva un Trattamento</button>
+    </div>
+  </section>
+</body>
+</html>`
         }
       ]
     };

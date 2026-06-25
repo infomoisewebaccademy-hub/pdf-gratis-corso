@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -146,6 +146,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const [upsellCourse, setUpsellCourse] = useState<Course | null>(null);
   const [isBuying, setIsBuying] = useState(false);
   const [activeMockup, setActiveMockup] = useState(0);
+  const touchStartX = useRef<number | null>(null);
   
   // Waiting list state
   const [waitingListEmail, setWaitingListEmail] = useState(user?.email || '');
@@ -300,6 +301,17 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     const lpd = course.landing_page_data || generateDefaultLandingPage(course.title, course.price, course.discounted_price);
     if (!lpd) return null;
 
+    const activeShowcases = lpd.showcases && lpd.showcases.length > 0
+      ? lpd.showcases.map((sc: any, index: number) => ({ ...sc, id: index }))
+      : [
+          { id: 0, title: "🍕 Ristorante Pizzeria", subtitle: "Fornace Gourmet", builtinIndex: 0 },
+          { id: 1, title: "💇 Parrucchiera Elite", subtitle: "Taglio Sartoriale", builtinIndex: 1 },
+          { id: 2, title: "💆 Salone di Bellezza", subtitle: "Aura Aesthetic", builtinIndex: 2 },
+          { id: 3, title: "🦷 Studio Dentistico", subtitle: "Sorriso Sano", builtinIndex: 3 },
+          { id: 4, title: "📸 Studio Foto & Creative", subtitle: "Luce Studio", builtinIndex: 4 },
+        ];
+    const activeShowcaseItem = activeShowcases[activeMockup] || activeShowcases[0];
+
     return (
       <div className="bg-slate-50 min-h-screen text-slate-800 pb-24">
         {/* UPPER SNEAK-PEEK PREMIUM BAR */}
@@ -339,9 +351,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               </div>
               
               {/* DYNAMIC 3D COUNTDOWN TIMER */}
-              {course.show_countdown && course.countdown_end && (
+              {(course.show_countdown || course.landing_page_data?.show_countdown) && (course.countdown_end || course.landing_page_data?.countdown_end) && (
                 <div className="pt-6">
-                  <Countdown3D targetDate={course.countdown_end} />
+                  <Countdown3D targetDate={course.countdown_end || course.landing_page_data?.countdown_end} />
                 </div>
               )}
 
@@ -657,6 +669,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               .scroll-dentist { animation: autoScrollBgDentist 13s ease-in-out infinite; }
               .scroll-agency { animation: autoScrollBgAgency 14s ease-in-out infinite; }
               .scroll-pause:hover { animation-play-state: paused; }
+              .no-scrollbar::-webkit-scrollbar { display: none; }
+              .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
 
             <div className="relative z-10 max-w-6xl mx-auto">
@@ -753,30 +767,24 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     Simulatore Live di Siti Web Realizzabili con l'IA
                   </h3>
                   <p className="text-sm text-slate-400 mt-2">
-                    Usa le schede in alto per cambiare sito web. I siti sottostanti sono <strong className="text-brand-400">completi e scorrono in automatico</strong> per farti apprezzare l'incredibile cura dei dettagli e la struttura delle sezioni di vendita reale!
+                    Usa le schede, <strong className="text-brand-400">scorri lateralmente</strong> o clicca sulle <strong className="text-brand-400">frecce ai lati</strong> per cambiare sito web. I layout sottostanti sono completi e scorrono in automatico per farti apprezzare l'incredibile cura dei dettagli reale!
                   </p>
                 </div>
 
                 {/* Tab selector */}
-                <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto bg-slate-950 p-2 rounded-2xl border border-slate-800 shadow-xl">
-                  {[
-                    { id: 0, label: "🍕 Ristorante Pizzeria", subtitle: "Fornace Gourmet" },
-                    { id: 1, label: "💇 Parrucchiera Elite", subtitle: "Taglio Sartoriale" },
-                    { id: 2, label: "💆 Salone di Bellezza", subtitle: "Aura Aesthetic" },
-                    { id: 3, label: "🦷 Studio Dentistico", subtitle: "Sorriso Sano" },
-                    { id: 4, label: "📸 Studio Foto & Creative", subtitle: "Luce Studio" },
-                  ].map((tab) => (
+                <div className="flex overflow-x-auto md:flex-wrap items-center md:justify-center gap-2 max-w-4xl mx-auto bg-slate-950 p-2 rounded-2xl border border-slate-800 shadow-xl no-scrollbar scroll-smooth snap-x snap-mandatory">
+                  {activeShowcases.map((tab: any, idx: number) => (
                     <button
-                      key={tab.id}
-                      onClick={() => setActiveMockup(tab.id)}
-                      className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl transition-all duration-300 text-center ${
-                        activeMockup === tab.id
+                      key={idx}
+                      onClick={() => setActiveMockup(idx)}
+                      className={`flex-none md:flex-1 min-w-[140px] md:min-w-[130px] py-2 px-3 rounded-xl transition-all duration-300 text-center snap-center ${
+                        activeMockup === idx
                           ? "bg-brand-600 text-white font-extrabold shadow-md transform scale-102 border border-brand-500"
                           : "bg-slate-900/60 hover:bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-850"
                       }`}
                     >
-                      <div className="text-xs">{tab.label}</div>
-                      <div className="text-[9px] opacity-70 font-mono tracking-tight font-normal">{tab.subtitle}</div>
+                      <div className="text-xs truncate max-w-[155px] mx-auto">{tab.title || tab.label}</div>
+                      <div className="text-[9px] opacity-70 font-mono tracking-tight font-normal truncate max-w-[155px] mx-auto">{tab.subtitle}</div>
                     </button>
                   ))}
                 </div>
@@ -794,11 +802,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                     <div className="bg-slate-950 px-4 py-1.5 rounded-lg border border-slate-850/60 font-mono text-center text-xs text-slate-400 w-full max-w-sm sm:max-w-md mx-6 truncate select-all flex items-center justify-center gap-1.5 shadow-inner">
                       <span className="text-emerald-500 text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 bg-emerald-950 rounded border border-emerald-900/50">SSL</span>
                       <span>
-                        {activeMockup === 0 && "https://www.fornacebasilicogourmet.it"}
-                        {activeMockup === 1 && "https://www.tagliosartorialehairspa.it"}
-                        {activeMockup === 2 && "https://www.auraaestheticlab.it"}
-                        {activeMockup === 3 && "https://www.studiorodontoiatricosorriso.it"}
-                        {activeMockup === 4 && "https://www.lucestudiofotograficofirenze.it"}
+                        {activeShowcaseItem?.url || `https://www.${activeShowcaseItem?.subtitle?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'website'}.it`}
                       </span>
                     </div>
                     {/* Empty block to balance layout */}
@@ -808,19 +812,84 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   </div>
 
                   {/* Browser Viewport */}
-                  <div className="relative bg-white text-slate-800 h-[480px] overflow-hidden group">
-                    {/* Auto-scrolling interactive content container */}
-                    <div 
-                      className={`w-full absolute top-0 left-0 scroll-pause ${
-                        activeMockup === 0 ? "scroll-pizza" :
-                        activeMockup === 1 ? "scroll-hair" :
-                        activeMockup === 2 ? "scroll-beauty" :
-                        activeMockup === 3 ? "scroll-dentist" :
-                        "scroll-agency"
-                      }`}
+                  <div 
+                    className="relative bg-white text-slate-800 h-[480px] overflow-hidden group touch-pan-y"
+                    onTouchStart={(e) => {
+                      touchStartX.current = e.touches[0].clientX;
+                    }}
+                    onTouchEnd={(e) => {
+                      if (touchStartX.current === null) return;
+                      const touchEndX = e.changedTouches[0].clientX;
+                      const diffX = touchStartX.current - touchEndX;
+                      // Threshold of 50px for swipe gesture
+                      if (Math.abs(diffX) > 50) {
+                        if (diffX > 0) {
+                          // Swipe left -> next mockup
+                          setActiveMockup((prev) => (prev + 1) % activeShowcases.length);
+                        } else {
+                          // Swipe right -> prev mockup
+                          setActiveMockup((prev) => (prev - 1 + activeShowcases.length) % activeShowcases.length);
+                        }
+                      }
+                      touchStartX.current = null;
+                    }}
+                  >
+                    {/* Float prev/next buttons for desktop & mobile accessibility */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMockup((prev) => (prev - 1 + activeShowcases.length) % activeShowcases.length);
+                      }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-40 bg-slate-950/80 hover:bg-slate-950 text-white p-2.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md opacity-80 hover:opacity-100 md:opacity-0 group-hover:opacity-100 flex items-center justify-center focus:outline-none"
+                      title="Sito precedente"
                     >
-                      {/* SITE 0: PIZZERIA */}
-                      {activeMockup === 0 && (
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMockup((prev) => (prev + 1) % activeShowcases.length);
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-40 bg-slate-950/80 hover:bg-slate-950 text-white p-2.5 rounded-full border border-slate-800 hover:border-slate-700 shadow-2xl cursor-pointer transition-all duration-200 backdrop-blur-md opacity-80 hover:opacity-100 md:opacity-0 group-hover:opacity-100 flex items-center justify-center focus:outline-none"
+                      title="Sito successivo"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+
+                    {activeShowcaseItem && (activeShowcaseItem.custom_html || activeShowcaseItem.url || activeShowcaseItem.builtinIndex === undefined) ? (
+                      <div className="w-full h-full bg-white relative">
+                        {activeShowcaseItem.custom_html ? (
+                          <iframe
+                            srcDoc={activeShowcaseItem.custom_html}
+                            className="w-full h-full border-0 bg-white"
+                            title={activeShowcaseItem.title}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        ) : (
+                          <iframe
+                            src={activeShowcaseItem.url}
+                            className="w-full h-full border-0 bg-white"
+                            title={activeShowcaseItem.title}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      /* Auto-scrolling interactive content container */
+                      <div 
+                        className={`w-full absolute top-0 left-0 scroll-pause ${
+                          activeShowcaseItem?.builtinIndex === 0 ? "scroll-pizza" :
+                          activeShowcaseItem?.builtinIndex === 1 ? "scroll-hair" :
+                          activeShowcaseItem?.builtinIndex === 2 ? "scroll-beauty" :
+                          activeShowcaseItem?.builtinIndex === 3 ? "scroll-dentist" :
+                          "scroll-agency"
+                        }`}
+                      >
+                        {/* SITE 0: PIZZERIA */}
+                        {activeShowcaseItem?.builtinIndex === 0 && (
                         <div className="bg-slate-50 text-slate-850 font-sans">
                           {/* Site Header */}
                           <div className="bg-amber-600 text-white text-center py-2 px-4 text-[10px] uppercase font-bold tracking-widest">
@@ -942,7 +1011,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       )}
 
                       {/* SITE 1: PARRUCCHIERA */}
-                      {activeMockup === 1 && (
+                      {activeShowcaseItem?.builtinIndex === 1 && (
                         <div className="bg-stone-50 text-stone-850 font-sans">
                           {/* Site Header */}
                           <div className="bg-rose-50 border-b border-rose-100/60 px-6 py-4 flex items-center justify-between">
@@ -1031,7 +1100,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       )}
 
                       {/* SITE 2: SALONE DI BELLEZZA */}
-                      {activeMockup === 2 && (
+                      {activeShowcaseItem?.builtinIndex === 2 && (
                         <div className="bg-[#fbfcfa] text-slate-800 font-sans">
                           {/* Site Header */}
                           <div className="bg-[#123026] text-white py-1.5 px-4 text-center text-[10px] tracking-widest uppercase">
@@ -1115,7 +1184,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       )}
 
                       {/* SITE 3: STUDIO MEDICO DENTISTICO */}
-                      {activeMockup === 3 && (
+                      {activeShowcaseItem?.builtinIndex === 3 && (
                         <div className="bg-slate-50 text-slate-800 font-sans">
                           {/* Site Header */}
                           <div className="bg-sky-700 text-white text-center py-2 px-4 text-[9px] uppercase font-bold tracking-widest">
@@ -1186,7 +1255,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       )}
 
                       {/* SITE 4: CREATIVE DESIGN STUDIO */}
-                      {activeMockup === 4 && (
+                      {activeShowcaseItem?.builtinIndex === 4 && (
                         <div className="bg-[#0c0d10] text-[#dedee5] font-sans">
                           {/* Site Header */}
                           <div className="bg-white text-black py-4 px-8 flex items-center justify-between">
@@ -1257,6 +1326,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         </div>
                       )}
                     </div>
+                    )}
 
                     {/* Auto-scroll active notification pop */}
                     <div className="absolute bottom-3 left-3 bg-slate-900/90 text-white py-1 px-2.5 rounded-lg text-[9px] font-semibold flex items-center gap-1.5 pointer-events-none shadow backdrop-blur-sm tracking-wide">
