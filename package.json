@@ -32,6 +32,7 @@
     "@types/node": "^22.14.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
+    "@vercel/node": "^5.8.21",
     "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.39.3",
     "eslint-plugin-react-hooks": "^7.0.1",
