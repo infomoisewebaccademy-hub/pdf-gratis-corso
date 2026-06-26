@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Course, Lesson, UserProfile, PlatformSettings } from '../types';
-import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase, ChevronLeft, ChevronRight, Monitor, Smartphone } from 'lucide-react';
+import { Clock, Book, BarChart, Check, Lock, Play, PlayCircle, Sparkles, AlertCircle, ShoppingCart, Zap, CheckCircle2, Download, FileText, Star, StarHalf, ShieldCheck, Award, Users, ArrowLeft, ChevronDown, ChevronUp, Bell, X, Target, TrendingUp, Shield, Laptop, Code, Brain, Loader2, CreditCard, Mail, Key, ArrowRight, DollarSign, Briefcase, ChevronLeft, ChevronRight, Monitor, Smartphone, Layers, Globe } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { trackInitiateCheckout, trackAddToCart } from '../services/metaPixel';
@@ -135,6 +135,47 @@ const SecureVideoPlayer: React.FC<{ lesson: Lesson, onEnded: () => void }> = ({ 
     );
 };
 
+const getFormattedHtml = (htmlContent: string) => {
+  if (!htmlContent) return '';
+  let formatted = htmlContent;
+  if (!formatted.includes('<meta name="viewport"')) {
+    if (formatted.includes('<head>')) {
+      formatted = formatted.replace('<head>', '<head><meta name="viewport" content="width=device-width, initial-scale=1.0">');
+    } else {
+      formatted = `<meta name="viewport" content="width=device-width, initial-scale=1.0">${formatted}`;
+    }
+  }
+  const customStyles = `
+    <style>
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+    </style>
+  `;
+  if (formatted.includes('</head>')) {
+    formatted = formatted.replace('</head>', `${customStyles}</head>`);
+  } else {
+    formatted = `${customStyles}${formatted}`;
+  }
+  return formatted;
+};
+
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, isPurchased, onBack, user, settings, forceLanding }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [isNotesExpanded, setIsNotesExpanded] = useState(false);
@@ -147,6 +188,30 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
   const [isBuying, setIsBuying] = useState(false);
   const [activeMockup, setActiveMockup] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  
+  // Dynamic Scroll-Aware 3D Showcase States
+  const showcaseSectionRef = useRef<HTMLDivElement>(null);
+  const [scrollRatio, setScrollRatio] = useState(0);
+  const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleScroll = () => {
+      if (!showcaseSectionRef.current) return;
+      const rect = showcaseSectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const elementCenter = rect.top + rect.height / 2;
+      const viewportCenter = windowHeight / 2;
+      const distance = elementCenter - viewportCenter;
+      const maxDistance = windowHeight * 1.1;
+      const ratio = Math.max(-1, Math.min(1, distance / maxDistance));
+      setScrollRatio(ratio);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   // 3D Carousel dragging and sizing states
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
@@ -164,6 +229,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const isMobile = windowWidth < 768;
 
   
   // Waiting list state
@@ -251,8 +318,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
     }
   };
 
-  const isDiscountAvailable = user && course.discounted_price && course.discounted_price > 0 && !isPurchased;
-  const finalPrice = isDiscountAvailable ? course.discounted_price! : course.price;
+  const isPrice27 = course.price === 27 || course.discounted_price === 27 || course.price === 22 || course.discounted_price === 22;
+  const isDiscountAvailable = user && course.discounted_price && course.discounted_price > 0 && !isPurchased && !isPrice27;
+  const finalPrice = isPrice27 ? 27 : (isDiscountAvailable ? course.discounted_price! : course.price);
   const inCart = isInCart(course.id);
 
   const handleBuyNow = () => {
@@ -328,11 +396,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
           { id: 3, title: "🦷 Studio Dentistico", subtitle: "Sorriso Sano", builtinIndex: 3 },
           { id: 4, title: "📸 Studio Foto & Creative", subtitle: "Luce Studio", builtinIndex: 4 },
         ];
+    const N = activeShowcases.length;
     const activeShowcaseItem = activeShowcases[activeMockup] || activeShowcases[0];
 
     // High-converting pricing logic
-    const displayOldPrice = course.discounted_price && course.discounted_price > 0 ? course.price : Math.round(course.price * 2.5);
-    const displayNewPrice = course.discounted_price && course.discounted_price > 0 ? course.discounted_price : course.price;
+    const isPrice27 = course.price === 27 || course.discounted_price === 27 || course.price === 22 || course.discounted_price === 22;
+    const displayNewPrice = isPrice27 ? 27 : (course.discounted_price && course.discounted_price > 0 ? course.discounted_price : course.price);
+    const displayOldPrice = isPrice27 ? 97 : (course.discounted_price && course.discounted_price > 0 ? course.price : Math.round(course.price * 2.5));
     const discountPercentage = Math.round(((displayOldPrice - displayNewPrice) / displayOldPrice) * 100);
 
     const showCountdown = (course.show_countdown || course.landing_page_data?.show_countdown) && (course.countdown_end || course.landing_page_data?.countdown_end);
@@ -359,12 +429,12 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
           }}
         >
           {/* Accent lighting strip */}
-          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-600 via-amber-400 to-emerald-500" />
+          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-600 to-brand-400" />
 
           {/* Pricing Info Header */}
           <div className="flex items-center justify-between gap-4 border-b border-slate-900 pb-5 pt-1">
             <div>
-              <span className="text-[10px] uppercase font-extrabold tracking-widest text-amber-400 block font-mono">Offerta Speciale Riservata</span>
+              <span className="text-[10px] uppercase font-extrabold tracking-widest text-brand-400 block font-mono">Offerta Speciale Riservata</span>
               <div className="flex items-baseline gap-2 mt-1.5">
                 <span className="text-4xl sm:text-5.5xl font-black text-white tracking-tight">€{displayNewPrice}</span>
                 <span className="text-slate-500 line-through text-base sm:text-lg font-semibold">€{displayOldPrice}</span>
@@ -374,8 +444,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               <span className="bg-brand-600 text-white font-extrabold text-[11px] sm:text-xs px-2.5 py-1 rounded-xl shadow-md shadow-brand-500/20 animate-pulse border border-brand-500/20">
                 -{discountPercentage}% ORA
               </span>
-              <span className="text-[10px] text-emerald-400 font-extrabold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-[10px] text-brand-300 font-extrabold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-ping" />
                 Risparmi €{displayOldPrice - displayNewPrice}
               </span>
             </div>
@@ -392,12 +462,12 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
           {/* Scarcity Countdown - STRICTLY RIGHT BELOW THE PRICE ON MOBILE! */}
           {showCountdown && targetDate && (
             <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between text-[11px] font-bold text-amber-400 uppercase tracking-wider font-mono">
+              <div className="flex items-center justify-between text-[11px] font-bold text-brand-400 uppercase tracking-wider font-mono">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5 animate-pulse" />
                   IL PREZZO AUMENTA TRA:
                 </span>
-                <span className="text-red-400 animate-pulse font-black">ULTIMI POSTI DISPONIBILI</span>
+                <span className="text-brand-450 animate-pulse font-black">ULTIMI POSTI DISPONIBILI</span>
               </div>
               <Countdown3D targetDate={targetDate} />
             </div>
@@ -411,7 +481,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 <button
                   onClick={handleBuyNow}
                   disabled={isBuying}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-2xl font-black py-4 px-6 text-center text-lg sm:text-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer border-b-4 border-emerald-700 select-none group"
+                  className="w-full bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white rounded-2xl font-black py-4.5 px-6 text-center text-lg sm:text-xl shadow-[0_10px_20px_rgba(124,58,237,0.3)] hover:shadow-[0_15px_30px_rgba(124,58,237,0.45)] border-b-[5px] border-brand-950 active:translate-y-[3px] active:border-b-[2px] transition-all duration-150 flex items-center justify-center gap-2.5 cursor-pointer select-none group"
                 >
                   {isBuying ? (
                     <>
@@ -434,7 +504,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   }}
                   className={`w-full rounded-2xl font-bold py-3.5 px-6 text-center text-sm transition-all border flex items-center justify-center gap-2 cursor-pointer select-none ${
                     inCart
-                      ? 'bg-emerald-950 text-emerald-400 border-emerald-800 hover:bg-emerald-900/40 shadow-sm'
+                      ? 'bg-brand-950/80 text-brand-400 border-brand-850 hover:bg-brand-900/50 shadow-sm'
                       : 'bg-slate-900 text-slate-200 border-slate-850 hover:bg-slate-800/80'
                   }`}
                 >
@@ -460,7 +530,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
           {/* Secure checkout assurances & badges */}
           <div className="border-t border-slate-900 pt-4.5 space-y-2.5">
             <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <ShieldCheck className="h-4 w-4 text-brand-400 shrink-0 mt-0.5" />
               <span className="leading-snug">GARANZIA 14 GIORNI SODDISFATTO O RIMBORSATO AL 100%</span>
             </div>
             <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
@@ -468,7 +538,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               <span className="leading-snug">TRANSAZIONE SICURA SSL CON CRITTOGRAFIA DI GRADO MILITARE</span>
             </div>
             <div className="flex items-start gap-2.5 text-[10px] font-bold text-slate-400">
-              <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+              <Zap className="h-4 w-4 text-brand-400 shrink-0 mt-0.5" />
               <span className="leading-snug">MATERIALE RILASCIATO IMMEDIATAMENTE NELLA TUA AREA PERSONALE</span>
             </div>
           </div>
@@ -539,10 +609,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               <div className="pt-4 pb-2">
                 <button
                   onClick={scrollToPricing}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-brand-600 to-indigo-650 hover:from-brand-700 hover:to-indigo-750 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/20 hover:shadow-brand-500/30 transform hover:-translate-y-0.5 transition-all cursor-pointer border-b-4 border-indigo-900 group select-none"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4.5 bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base rounded-2xl border-b-[5px] border-brand-950 shadow-[0_10px_25px_-5px_rgba(124,58,237,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(124,58,237,0.55)] active:translate-y-[3px] active:border-b-[2px] active:shadow-[0_4px_12px_rgba(124,58,237,0.3)] transition-all duration-150 cursor-pointer group select-none text-center"
                 >
-                  <Zap className="h-4.5 w-4.5 text-white fill-current group-hover:scale-110 transition-transform" />
-                  SBLOCCA IL TUO ACCESSO IMMEDIATO
+                  <Zap className="h-5 w-5 text-yellow-300 fill-yellow-300 animate-pulse group-hover:scale-110 transition-transform shrink-0" />
+                  SBLOCCA ACCESSO IMMEDIATO ALL'ACADEMY
                 </button>
                 <p className="text-[10px] text-slate-400 font-mono mt-2 pl-1">⚡ Accesso istantaneo e illimitato H24 • Garanzia 100%</p>
               </div>
@@ -747,10 +817,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                   <div className="pt-4">
                     <button
                       onClick={scrollToPricing}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-indigo-500 hover:from-brand-600 hover:to-indigo-600 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all cursor-pointer group"
+                      className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl border-b-[4px] border-brand-800 hover:border-brand-900 shadow-[0_6px_15px_rgba(124,58,237,0.3)] active:translate-y-[2px] active:border-b-[1px] transition-all duration-150 cursor-pointer group select-none"
                     >
-                      <Sparkles className="h-4 w-4 text-white group-hover:animate-pulse" />
-                      INIZIA ORA CON DANIEL
+                      <Sparkles className="h-4 w-4 text-yellow-300 fill-yellow-300 group-hover:animate-spin animate-pulse" />
+                      INIZIA ORA IL TUO PERCORSO
                     </button>
                   </div>
                 </div>
@@ -793,10 +863,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 <p className="text-sm text-slate-800 font-bold mb-3">Hai ancora dei dubbi o vuoi iniziare subito?</p>
                 <button
                   onClick={scrollToPricing}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-950 hover:bg-slate-900 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg transition-all cursor-pointer select-none"
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-slate-950 hover:bg-slate-900 text-white font-black text-xs sm:text-sm rounded-xl border-b-[4px] border-slate-800 active:translate-y-[2px] active:border-b-[1px] shadow-lg hover:shadow-xl transition-all duration-150 cursor-pointer select-none"
                 >
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                  Sì, sblocca il mio accesso sicuro con Garanzia di 14 giorni
+                  SÌ, SBLOCCA ORA IL MIO ACCESSO SICURO (GARANZIA 14 GIORNI)
                 </button>
               </div>
             </div>
@@ -837,57 +907,49 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               .no-scrollbar::-webkit-scrollbar { display: none; }
               .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-              /* 3D Carousel styles */
-              .scene-3d {
+               /* 3D Cinematic Deck Styles */
+              .deck-scene {
                 position: relative;
                 width: 100%;
+                perspective: 1200px;
+                transform-style: preserve-3d;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                perspective: 1200px;
                 overflow: visible;
                 user-select: none;
                 -webkit-user-select: none;
               }
-              @media (min-width: 1024px) {
-                .scene-3d {
-                  mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
-                  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
-                }
-              }
-              .a3d-carousel {
-                position: relative;
-                transform-style: preserve-3d;
-                transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              .card-3d {
+              .deck-card {
                 position: absolute;
                 transform-style: preserve-3d;
                 backface-visibility: hidden;
                 -webkit-backface-visibility: hidden;
-                transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s, filter 0.6s, box-shadow 0.6s;
-                border-radius: 20px;
+                transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                            opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                            filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                            box-shadow 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                            width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                            height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                border-radius: 24px;
                 overflow: hidden;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
               }
-              .card-3d-active {
+              .deck-card-active {
                 opacity: 1 !important;
                 filter: none !important;
-                z-index: 10;
-                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+                z-index: 30;
+                box-shadow: 0 35px 70px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
               }
-              .card-3d-background {
+              .deck-card-background {
                 opacity: 0.35;
-                filter: brightness(0.4) blur(1px);
+                filter: brightness(0.4) blur(1.5px);
                 cursor: pointer;
-                z-index: 1;
+                z-index: 10;
               }
-              .card-3d-background:hover {
-                opacity: 0.6;
-                filter: brightness(0.6) blur(0.2px);
+              .deck-card-background:hover {
+                opacity: 0.55;
+                filter: brightness(0.6) blur(0.5px);
               }
             `}</style>
 
@@ -982,756 +1044,313 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               <div className="text-center mt-12 mb-4 max-w-xl mx-auto relative z-10">
                 <button
                   onClick={scrollToPricing}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-600 hover:to-emerald-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/10 hover:shadow-brand-500/20 transform hover:-translate-y-0.5 transition-all cursor-pointer border-b-4 border-slate-950 group select-none"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-sm sm:text-base rounded-2xl border-b-[5px] border-emerald-800 hover:border-emerald-900 shadow-[0_10px_25px_-5px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_35px_-5px_rgba(16,185,129,0.45)] active:translate-y-[3px] active:border-b-[2px] transition-all duration-150 cursor-pointer group select-none"
                 >
-                  <Zap className="h-5 w-5 text-white animate-pulse group-hover:scale-110 transition-transform" />
-                  PRENDI LA TUA QUOTA DI MERCATO ORA
+                  <Zap className="h-5 w-5 text-yellow-300 fill-yellow-300 animate-pulse group-hover:scale-110 transition-transform" />
+                  INIZIA A GUADAGNARE CON L'IA ORA
                 </button>
                 <p className="text-[10px] text-slate-450 font-mono mt-2">⚠️ SOLO POCHI POSTI ANCORA DISPONIBILI CON SCONTO ATTIVO</p>
               </div>
 
               {/* LIVE WEBSITES SIMULATOR BLOCK */}
-              <div className="space-y-8 mt-16 overflow-hidden py-10">
-                <div className="text-center max-w-2xl mx-auto px-4">
-                  <h3 className="text-2xl sm:text-3xl font-black text-white">
-                    Simulatore Live di Siti Web Realizzabili con l'IA
+              <div ref={showcaseSectionRef} className="space-y-12 mt-20 overflow-hidden py-14 bg-slate-950 relative border-t border-b border-white/5">
+                {/* Space mesh grid overlay for cinematic Stripe/Linear style */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none opacity-60"></div>
+                
+                {/* Accent background glow spots */}
+                <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-brand-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <div className="text-center max-w-3xl mx-auto px-4 relative z-10">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20 mb-3 select-none">
+                    <Sparkles className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+                    Anteprime Interattive Real-Time
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
+                    Siti Web Reali Creati GRATIS con l'Intelligenza Artificiale
                   </h3>
-                  <p className="text-sm text-slate-400 mt-2">
-                    I layout sottostanti sono reali e completi. <strong className="text-brand-400">Trascina lateralmente</strong> per far ruotare il carosello 3D o <strong className="text-brand-400">scorri in verticale</strong> sul sito attivo per scoprirlo nei dettagli!
+                  <p className="text-sm sm:text-base text-slate-400 mt-4 leading-relaxed max-w-2xl mx-auto font-normal">
+                    Esplora la qualità, la fluidità ed il design dei progetti completi generati a costo zero. 
+                    <span className="text-white font-bold"> Trascina o usa le frecce per ruotare il carosello 3D</span>, e scorri in verticale all'interno delle anteprime per provarle dal vivo!
                   </p>
                 </div>
 
-
-
-                {/* 3D CAROUSEL VIEWPORT */}
-                {(() => {
-                  const isMobile = windowWidth < 768;
-                  const isTablet = windowWidth >= 768 && windowWidth < 1024;
-                  const isLargeDesktop = windowWidth >= 1280;
-
-                  // 3D Carousel responsive card dimensions
-                  let cardWidth = 365;
-                  let cardHeight = 500;
-                  let radius = 280;
-
-                  if (isMobile) {
-                    cardWidth = Math.min(windowWidth - 48, 340);
-                    cardHeight = 460;
-                    radius = Math.min(windowWidth * 0.45, 150);
-                  } else if (isTablet) {
-                    cardWidth = 350;
-                    cardHeight = 500;
-                    radius = 240;
-                  } else if (isLargeDesktop) {
-                    cardWidth = 460;
-                    cardHeight = 600;
-                    radius = 350;
-                  } else { // Standard desktop (1024px to 1280px)
-                    cardWidth = 400;
-                    cardHeight = 550;
-                    radius = 300;
-                  }
-
-                  const N = activeShowcases.length;
-                  const angleStep = 360 / N;
-                  const currentRotation = -activeMockup * angleStep + (dragOffset * 0.25);
-
-                  // Built-in mockup renderers
-                  const renderMockupContent = (builtinIndex: number) => {
-                    switch (builtinIndex) {
-                      case 0:
+                {/* Horizontal Category Navigation Bar */}
+                <div className="relative z-10 max-w-5xl mx-auto px-4">
+                  <div className="w-full overflow-x-auto pb-4 pt-1 px-2 scrollbar-none">
+                    <div className="flex gap-2.5 min-w-max mx-auto justify-center">
+                      {[
+                        { id: 0, label: "Ristorazione", subtitle: "Food & Gourmet", icon: "🍔", badge: "Live Preview 01" },
+                        { id: 1, label: "Hair & Styling", subtitle: "Sartorial Salon", icon: "✂️", badge: "Live Preview 02" },
+                        { id: 2, label: "Estetica & Lab", subtitle: "Aesthetic & Care", icon: "🌿", badge: "Live Preview 03" },
+                        { id: 3, label: "Studio Medico", subtitle: "Dental Care", icon: "🦷", badge: "Live Preview 04" },
+                        { id: 4, label: "Creative Agency", subtitle: "Visual Studio", icon: "💡", badge: "Live Preview 05" }
+                      ].map((pill) => {
+                        const isActive = pill.id === activeMockup;
                         return (
-                          <div className="bg-slate-50 text-slate-850 font-sans text-left">
-                            {/* Site Header */}
-                            <div className="bg-amber-600 text-white text-center py-2 px-4 text-[10px] uppercase font-bold tracking-widest">
-                              🔥 CONSEGNA A DOMICILIO GRATUITA STASERA CON CODICE "PIZZA_IA"
+                          <button
+                            key={pill.id}
+                            onClick={() => setActiveMockup(pill.id)}
+                            className={`px-4 py-2.5 rounded-2xl border transition-all duration-350 flex items-center gap-3 shrink-0 cursor-pointer text-left select-none relative overflow-hidden ${
+                              isActive
+                                ? 'bg-gradient-to-r from-brand-600/95 to-indigo-600/95 text-white border-brand-500/50 shadow-lg shadow-brand-500/20 scale-[1.02]'
+                                : 'bg-slate-900/60 backdrop-blur-md text-slate-400 border-white/5 hover:bg-slate-800/40 hover:text-white hover:border-white/10'
+                            }`}
+                          >
+                            <div className={`p-1.5 rounded-xl shrink-0 text-lg ${isActive ? 'bg-white/15' : 'bg-slate-950/80 border border-white/5'}`}>
+                              {pill.icon}
                             </div>
-                            <div className="bg-white/95 sticky top-0 border-b border-slate-100 px-6 py-4 flex items-center justify-between shadow-sm z-50">
-                              <span className="font-extrabold text-base tracking-tight text-amber-600">🍕 FORNACE & BASILICO</span>
-                              <div className="hidden sm:flex items-center gap-5 text-xs text-slate-600 font-bold">
-                                <span>IL MENU</span>
-                                <span>CHI SIAMO</span>
-                                <span>PROMOZIONI</span>
-                                <span className="bg-amber-500 text-white px-3 py-1.5 rounded-lg">PRENOTA</span>
+                            <div className="min-w-0 pr-1">
+                              <div className="text-xs font-black uppercase tracking-wider leading-tight">{pill.label}</div>
+                              <div className={`text-[9px] font-mono tracking-tight mt-0.5 ${isActive ? 'text-brand-200' : 'text-slate-500'}`}>
+                                {pill.subtitle}
                               </div>
                             </div>
-
-                            {/* Site Hero */}
-                            <div className="relative bg-gradient-to-r from-amber-500/10 to-orange-500/10 px-8 py-16 text-center border-b border-slate-100">
-                              <span className="inline-block bg-amber-500/15 text-amber-800 text-[10px] uppercase font-extrabold tracking-widest px-3 py-1 rounded-full mb-3">
-                                Lievitazione Naturale 48 Ore
-                              </span>
-                              <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                                La Vera Pizza Napoletana Gourmet a Casa Tua
-                              </h1>
-                              <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-lg mx-auto leading-relaxed">
-                                Lavoriamo unicamente con farine biologiche macinate a pietra, pomodoro San Marzano DOP e mozzarella di bufala campana fresca ogni mattina.
-                              </p>
-                              <div className="flex justify-center gap-3 mt-6">
-                                <span className="bg-amber-500 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md">Sfoglia il Menu</span>
-                                <span className="bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-xl text-xs font-bold">Chiama Subito</span>
+                            {isActive && (
+                              <div className="absolute top-1.5 right-1.5 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                <span className="text-[7px] font-mono font-bold text-emerald-300 uppercase tracking-widest">{pill.badge}</span>
                               </div>
-                            </div>
-
-                            {/* Site Interactive Menu */}
-                            <div className="p-8 space-y-6 bg-white">
-                              <h2 className="text-center text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">Le Nostre Specialità d'Elite</h2>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-100 flex items-start gap-3 transition-colors">
-                                  <span className="text-2xl">🍕</span>
-                                  <div className="flex-1">
-                                    <div className="flex justify-between font-bold text-xs text-slate-900">
-                                      <span>Margherita di Bufala</span>
-                                      <span className="text-amber-600">€8,50</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 mt-1">Pomodoro San Marzano DOP, mozzarella di bufala, basilico fresco, olio EVO.</p>
-                                  </div>
-                                </div>
-                                <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-100 flex items-start gap-3 transition-colors">
-                                  <span className="text-2xl">🥑</span>
-                                  <div className="flex-1">
-                                    <div className="flex justify-between font-bold text-xs text-slate-900">
-                                      <span>Pistacchiosa DOP</span>
-                                      <span className="text-amber-600">€12,50</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 mt-1">Pesto di pistacchi di Bronte, fior di latte, mortadella IGP, granella e burrata intera.</p>
-                                  </div>
-                                </div>
-                                <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-100 flex items-start gap-3 transition-colors">
-                                  <span className="text-2xl">🌶️</span>
-                                  <div className="flex-1">
-                                    <div className="flex justify-between font-bold text-xs text-slate-900">
-                                      <span>Diavola Rustica</span>
-                                      <span className="text-amber-600">€9,50</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 mt-1">Pomodoro San Marzano DOP, fior di latte, spianata calabrese piccante, olive nere.</p>
-                                  </div>
-                                </div>
-                                <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-100 flex items-start gap-3 transition-colors">
-                                  <span className="text-2xl">🍄</span>
-                                  <div className="flex-1">
-                                    <div className="flex justify-between font-bold text-xs text-slate-900">
-                                      <span>Funghi e Tartufo</span>
-                                      <span className="text-amber-600">€13,00</span>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 mt-1">Salsa tartufata, scamorza affumicata, porcini freschi saltati, scaglie di grana.</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Table Booking Form */}
-                            <div className="p-8 bg-amber-500/5 border-t border-b border-slate-100">
-                              <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border border-slate-100 shadow-lg">
-                                <h3 className="text-sm font-bold text-center text-slate-950 mb-4">Riserva il tuo Tavolo in tempo reale</h3>
-                                <div className="space-y-3">
-                                  <div>
-                                    <label className="block text-[9px] font-bold text-slate-500 mb-1">Nome Completo</label>
-                                    <input type="text" placeholder="Mario Rossi" disabled className="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                      <label className="block text-[9px] font-bold text-slate-500 mb-1">Data</label>
-                                      <input type="date" value="2026-06-10" disabled className="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] py-1.5 px-3 rounded-lg" />
-                                    </div>
-                                    <div>
-                                      <label className="block text-[9px] font-bold text-slate-500 mb-1">Orario</label>
-                                      <select disabled className="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] py-1.5 px-3 rounded-lg">
-                                        <option>20:30 (Consigliato)</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <label className="block text-[9px] font-bold text-slate-500 mb-1">Numero Persone</label>
-                                    <input type="number" value="4" disabled className="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  </div>
-                                  <button disabled className="w-full bg-amber-500 text-white font-extrabold text-[11px] py-2 px-4 rounded-lg shadow mt-2">
-                                    Verifica Disponibilità & Prenota su WhatsApp
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Footer */}
-                            <div className="bg-slate-900 text-slate-400 py-10 px-8 text-center text-xs">
-                              <p className="font-bold text-white mb-2">Pizzeria Fornace & Basilico Gourmet</p>
-                              <p className="text-[10px] text-slate-500">Via Toledo 44, 80134 Napoli | Tel: +39 081 2345 678</p>
-                              <p className="text-[9px] text-slate-600 mt-6 shadow-sm">© {new Date().getFullYear()} Fornace & Basilico. Tutti i diritti riservati.</p>
-                            </div>
-                          </div>
+                            )}
+                          </button>
                         );
-                      case 1:
-                        return (
-                          <div className="bg-stone-50 text-stone-850 font-sans text-left">
-                            {/* Site Header */}
-                            <div className="bg-rose-50 border-b border-rose-100/60 px-6 py-4 flex items-center justify-between">
-                              <span className="font-serif italic font-black text-rose-700 tracking-wide">✂️ SARTORIALE HAIR SPA</span>
-                              <div className="hidden sm:flex items-center gap-5 text-xs text-stone-600 font-bold uppercase tracking-wider">
-                                <span>Servizi</span>
-                                <span>Galleria</span>
-                                <span>Filosofia</span>
-                                <span className="border-b-2 border-rose-600 text-rose-700 pb-0.5">PRENOTA LIVE</span>
-                              </div>
-                            </div>
+                      })}
+                    </div>
+                  </div>
+                </div>
 
-                            {/* Site Hero */}
-                            <div className="bg-stone-100 px-8 py-16 text-center border-b border-stone-200">
-                              <span className="inline-block bg-rose-100 text-rose-800 text-[9px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-3">
-                                Luxury Hair Stylist Milano
-                              </span>
-                              <h1 className="font-serif italic text-3xl font-black text-stone-900 leading-tight">
-                                Definisci la Tua Unicità. Valorizza il Tuo Stile.
-                              </h1>
-                              <p className="text-xs text-stone-600 mt-2 max-w-md mx-auto leading-relaxed">
-                                Sperimenta trattamenti mirati per la rigenerazione profonda del capello, abbinati a tagli sartoriali studiati sulla base dell'analisi morfologica del viso.
-                              </p>
-                            </div>
+                {/* Device responsive toggle switch container */}
+                <div className="flex items-center justify-center gap-1.5 bg-slate-900/60 backdrop-blur-md border border-white/5 p-1 rounded-2xl max-w-xs mx-auto relative z-10">
+                  <button
+                    type="button"
+                    onClick={() => setExplorerDeviceMode('desktop')}
+                    className={`flex-1 py-1.5 px-3 rounded-xl transition-all duration-200 text-[10px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer ${
+                      explorerDeviceMode === 'desktop'
+                        ? 'bg-white/10 text-white shadow-sm shadow-black/20'
+                        : 'text-slate-450 hover:text-slate-200'
+                    }`}
+                  >
+                    <Laptop className="h-3.5 w-3.5 text-brand-400" />
+                    Laptop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExplorerDeviceMode('mobile')}
+                    className={`flex-1 py-1.5 px-3 rounded-xl transition-all duration-200 text-[10px] font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer ${
+                      explorerDeviceMode === 'mobile'
+                        ? 'bg-white/10 text-white shadow-sm shadow-black/20'
+                        : 'text-slate-450 hover:text-slate-200'
+                    }`}
+                  >
+                    <Smartphone className="h-3.5 w-3.5 text-brand-400" />
+                    Cellulare
+                  </button>
+                </div>
 
-                            {/* Services list with prices */}
-                            <div className="p-8 space-y-6 bg-white">
-                              <h2 className="font-serif italic text-center text-lg font-bold text-stone-950">Il Listino dei Servizi d'Elite</h2>
-                              <div className="space-y-4">
-                                <div className="border-b border-stone-100 pb-3 flex justify-between items-end gap-4">
-                                  <div>
-                                    <span className="text-xs font-bold text-stone-900 block">Sinfonia Taglio & Piega Classica</span>
-                                    <span className="text-[10px] text-stone-500">Comprensivo di shampoo purificante biologico ed impacco lenitivo.</span>
-                                  </div>
-                                  <span className="font-serif italic font-bold text-rose-700 shrink-0 text-sm">€45,00</span>
-                                </div>
-                                <div className="border-b border-stone-100 pb-3 flex justify-between items-end gap-4">
-                                  <div>
-                                    <span className="text-xs font-bold text-stone-900 block">Balayage Soleil & Trattamento Gloss</span>
-                                    <span className="text-[10px] text-stone-500">Schiariture naturali ad effetto tridimensionale con sfumature dorate.</span>
-                                  </div>
-                                  <span className="font-serif italic font-bold text-rose-700 shrink-0 text-sm">€110,00</span>
-                                </div>
-                                <div className="border-b border-stone-100 pb-3 flex justify-between items-end gap-4">
-                                  <div>
-                                    <span className="text-xs font-bold text-stone-900 block">Rituale Molecolare Rigenerante</span>
-                                    <span className="text-[10px] text-stone-500">Ricostruzione del fusto con amminoacidi vegetali ed ultrasuoni.</span>
-                                  </div>
-                                  <span className="font-serif italic font-bold text-rose-700 shrink-0 text-sm">€60,00</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Contact Interactive form */}
-                            <div className="p-8 bg-stone-100 border-t border-stone-200">
-                              <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border border-stone-200 shadow-lg">
-                                <h3 className="font-serif italic text-sm font-bold text-center text-stone-950 mb-3">Richiedi un Appuntamento Premium</h3>
-                                <div className="space-y-3">
-                                  <input type="text" placeholder="Nome Completo" disabled className="w-full bg-stone-50 border border-stone-200 text-stone-600 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  <input type="email" placeholder="Email di Contatto" disabled className="w-full bg-stone-50 border border-stone-200 text-stone-600 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  <button disabled className="w-full bg-rose-700 hover:bg-rose-800 text-white font-serif font-bold text-xs py-2 px-4 rounded-lg shadow-md transition-colors">
-                                    Invia Richiesta di Prenotazione
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Footer */}
-                            <div className="bg-stone-900 text-stone-400 py-10 px-8 text-center text-xs">
-                              <p className="font-serif italic font-bold text-white mb-2">Taglio Sartoriale & Hair Spa</p>
-                              <p className="text-[10px] text-stone-500">Corso Como 12, 20154 Milano | Tel/WhatsApp: +39 02 9876 543</p>
-                              <p className="text-[9px] text-stone-600 mt-6">© {new Date().getFullYear()} Taglio Sartoriale. Tutti i diritti riservati.</p>
-                            </div>
-                          </div>
-                        );
-                      case 2:
-                        return (
-                          <div className="bg-[#fbfcfa] text-slate-800 font-sans text-left">
-                            {/* Site Header */}
-                            <div className="bg-[#123026] text-white py-1.5 px-4 text-center text-[10px] tracking-widest uppercase">
-                              🌿 BEAUTY REVOLUTION: TRATTAMENTI CLINICI BIOAVANZATI
-                            </div>
-                            <div className="bg-white/95 sticky top-0 border-b border-[#ebefe9] px-6 py-4 flex items-center justify-between">
-                              <span className="font-serif font-black text-lg text-[#123026] tracking-tight">⭐ AURA BEAUTY LAB</span>
-                              <div className="hidden sm:flex items-center gap-5 text-xs text-[#204136] font-bold">
-                                <span>Viso</span>
-                                <span>Corpo</span>
-                                <span>Tecnologie</span>
-                                <span className="bg-[#123026] text-white px-3 py-1.5 rounded">Consulenza Gratuita</span>
-                              </div>
-                            </div>
-
-                            {/* Site Hero */}
-                            <div className="bg-[#f4f7f2] px-8 py-16 text-center border-b border-[#ebefe9]">
-                              <span className="inline-block bg-[#123026]/10 text-[#123026] text-[9px] uppercase font-black tracking-widest px-3 py-1 rounded-full mb-3">
-                                Estetica Clinica di Lusso
-                              </span>
-                              <h1 className="font-serif text-3xl font-extrabold text-[#123026] tracking-tight leading-tight">
-                                L'Arte Di Volersi Bene Con Trattamenti Sinergici
-                              </h1>
-                              <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto leading-relaxed">
-                                Rivoluzioniamo l'estetica tradizionale con tecnologie certificate FDA e linee cosmetiche prive di parabeni per risultati effettivi fin dalla prima seduta.
-                              </p>
-                            </div>
-
-                            {/* Beauty Selector cards */}
-                            <div className="p-8 space-y-6 bg-white">
-                              <h2 className="text-center font-serif text-lg font-bold text-[#123026]">Tecnologie Viso & Corpo d'Avanguardia</h2>
-                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div className="bg-[#fbfcfa] border border-[#ebefe9] p-4 rounded-xl text-center">
-                                  <span className="text-2xl block mb-2">⭐</span>
-                                  <span className="text-xs font-bold text-slate-900 block">Trattamento Gold</span>
-                                  <p className="text-[9px] text-slate-500 mt-1">Idratazione molecolare profonda con oro 24k.</p>
-                                  <span className="text-xs font-extrabold text-[#123026] block mt-2">€90,00</span>
-                                </div>
-                                <div className="bg-[#fbfcfa] border border-[#ebefe9] p-4 rounded-xl text-center">
-                                  <span className="text-2xl block mb-2">⚡</span>
-                                  <span className="text-xs font-bold text-slate-900 block">Laser Diodo</span>
-                                  <p className="text-[9px] text-slate-500 mt-1">Epilazione laser progressiva medicale indolore.</p>
-                                  <span className="text-xs font-extrabold text-[#123026] block mt-2">€120,00</span>
-                                </div>
-                                <div className="bg-[#fbfcfa] border border-[#ebefe9] p-4 rounded-xl text-center">
-                                  <span className="text-2xl block mb-2">💆</span>
-                                  <span className="text-xs font-bold text-slate-900 block">Linfodrenaggio</span>
-                                  <p className="text-[9px] text-slate-500 mt-1">Massaggio corporale con oli essenziali biologici.</p>
-                                  <span className="text-xs font-extrabold text-[#123026] block mt-2">€65,00</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Skin Advisor Form */}
-                            <div className="p-8 bg-[#f4f7f2] border-t border-[#ebefe9]">
-                              <div className="max-w-md mx-auto bg-white p-5 rounded-2xl border border-[#ebefe9] shadow">
-                                <h3 className="text-sm font-bold text-center text-[#123026] mb-3 font-serif">Richiedi Analisi Viso Digitale Gratuita</h3>
-                                <div className="space-y-3">
-                                  <div>
-                                    <label className="block text-[9px] font-bold text-[#204136] mb-1">Inestetismo che desideri trattare</label>
-                                    <select disabled className="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[10px] py-1.5 px-3 rounded-lg">
-                                      <option>Rughe & Linee Sottili (Antietà)</option>
-                                      <option>Macchie cutanee & Iperpigmentazione</option>
-                                      <option>Acne & Imperfezioni Pelle Grassa</option>
-                                    </select>
-                                  </div>
-                                  <button disabled className="w-full bg-[#123026] hover:bg-[#1f4a3c] text-white font-serif font-bold text-xs py-2 px-4 rounded-lg shadow">
-                                    Richiedi Consulenza Gratuita
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Footer */}
-                            <div className="bg-[#123026] text-white/70 py-10 px-8 text-center text-xs">
-                              <p className="font-serif font-bold text-white mb-1">Aura Aesthetic Lab</p>
-                              <p className="text-[10px] text-white/50">Via dei Condotti 89, 00187 Roma | Telefono: +39 06 6543 210</p>
-                              <p className="text-[9px] text-white/30 mt-6">© {new Date().getFullYear()} Aura Beauty. Tutti i diritti riservati.</p>
-                            </div>
-                          </div>
-                        );
-                      case 3:
-                        return (
-                          <div className="bg-slate-50 text-slate-800 font-sans text-left">
-                            {/* Site Header */}
-                            <div className="bg-sky-700 text-white text-center py-2 px-4 text-[9px] uppercase font-bold tracking-widest">
-                              🚨 SERVIZIO PRONTO SOCCORSO DENTISTICO ATTIVO H24: +39 06 11122233
-                            </div>
-                            <div className="bg-white/95 sticky top-0 border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-                              <span className="font-black text-sky-800 tracking-tight flex items-center gap-1">🔬 STUDIO SORRISO FUTURO</span>
-                              <div className="hidden sm:flex items-center gap-5 text-xs text-sky-950 font-bold">
-                                <span>Trattamenti</span>
-                                <span>Staff</span>
-                                <span>Casi Clinici</span>
-                                <span className="bg-sky-600 text-white px-3 py-1.5 rounded-lg text-xs">CHIEDI CONSULENZA</span>
-                              </div>
-                            </div>
-
-                            {/* Site Hero */}
-                            <div className="bg-sky-50 px-8 py-16 text-center border-b border-sky-100">
-                              <span className="inline-block bg-sky-100 text-sky-800 text-[9px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-3">
-                                Studio Odontoiatrico Convenzionato Roma
-                              </span>
-                              <h1 className="text-3xl font-extrabold text-sky-950 tracking-tight leading-tight">
-                                La Salute Dei Tuoi Denti, Progettata Con Tecnologie Digitali.
-                              </h1>
-                              <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto leading-relaxed">
-                                Utilizziamo radiografia 3D a bassissima emissione e impianti dentali personalizzati al computer per minimizzare il dolore ed i tempi di recupero post-intervento.
-                              </p>
-                            </div>
-
-                            {/* Interactive treatments */}
-                            <div className="p-8 space-y-6 bg-white">
-                              <h2 className="text-center text-lg font-bold text-sky-950">Le Nostre Attività Cliniche Principali</h2>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                                  <span className="text-[10px] font-bold text-sky-600 tracking-widest block uppercase">01 / Implantologia</span>
-                                  <span className="text-xs font-extrabold text-slate-900 block mt-1">Impianti hitech mini-invasivi</span>
-                                  <p className="text-[10px] text-slate-500 mt-1">Nessun bisturi necessario per la maggior parte dei casi clinici controllati via software.</p>
-                                </div>
-                                <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                                  <span className="text-[10px] font-bold text-sky-600 tracking-widest block uppercase">02 / Allineamento</span>
-                                  <span className="text-xs font-extrabold text-slate-900 block mt-1">Invisalign® Platinum Elite Provider</span>
-                                  <p className="text-[10px] text-slate-500 mt-1">Sostituisci l'antico apparecchio di ferro con mascherine totalmente invisibili in resina termoplastica.</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Urgency Ticket */}
-                            <div className="p-8 bg-sky-50/20 border-t border-sky-100 text-center">
-                              <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border border-sky-100 shadow-lg">
-                                <h3 className="text-xs font-bold text-sky-950 mb-2 uppercase tracking-wider">Hai bisogno di un controllo gratuito o d'urgenza?</h3>
-                                <p className="text-[10px] text-slate-500 mb-4">Compila per ricevere priorità immediata.</p>
-                                <div className="space-y-3">
-                                  <input type="text" placeholder="Nome Completo" disabled className="w-full bg-slate-50 border border-slate-200 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  <input type="phone" placeholder="Cellulare per Conferma WhatsApp" disabled className="w-full bg-slate-50 border border-slate-200 text-[10px] py-1.5 px-3 rounded-lg" />
-                                  <button disabled className="w-full bg-sky-700 text-white font-bold text-xs py-2 px-4 rounded-lg">
-                                    Invia Richiesta Prenotazione h24
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Footer */}
-                            <div className="bg-slate-900 text-slate-400 py-10 px-8 text-center text-xs">
-                              <p className="font-bold text-white mb-2">Studio Sorriso Futuro e Associazioni Partner</p>
-                              <p className="text-[10px] text-slate-500">Piazza del Popolo 3, 00187 Roma | Centralino Emergenze: +39 06 111 222 33</p>
-                              <p className="text-[9px] text-slate-600 mt-6">© {new Date().getFullYear()} Studio Sorriso Futuro. Tutti i diritti riservati.</p>
-                            </div>
-                          </div>
-                        );
-                      case 4:
-                        return (
-                          <div className="bg-[#0c0d10] text-[#dedee5] font-sans text-left">
-                            {/* Site Header */}
-                            <div className="bg-white text-black py-4 px-8 flex items-center justify-between">
-                              <span className="font-mono tracking-[4px] font-black text-sm">💡 LUCE STUDIO CREATIVO</span>
-                              <div className="hidden sm:flex items-center gap-6 text-[10px] font-mono font-bold tracking-widest uppercase">
-                                <span>PORTFOLIO</span>
-                                <span>CHI SIAMO</span>
-                                <span className="bg-black text-white px-3 py-1.5">CONTATTACI</span>
-                              </div>
-                            </div>
-
-                            {/* Site Hero */}
-                            <div className="px-8 py-20 text-center border-b border-zinc-900 bg-zinc-950">
-                              <span className="inline-block bg-white text-black text-[9px] font-mono tracking-widest px-3 py-1 uppercase mb-3">
-                                Web Photography & Branding
-                              </span>
-                              <h1 className="text-3xl font-bold tracking-tighter text-white uppercase leading-none font-serif">
-                                Infonderemo la Luce Giusta al Tuo Brand.
-                              </h1>
-                              <p className="text-xs text-zinc-400 mt-3 max-w-sm mx-auto leading-relaxed font-mono">
-                                Studio fotografico d'avanguardia specializzato in cataloghi commerciali per abbigliamento, e-commerce e brand di moda internazionali.
-                              </p>
-                            </div>
-
-                            {/* Photo showcase project list */}
-                            <div className="p-8 space-y-6 bg-black">
-                              <h2 className="text-center font-serif text-lg font-bold text-white uppercase tracking-widest">Le Nostre Campagne Principali</h2>
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-zinc-900/60 p-4 border border-zinc-800/80 rounded-lg">
-                                  <span className="font-mono text-[9px] text-zinc-500 block">SARTORIA MILANESE</span>
-                                  <span className="text-xs font-bold text-white block mt-1">Campagna Autunno Inverno 2026</span>
-                                  <div className="text-[9px] text-zinc-400 mt-2 italic">Valore Progetto: €12.500</div>
-                                </div>
-                                <div className="bg-zinc-900/60 p-4 border border-zinc-800/80 rounded-lg">
-                                  <span className="font-mono text-[9px] text-zinc-500 block">E-COMMERCE FRAGRANCE</span>
-                                  <span className="text-xs font-bold text-white block mt-1">Branding Visual Profumo "Aether"</span>
-                                  <div className="text-[9px] text-zinc-400 mt-2 italic">Valore Progetto: €8.900</div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Project Contact form */}
-                            <div className="p-8 bg-zinc-950 border-t border-zinc-900">
-                              <div className="max-w-md mx-auto bg-black p-5 rounded-2xl border border-zinc-900 shadow">
-                                <h3 className="text-xs font-mono font-bold text-center text-white mb-3 tracking-widest uppercase">Dai Vita al Tuo Progetto</h3>
-                                <div className="space-y-3">
-                                  <div>
-                                    <label className="block text-[8px] font-mono text-zinc-500 mb-1 uppercase tracking-widest">Servizio Richiesto</label>
-                                    <select disabled className="w-full bg-zinc-900 border border-zinc-850 text-stone-200 text-[10px] py-1.5 px-3 rounded-lg">
-                                      <option>Photoshoot Commerciale Moda</option>
-                                      <option>Visual Identity & Logo Design</option>
-                                      <option>Campagna Pubblicitaria Instagram & TikTok</option>
-                                    </select>
-                                  </div>
-                                  <button disabled className="w-full bg-white text-black font-mono font-extrabold text-[10px] py-2 px-4 rounded uppercase tracking-wider">
-                                    Invia Briefing Creativo
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Site Footer */}
-                            <div className="bg-black text-zinc-500 py-10 px-8 text-center text-xs border-t border-zinc-900">
-                              <p className="font-mono text-white mb-2 uppercase tracking-wide">LUCE Studio Fotografico & Creativo</p>
-                              <p className="text-[10px] text-zinc-600">San Frediano, 50124 Firenze | Email: hello@lucestudio.it</p>
-                              <p className="text-[9px] text-zinc-700 mt-6">© {new Date().getFullYear()} LUCE Studio. Tutti i diritti riservati.</p>
-                            </div>
-                          </div>
-                        );
-                      default:
-                        return null;
-                    }
-                  };
-
-                  const handleMouseDown = (e: React.MouseEvent) => {
-                    if (e.button !== 0) return;
-                    setIsDragging(true);
-                    dragStartX.current = e.clientX;
-                    dragStartY.current = e.clientY;
-                    dragDirection.current = 'none';
-                  };
-
-                  const handleMouseMove = (e: React.MouseEvent) => {
-                    if (!isDragging) return;
-                    const deltaX = e.clientX - dragStartX.current;
-                    const deltaY = e.clientY - dragStartY.current;
-
-                    if (dragDirection.current === 'none') {
-                      if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
-                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                          dragDirection.current = 'horizontal';
-                        } else {
-                          dragDirection.current = 'vertical';
-                        }
+                {/* Main Cinematic 3D Deck Canvas */}
+                <div className="relative z-10 max-w-7xl mx-auto px-4 mt-8 flex flex-col items-center justify-center">
+                  <div 
+                    className="deck-scene relative w-full flex items-center justify-center"
+                    style={{ 
+                      height: isMobile ? '590px' : '560px',
+                    }}
+                    onMouseDown={(e) => {
+                      if (e.button === 0) {
+                        setIsDragging(true);
+                        dragStartX.current = e.clientX;
+                        setDragOffset(0);
                       }
-                    }
-
-                    if (dragDirection.current === 'horizontal') {
+                    }}
+                    onMouseMove={(e) => {
+                      if (!isDragging) return;
+                      const deltaX = e.clientX - dragStartX.current;
                       setDragOffset(deltaX);
-                    }
-                  };
-
-                  const handleMouseUp = () => {
-                    if (!isDragging) return;
-                    setIsDragging(false);
-
-                    if (dragDirection.current === 'horizontal') {
-                      const dragDegrees = dragOffset * 0.35;
-                      const cardChange = -Math.round(dragDegrees / angleStep);
-                      if (Math.abs(cardChange) >= 1) {
-                        let nextIndex = (activeMockup + cardChange) % N;
-                        if (nextIndex < 0) nextIndex += N;
-                        setActiveMockup(nextIndex);
+                    }}
+                    onMouseUp={() => {
+                      if (!isDragging) return;
+                      setIsDragging(false);
+                      const threshold = 60;
+                      if (dragOffset > threshold) {
+                        setActiveMockup((prev) => (prev - 1 + N) % N);
+                      } else if (dragOffset < -threshold) {
+                        setActiveMockup((prev) => (prev + 1) % N);
                       }
-                    }
-                    setDragOffset(0);
-                    dragDirection.current = 'none';
-                  };
-
-                  const handleTouchStart = (e: React.TouchEvent) => {
-                    setIsDragging(true);
-                    dragStartX.current = e.touches[0].clientX;
-                    dragStartY.current = e.touches[0].clientY;
-                    dragDirection.current = 'none';
-                  };
-
-                  const handleTouchMove = (e: React.TouchEvent) => {
-                    if (!isDragging) return;
-                    const deltaX = e.touches[0].clientX - dragStartX.current;
-                    const deltaY = e.touches[0].clientY - dragStartY.current;
-
-                    if (dragDirection.current === 'none') {
-                      if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
-                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                          dragDirection.current = 'horizontal';
-                        } else {
-                          dragDirection.current = 'vertical';
-                        }
+                      setDragOffset(0);
+                    }}
+                    onMouseLeave={() => {
+                      if (isDragging) {
+                        setIsDragging(false);
+                        setDragOffset(0);
                       }
-                    }
-
-                    if (dragDirection.current === 'horizontal') {
-                      if (e.cancelable) e.preventDefault();
+                    }}
+                    onTouchStart={(e) => {
+                      setIsDragging(true);
+                      dragStartX.current = e.touches[0].clientX;
+                      setDragOffset(0);
+                    }}
+                    onTouchMove={(e) => {
+                      if (!isDragging) return;
+                      const deltaX = e.touches[0].clientX - dragStartX.current;
                       setDragOffset(deltaX);
-                    }
-                  };
+                    }}
+                    onTouchEnd={() => {
+                      if (!isDragging) return;
+                      setIsDragging(false);
+                      const threshold = 60;
+                      if (dragOffset > threshold) {
+                        setActiveMockup((prev) => (prev - 1 + N) % N);
+                      } else if (dragOffset < -threshold) {
+                        setActiveMockup((prev) => (prev + 1) % N);
+                      }
+                      setDragOffset(0);
+                    }}
+                  >
+                    {/* Floating navigation arrows */}
+                    {!isMobile && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMockup((prev) => (prev - 1 + N) % N);
+                          }}
+                          className="absolute left-4 lg:left-8 z-45 p-3 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800 hover:border-white/20 transition-all duration-200 shadow-xl shadow-black/40 cursor-pointer hover:scale-110 active:scale-95"
+                          title="Progetto Precedente"
+                        >
+                          <ChevronLeft className="h-6 w-6" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMockup((prev) => (prev + 1) % N);
+                          }}
+                          className="absolute right-4 lg:right-8 z-45 p-3 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/5 text-slate-400 hover:text-white hover:bg-slate-800 hover:border-white/20 transition-all duration-200 shadow-xl shadow-black/40 cursor-pointer hover:scale-110 active:scale-95"
+                          title="Progetto Successivo"
+                        >
+                          <ChevronRight className="h-6 w-6" />
+                        </button>
+                      </>
+                    )}
 
-                  const handleTouchEnd = () => {
-                    if (!isDragging) return;
-                    setIsDragging(false);
+                    {/* Rendering the Deck cards */}
+                    {activeShowcases.map((tab: any, idx: number) => {
+                      const isActive = idx === activeMockup;
+                      
+                      // 3D placement math
+                      let diff = idx - activeMockup;
+                      if (diff < -N / 2) diff += N;
+                      if (diff > N / 2) diff -= N;
 
-                    if (dragDirection.current === 'horizontal') {
-                      const dragDegrees = dragOffset * 0.35;
-                      const cardChange = -Math.round(dragDegrees / angleStep);
-                      let nextIndex = (activeMockup + cardChange) % N;
-                      if (nextIndex < 0) nextIndex += N;
-                      setActiveMockup(nextIndex);
-                    }
-                    setDragOffset(0);
-                    dragDirection.current = 'none';
-                  };
+                      // Styles calculation
+                      let transformStyle = "";
+                      let opacity = 0;
+                      let zIndex = 10;
+                      let pointerEvents: "auto" | "none" = "none";
+                      let filter = "none";
 
-                  if (simulatorViewMode === 'explorer') {
-                    return (
-                      <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 mt-8">
-                        {/* Simulated Browser/Handset Frame */}
-                        <div 
-                          className={`mx-auto bg-slate-950 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col ${
-                            explorerDeviceMode === 'mobile' || windowWidth < 768
-                              ? 'max-w-[340px] h-[580px] border-[10px] border-slate-800 rounded-[36px] ring-4 ring-slate-900/40 relative' // Phone handset look
-                              : 'w-full h-[640px]' // Wide desktop browser look
+                      const scrollTiltX = scrollRatio * 14; 
+                      const scrollTranslateY = scrollRatio * -25; 
+                      const scrollScale = 1 - (Math.abs(scrollRatio) * 0.06);
+
+                      if (isActive) {
+                        zIndex = 30;
+                        opacity = 1;
+                        pointerEvents = "auto";
+                        transformStyle = `perspective(1200px) rotateX(${scrollTiltX + mouseTilt.y}deg) rotateY(${mouseTilt.x}deg) translateY(${scrollTranslateY}px) scale(${scrollScale})`;
+                      } else if (diff === -1) {
+                        zIndex = 20;
+                        opacity = isMobile ? 0.12 : 0.45;
+                        filter = "blur(1.5px) brightness(0.45)";
+                        const xOffset = isMobile ? "-140px" : "-380px";
+                        const zOffset = isMobile ? "-120px" : "-240px";
+                        const yRotation = isMobile ? "14deg" : "22deg";
+                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(0.8)`;
+                      } else if (diff === 1) {
+                        zIndex = 20;
+                        opacity = isMobile ? 0.12 : 0.45;
+                        filter = "blur(1.5px) brightness(0.45)";
+                        const xOffset = isMobile ? "140px" : "380px";
+                        const zOffset = isMobile ? "-120px" : "-240px";
+                        const yRotation = isMobile ? "-14deg" : "-22deg";
+                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(0.8)`;
+                      } else {
+                        zIndex = 10;
+                        opacity = 0;
+                        transformStyle = `perspective(1200px) translateZ(-400px) scale(0.6)`;
+                      }
+
+                      // Card width/height morph animation parameters based on desktop/mobile view toggle
+                      const isPhoneFrame = explorerDeviceMode === 'mobile' || isMobile;
+                      const cardWidth = isPhoneFrame ? '335px' : '720px';
+                      const cardHeight = isPhoneFrame ? '550px' : '480px';
+
+                      return (
+                        <div
+                          key={tab.id}
+                          onClick={() => {
+                            if (!isActive) {
+                              setActiveMockup(idx);
+                            }
+                          }}
+                          className={`deck-card bg-slate-950 border border-white/5 flex flex-col ${
+                            isActive ? "deck-card-active" : "deck-card-background"
                           }`}
                           style={{
-                            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85)'
+                            width: cardWidth,
+                            height: cardHeight,
+                            transform: transformStyle,
+                            opacity: opacity,
+                            filter: filter,
+                            pointerEvents: pointerEvents,
+                            cursor: isActive ? 'auto' : 'pointer',
                           }}
+                          onMouseMove={isActive ? (e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const nX = (x / rect.width) * 2 - 1;
+                            const nY = (y / rect.height) * 2 - 1;
+                            setMouseTilt({ x: nX * 7, y: -nY * 7 });
+                          } : undefined}
+                          onMouseLeave={isActive ? () => setMouseTilt({ x: 0, y: 0 }) : undefined}
                         >
-                          {/* Top Speaker Notch for Mobile frame */}
-                          {(explorerDeviceMode === 'mobile' || windowWidth < 768) && (
-                            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-800 rounded-b-xl z-50 flex items-center justify-center">
-                              <div className="w-12 h-1 bg-slate-900 rounded-full" />
-                            </div>
-                          )}
-
-                          {/* Browser/Device Header Bar */}
-                          <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 select-none pt-4 sm:pt-3">
-                            {/* Window Dots (Hidden in mobile portrait frame for a cleaner phone look) */}
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                              <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-                            </div>
-
-                            {/* URL Address Bar */}
-                            <div className="bg-slate-950 px-2 py-1.5 rounded-lg border border-slate-850 font-mono text-center text-[10px] sm:text-xs text-slate-300 flex-1 max-w-md mx-3 truncate flex items-center justify-center gap-1.5 shadow-inner">
-                              <span className="text-[8px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-900/50 px-1 py-0.2 rounded shrink-0 leading-none scale-90">HTTPS</span>
-                              <span className="truncate text-slate-400">
-                                {`https://www.demo-ia.it/preview-${activeMockup + 1}`}
-                              </span>
-                            </div>
-
-                            {/* Live Badge */}
-                            <span className="bg-emerald-500/10 text-emerald-400 text-[8px] sm:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-emerald-500/20 shadow-sm shrink-0 flex items-center gap-1 scale-90 sm:scale-100">
-                              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                              LIVE
-                            </span>
-                          </div>
-
-                          {/* Simulated Site Content Area */}
-                          <div className="bg-white text-slate-800 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y custom-scrollbar select-text text-left">
-                            {activeShowcaseItem.custom_html || activeShowcaseItem.url || activeShowcaseItem.builtinIndex === undefined ? (
-                              <div className="w-full h-full bg-white relative">
-                                {activeShowcaseItem.custom_html ? (
-                                  <iframe
-                                    srcDoc={activeShowcaseItem.custom_html}
-                                    className="w-full h-full border-0 bg-white"
-                                    title={activeShowcaseItem.title}
-                                    sandbox="allow-scripts allow-same-origin"
-                                  />
-                                ) : (
-                                  <iframe
-                                    src={activeShowcaseItem.url}
-                                    className="w-full h-full border-0 bg-white"
-                                    title={activeShowcaseItem.title}
-                                    sandbox="allow-scripts allow-same-origin"
-                                  />
-                                )}
+                          {isPhoneFrame ? (
+                            /* HIGH-FIDELITY SMARTPHONE HANDSET FRAME (iPhone 16 look) */
+                            <div className="w-full h-full flex flex-col bg-slate-900 overflow-hidden relative border-4 border-slate-800 rounded-[36px] shadow-2xl">
+                              {/* Notch / Dynamic Island speaker */}
+                              <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-50 flex items-center justify-center gap-1">
+                                <div className="w-12 h-1 bg-zinc-900 rounded-full" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-950/80" />
                               </div>
-                            ) : (
-                              renderMockupContent(activeShowcaseItem.builtinIndex)
-                            )}
-                          </div>
-                        </div>
 
-                        {/* Quick Navigation Footer for Explorer View */}
-                        <div className="flex items-center justify-between mt-6 max-w-md mx-auto bg-slate-950 border border-slate-800 px-5 py-3 rounded-2xl shadow-xl">
-                          <button
-                            onClick={() => {
-                              setActiveMockup((prev) => (prev - 1 + N) % N);
-                            }}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-900 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
-                            title="Sito Precedente"
-                          >
-                            <ChevronLeft className="h-5 w-5" />
-                          </button>
-                          <div className="text-center">
-                            <div className="text-xs font-black text-white uppercase tracking-widest font-mono">
-                              SITO {activeMockup + 1} DI {N}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setActiveMockup((prev) => (prev + 1) % N);
-                            }}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-900 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
-                            title="Sito Successivo"
-                          >
-                            <ChevronRight className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // Otherwise render original Carousel 3D, optimized
-                  return (
-                    <div 
-                      className="scene-3d select-none my-12"
-                      style={{ height: `${cardHeight + 60}px` }}
-                      onMouseDown={handleMouseDown}
-                      onMouseMove={handleMouseMove}
-                      onMouseUp={handleMouseUp}
-                      onMouseLeave={handleMouseUp}
-                      onTouchStart={handleTouchStart}
-                      onTouchMove={handleTouchMove}
-                      onTouchEnd={handleTouchEnd}
-                    >
-
-
-                      {/* 3D CAROUSEL CONTAINER */}
-                      <div 
-                        className="a3d-carousel"
-                        style={{
-                          width: `${cardWidth}px`,
-                          height: `${cardHeight}px`,
-                          transform: `rotateY(${currentRotation}deg)`,
-                        }}
-                      >
-                        {activeShowcases.map((tab: any, idx: number) => {
-                          const isActive = idx === activeMockup;
-                          const cardAngle = idx * angleStep;
-
-                          return (
-                            <div
-                              key={tab.id}
-                              onClick={() => {
-                                if (!isActive) {
-                                  setActiveMockup(idx);
-                                }
-                              }}
-                              className={`card-3d bg-slate-950 border border-slate-800 flex flex-col ${
-                                isActive ? "card-3d-active" : "card-3d-background"
-                              }`}
-                              style={{
-                                width: `${cardWidth}px`,
-                                height: `${cardHeight}px`,
-                                transform: `rotateY(${cardAngle}deg) translateZ(${radius}px) scale(${isActive ? 1.0 : 0.88})`,
-                                opacity: isActive ? 1.0 : isMobile ? 0.05 : 0.4,
-                                pointerEvents: isActive ? 'auto' : 'none',
-                                cursor: isActive ? 'auto' : 'pointer'
-                              }}
-                            >
-                              {/* Browser Header Bar */}
-                              <div className="bg-slate-900 border-b border-slate-800 px-3 py-2.5 flex items-center justify-between shrink-0 select-none">
-                                <div className="flex items-center gap-1 shrink-0">
-                                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-80" />
-                                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 opacity-80" />
-                                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 opacity-80" />
-                                </div>
-                                {/* URL Bar */}
-                                <div className="bg-slate-950 px-2 py-1 rounded-md border border-slate-850/60 font-mono text-center text-[10px] text-slate-400 w-full max-w-[150px] sm:max-w-[180px] mx-2 truncate select-all flex items-center justify-center gap-1 shadow-inner">
-                                  <span className="text-emerald-500 text-[8px] uppercase font-bold tracking-widest px-1 py-0.2 bg-emerald-950 rounded border border-emerald-900/50 scale-90 shrink-0">SSL</span>
-                                  <span className="truncate">
-                                    {`https://www.demo-ia.it/preview-${idx + 1}`}
+                              {/* Top status bar indicators */}
+                              <div className="bg-slate-900 px-6 pt-3 pb-1 flex justify-between items-center text-[9px] font-mono text-zinc-400 select-none shrink-0 border-b border-white/5">
+                                <span>09:41</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span>5G</span>
+                                  <span className="w-3.5 h-1.5 bg-zinc-500 rounded-sm relative inline-block border border-zinc-600">
+                                    <span className="absolute top-0 left-0 bottom-0 bg-zinc-200 w-[80%] rounded-2xs" />
                                   </span>
                                 </div>
-                                <div className="text-[8px] text-slate-500 font-bold shrink-0 uppercase tracking-wider bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
-                                  IA LIVE
+                              </div>
+
+                              {/* Unbranded Sleek Address/Title bar */}
+                              <div className="bg-slate-900 border-b border-white/5 py-2 px-3 flex items-center justify-center shrink-0 select-none">
+                                <div className="bg-slate-950/90 border border-white/5 px-2.5 py-1 rounded-xl font-mono text-[9px] text-slate-400 flex items-center justify-center gap-1.5 w-full max-w-[210px] shadow-inner">
+                                  <span className="text-emerald-500 text-[8px] uppercase font-bold tracking-widest px-1 py-0.2 bg-emerald-950/80 rounded border border-emerald-900/50 scale-90 shrink-0 leading-none">SSL</span>
+                                  <span className="truncate tracking-wide text-slate-450">ai-sandbox.io/preview</span>
                                 </div>
                               </div>
 
-                              {/* Simulated Website Viewport with vertical scrollbar */}
+                              {/* Scrollable Website Frame */}
                               <div 
-                                className="relative bg-white text-slate-800 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y custom-scrollbar select-text"
+                                className="relative bg-white text-slate-850 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y select-text custom-scrollbar"
                                 style={{ scrollbarWidth: 'thin' }}
                               >
                                 {tab.custom_html || tab.url || tab.builtinIndex === undefined ? (
                                   <div className={`w-full h-full bg-white relative ${!isActive ? 'pointer-events-none' : ''}`}>
                                     {tab.custom_html ? (
                                       <iframe
-                                        srcDoc={tab.custom_html}
+                                        srcDoc={getFormattedHtml(tab.custom_html)}
                                         className="w-full h-full border-0 bg-white"
                                         title={tab.title}
                                         sandbox="allow-scripts allow-same-origin"
@@ -1750,21 +1369,93 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                 )}
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })()}
+                          ) : (
+                            /* HIGH-FIDELITY BROWSER FRAME (Safari macOS Look) */
+                            <div className="w-full h-full flex flex-col bg-slate-900 overflow-hidden border border-white/5 rounded-2xl shadow-2xl">
+                              {/* Window Dots & Navigation Bar */}
+                              <div className="bg-slate-900 border-b border-white/5 px-4 py-3 flex items-center justify-between shrink-0 select-none">
+                                {/* Window dots */}
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 shadow-md" />
+                                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 shadow-md" />
+                                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 shadow-md" />
+                                </div>
 
-                <div className="text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1 select-none pointer-events-none mt-4">
-                  <span className="font-mono text-slate-400">💡 Gestione Multitasking Sinergica:</span>
-                  <span>Trascina per far ruotare il carosello 3D • Scorri in verticale per leggere il sito attivo</span>
+                                {/* Completely unbranded generic URL Bar */}
+                                <div className="bg-slate-950/90 px-3 py-1.5 rounded-xl border border-white/5 font-mono text-center text-[11px] text-slate-400 flex-1 max-w-[360px] mx-4 truncate flex items-center justify-center gap-2 shadow-inner">
+                                  <span className="text-[8px] uppercase font-bold tracking-widest text-emerald-400 bg-emerald-950/80 border border-emerald-900/50 px-1 py-0.2 rounded shrink-0 leading-none scale-90">SSL ATTIVO</span>
+                                  <span className="truncate text-slate-450 tracking-wide">https://ai-generated.site/active-demo</span>
+                                </div>
+
+                                {/* Active status badge */}
+                                <span className="bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-emerald-500/20 shadow-sm shrink-0 flex items-center gap-1">
+                                  <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                  IA LIVE
+                                </span>
+                              </div>
+
+                              {/* Scrollable Website Frame */}
+                              <div 
+                                className="relative bg-white text-slate-800 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y select-text custom-scrollbar"
+                                style={{ scrollbarWidth: 'thin' }}
+                              >
+                                {tab.custom_html || tab.url || tab.builtinIndex === undefined ? (
+                                  <div className="w-full h-full bg-white relative">
+                                    {tab.custom_html ? (
+                                      <iframe
+                                        srcDoc={getFormattedHtml(tab.custom_html)}
+                                        className="w-full h-full border-0 bg-white"
+                                        title={tab.title}
+                                        sandbox="allow-scripts allow-same-origin"
+                                      />
+                                    ) : (
+                                      <iframe
+                                        src={tab.url}
+                                        className="w-full h-full border-0 bg-white"
+                                        title={tab.title}
+                                        sandbox="allow-scripts allow-same-origin"
+                                      />
+                                    )}
+                                  </div>
+                                ) : (
+                                  renderMockupContent(tab.builtinIndex)
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Elegant fluid liquid-pill progress dots navigation */}
+                <div className="flex justify-center items-center gap-2.5 mt-4 relative z-10 select-none">
+                  {activeShowcases.map((_, idx) => {
+                    const isActive = idx === activeMockup;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveMockup(idx)}
+                        className={`h-2.5 rounded-full transition-all duration-500 ease-out cursor-pointer ${
+                          isActive 
+                            ? 'w-9 bg-brand-500 shadow-[0_0_10px_#3b82f6] shadow-brand-500/50' 
+                            : 'w-2.5 bg-slate-800 hover:bg-slate-700'
+                        }`}
+                        title={`Sito template ${idx + 1}`}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Micro-instructions footer with mono styling */}
+                <div className="text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1 select-none pointer-events-none mt-6 relative z-10">
+                  <span className="font-mono text-slate-400">💡 Gestione Interazione Tridimensionale:</span>
+                  <span>Trascina con il cursore per far scorrere • Usa lo scroll della rotellina all'interno del sito attivo</span>
                 </div>
               </div>
-          {/* FINAL BOTTOM CARD CALL TO ACTION */}
 
-          {/* FINAL BOTTOM CARD CALL TO ACTION */}
+              {/* FINAL BOTTOM CARD CALL TO ACTION */}
           <div className="bg-slate-950 text-white rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl border border-slate-800">
             <div className="absolute inset-0 bg-radial-gradient(ellipse_at_center,_var(--tw-gradient-stops)) from-brand-600/10 via-transparent to-transparent pointer-events-none"></div>
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
@@ -1773,8 +1464,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
               <p className="text-slate-405 text-sm leading-relaxed max-w-lg mx-auto">Non rimandare la crescita personale. Entra ora nell'Academy e padroneggia le tecnologie di domani con i massimi esperti del settore.</p>
               
               <div className="flex items-center justify-center gap-3 py-2">
-                <span className="text-slate-500 line-through text-lg">€{course.price}</span>
-                <span className="text-4xl font-black text-brand-400">€{finalPrice}</span>
+                <span className="text-slate-500 line-through text-lg">€{isPrice27 ? 97 : (course.discounted_price && course.discounted_price > 0 ? course.price : Math.round(course.price * 2.5))}</span>
+                <span className="text-4xl font-black text-brand-400">€{isPrice27 ? 27 : finalPrice}</span>
               </div>
 
               {isPurchasable ? (
@@ -1806,14 +1497,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
           {/* TIMELINE PROCESSO D'ELITE CON ANIMAZIONI 3D */}
           <div className="my-24">
             <div className="text-center max-w-3xl mx-auto mb-16 px-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-100/80 text-brand-850 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
-                <Sparkles className="h-3.5 w-3.5 text-brand-650 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/10 text-brand-400 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-brand-500/20 select-none">
+                <Sparkles className="h-3.5 w-3.5 text-brand-400 animate-pulse" />
                 Dall'Iscrizione all'Onboarding: Flusso Automatizzato
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 Come Funziona l'Iscrizione ed il Tuo Onboarding
               </h2>
-              <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-slate-400 mt-4 max-w-2xl mx-auto font-normal leading-relaxed">
                 Un processo impeccabile e automatizzato al millisecondo per iniziare a formarti e fare level-up senza barriere.
               </p>
             </div>
@@ -1986,22 +1677,22 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                                             <Sparkles className="h-3 w-3 mr-1" /> Offerta Fedeltà Attiva
                                         </div>
                                         <div className="flex items-end">
-                                            <span className="text-4xl font-bold text-purple-600">€{finalPrice}</span>
-                                            <span className="text-gray-400 ml-2 mb-1 line-through text-lg">€{course.price}</span>
+                                            <span className="text-4xl font-bold text-purple-600">€{isPrice27 ? 27 : finalPrice}</span>
+                                            <span className="text-gray-400 ml-2 mb-1 line-through text-lg">€{isPrice27 ? 97 : course.price}</span>
                                             {course.show_discount_badge !== false && (
                                                 <span className="ml-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
-                                                    -{Math.round(((course.price - course.discounted_price!) / course.price) * 100)}%
+                                                    -{isPrice27 ? 72 : Math.round(((course.price - course.discounted_price!) / course.price) * 100)}%
                                                 </span>
                                             )}
                                         </div>
                                     </>
                                 ) : (
                                     <div className="flex items-end">
-                                        <span className="text-4xl font-bold text-gray-900">€{course.price}</span>
-                                        <span className="text-gray-400 ml-2 mb-1 line-through">€{course.price * 1.5}</span>
+                                        <span className="text-4xl font-bold text-gray-900">€{isPrice27 ? 27 : course.price}</span>
+                                        <span className="text-gray-400 ml-2 mb-1 line-through">€{isPrice27 ? 97 : course.price * 1.5}</span>
                                         {course.show_discount_badge !== false && (
                                             <span className="ml-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">
-                                                -33%
+                                                -{isPrice27 ? 72 : 33}%
                                             </span>
                                         )}
                                     </div>
