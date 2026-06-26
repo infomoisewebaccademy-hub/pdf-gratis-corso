@@ -1148,7 +1148,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                 </div>
 
                 {/* Main Cinematic 3D Deck Canvas */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 mt-8 flex flex-col items-center justify-center">
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-0 md:px-4 mt-8 flex flex-col items-center justify-center overflow-hidden">
                   <div 
                     className="deck-scene relative w-full flex items-center justify-center"
                     style={{ 
@@ -1158,6 +1158,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       if (e.button === 0) {
                         setIsDragging(true);
                         dragStartX.current = e.clientX;
+                        dragStartY.current = e.clientY;
+                        dragDirection.current = 'horizontal';
                         setDragOffset(0);
                       }
                     }}
@@ -1176,25 +1178,45 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         setActiveMockup((prev) => (prev + 1) % N);
                       }
                       setDragOffset(0);
+                      dragDirection.current = 'none';
                     }}
                     onMouseLeave={() => {
                       if (isDragging) {
                         setIsDragging(false);
                         setDragOffset(0);
+                        dragDirection.current = 'none';
                       }
                     }}
                     onTouchStart={(e) => {
                       setIsDragging(true);
                       dragStartX.current = e.touches[0].clientX;
+                      dragStartY.current = e.touches[0].clientY;
+                      dragDirection.current = 'none';
                       setDragOffset(0);
                     }}
                     onTouchMove={(e) => {
                       if (!isDragging) return;
                       const deltaX = e.touches[0].clientX - dragStartX.current;
-                      setDragOffset(deltaX);
+                      const deltaY = e.touches[0].clientY - dragStartY.current;
+                      
+                      if (dragDirection.current === 'none') {
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+                          dragDirection.current = 'horizontal';
+                        } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 8) {
+                          dragDirection.current = 'vertical';
+                          setIsDragging(false);
+                        }
+                      }
+                      
+                      if (dragDirection.current === 'horizontal') {
+                        if (e.cancelable) {
+                          e.preventDefault();
+                        }
+                        setDragOffset(deltaX);
+                      }
                     }}
                     onTouchEnd={() => {
-                      if (!isDragging) return;
+                      if (!isDragging && dragDirection.current !== 'horizontal') return;
                       setIsDragging(false);
                       const threshold = 60;
                       if (dragOffset > threshold) {
@@ -1203,6 +1225,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                         setActiveMockup((prev) => (prev + 1) % N);
                       }
                       setDragOffset(0);
+                      dragDirection.current = 'none';
                     }}
                   >
                     {/* Floating navigation arrows */}
@@ -1251,27 +1274,34 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                       const scrollTranslateY = scrollRatio * -25; 
                       const scrollScale = 1 - (Math.abs(scrollRatio) * 0.06);
 
+                      const currentDragX = dragOffset;
+
                       if (isActive) {
                         zIndex = 30;
                         opacity = 1;
                         pointerEvents = "auto";
-                        transformStyle = `perspective(1200px) rotateX(${scrollTiltX + mouseTilt.y}deg) rotateY(${mouseTilt.x}deg) translateY(${scrollTranslateY}px) scale(${scrollScale})`;
+                        const dragRotationY = currentDragX * -0.06;
+                        transformStyle = `perspective(1200px) translateX(${currentDragX}px) rotateX(${scrollTiltX + mouseTilt.y}deg) rotateY(${mouseTilt.x + dragRotationY}deg) translateY(${scrollTranslateY}px) scale(${scrollScale})`;
                       } else if (diff === -1) {
                         zIndex = 20;
-                        opacity = isMobile ? 0.12 : 0.45;
+                        opacity = isMobile ? 0.25 : 0.45;
                         filter = "blur(1.5px) brightness(0.45)";
-                        const xOffset = isMobile ? "-140px" : "-380px";
+                        const baseOffsetVal = isMobile ? -140 : -380;
+                        const xOffset = `${baseOffsetVal + currentDragX}px`;
                         const zOffset = isMobile ? "-120px" : "-240px";
-                        const yRotation = isMobile ? "14deg" : "22deg";
-                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(0.8)`;
+                        const baseRotVal = isMobile ? 14 : 22;
+                        const yRotation = `${baseRotVal - (currentDragX * 0.05)}deg`;
+                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(${isMobile ? 0.68 : 0.8})`;
                       } else if (diff === 1) {
                         zIndex = 20;
-                        opacity = isMobile ? 0.12 : 0.45;
+                        opacity = isMobile ? 0.25 : 0.45;
                         filter = "blur(1.5px) brightness(0.45)";
-                        const xOffset = isMobile ? "140px" : "380px";
+                        const baseOffsetVal = isMobile ? 140 : 380;
+                        const xOffset = `${baseOffsetVal + currentDragX}px`;
                         const zOffset = isMobile ? "-120px" : "-240px";
-                        const yRotation = isMobile ? "-14deg" : "-22deg";
-                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(0.8)`;
+                        const baseRotVal = isMobile ? -14 : -22;
+                        const yRotation = `${baseRotVal - (currentDragX * 0.05)}deg`;
+                        transformStyle = `perspective(1200px) translateX(${xOffset}) translateZ(${zOffset}) rotateX(${scrollTiltX}deg) rotateY(${yRotation}) translateY(${scrollTranslateY}px) scale(${isMobile ? 0.68 : 0.8})`;
                       } else {
                         zIndex = 10;
                         opacity = 0;
@@ -1280,8 +1310,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
 
                       // Card width/height morph animation parameters based on desktop/mobile view toggle
                       const isPhoneFrame = explorerDeviceMode === 'mobile' || isMobile;
-                      const cardWidth = isPhoneFrame ? '335px' : '720px';
-                      const cardHeight = isPhoneFrame ? '550px' : '480px';
+                      const mobileCardWidth = Math.min(windowWidth - 24, 340);
+                      const cardWidth = isPhoneFrame ? (isMobile ? `${mobileCardWidth}px` : '335px') : '720px';
+                      const cardHeight = isPhoneFrame ? (isMobile ? '520px' : '550px') : '480px';
 
                       return (
                         <div
@@ -1302,6 +1333,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onPurchase, 
                             filter: filter,
                             pointerEvents: pointerEvents,
                             cursor: isActive ? 'auto' : 'pointer',
+                            transition: isDragging ? 'none' : undefined,
                           }}
                           onMouseMove={isActive ? (e) => {
                             const rect = e.currentTarget.getBoundingClientRect();
